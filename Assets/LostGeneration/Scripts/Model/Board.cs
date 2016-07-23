@@ -4,166 +4,194 @@ using System.Collections.ObjectModel;
 
 namespace LostGen {
     public class Board {
-        public class Entity {
-            protected Board _board;
-            protected List<Point> _footprint;
-            public ReadOnlyCollection<Point> Footprint
-            {
-                get
-                {
-                    return _footprint.AsReadOnly();
-                }
-            }
-            public Point Position;
+    	public const int WALL_TILE = 0;
+    	public const int FLOOR_TILE = 1;
 
-            public bool IsSolid;
-
-            public Entity(Board board, Point position, IEnumerable<Point> footprint = null, bool isSolid = false) {
-                if (board == null) {
-                    throw new ArgumentNullException("board");
-                }
-
-                if (footprint == null) {
-                    _footprint = new List<Point>();
-                } else {
-                    _footprint = new List<Point>(footprint);
-                }
-
-                if (_footprint.Count == 0) {
-                    _footprint.Add(Point.Zero);
-                }
-
-                _board = board;
-                Position = position;
-                IsSolid = isSolid;
-            }
-
-            public virtual void OnCollisionEnter(Entity other) { }
-            public virtual void OnCollisionStay(Entity other) { }
-            public virtual void OnCollisionExit(Entity other) { }
+    	private int[,] _tiles;
+        public int Width {
+        	get { return _tiles.GetLength(1); }
         }
 
-        public int Width;
-        public int Height;
+        public int Height {
+        	get { return _tiles.GetLength(0); }
+        }
+        
+        private Dictionary<Point, HashSet<Pawn>> _pawnBuckets = new Dictionary<Point, HashSet<Pawn>>();
+        private Dictionary<Pawn, HashSet<Pawn>> _collisions = new Dictionary<Pawn, HashSet<Pawn>>();
 
-        private Dictionary<Point, HashSet<Entity>> _entityBuckets = new Dictionary<Point, HashSet<Entity>>();
-        private Dictionary<Entity, HashSet<Entity>> _collisions = new Dictionary<Entity, HashSet<Entity>>();
-
-        public Board(int width, int height) {
-            Width = width;
-            Height = height;
+        public Board(int[,] tiles) {
+            _tiles = new int[tiles.GetLength(0), tiles.GetLength(1)];
+            Array.Copy(tiles, 0, _tiles, 0, tiles.Length);
         }
 
-        public IEnumerable<Entity> CollisionsAt(Point point) {
-            HashSet<Entity> entities;
-
-            _entityBuckets.TryGetValue(point, out entities);
-
-            return entities;
+        public int GetTile(int x, int y) {
+        	return _tiles[y, x];
         }
 
-        private HashSet<Entity> GetBucket(Point position) {
-            HashSet<Entity> bucket;
-            _entityBuckets.TryGetValue(position, out bucket);
+        public int GetTile(Point point) {
+            return _tiles[point.Y, point.X];
+        }
+
+        public bool InBounds(Point point) {
+            return point.X >= 0 && point.X < Width &&
+                   point.Y >= 0 && point.Y < Height;
+        }
+
+        public IEnumerator<Pawn> GetPawnIterator() {
+            return _collisions.Keys.GetEnumerator();
+        }
+
+        public IEnumerable<Pawn> CollisionsAt(Point point) {
+            HashSet<Pawn> pawns;
+
+            _pawnBuckets.TryGetValue(point, out pawns);
+
+            return pawns;
+        }
+
+        private HashSet<Pawn> GetBucket(Point position) {
+            HashSet<Pawn> bucket;
+            _pawnBuckets.TryGetValue(position, out bucket);
 
             if (bucket == null) {
-                bucket = new HashSet<Entity>();
-                _entityBuckets.Add(position, bucket);
+                bucket = new HashSet<Pawn>();
+                _pawnBuckets.Add(position, bucket);
             }
 
             return bucket;
         }
 
-        public bool AddEntity(Entity entity) {
+        public bool AddPawn(Pawn pawn) {
             bool successful = true;
 
-            if (entity != null && !_collisions.ContainsKey(entity)) {
-                foreach (Point point in entity.Footprint) {
-                    HashSet<Entity> bucket = GetBucket(entity.Position + point);
-                    successful &= bucket.Add(entity);
+            if (pawn != null && !_collisions.ContainsKey(pawn)) {
+                foreach (Point point in pawn.Footprint) {
+                    HashSet<Pawn> bucket = GetBucket(pawn.Position + point);
+                    successful &= bucket.Add(pawn);
                 }
-                _collisions.Add(entity, new HashSet<Entity>());
+                _collisions.Add(pawn, new HashSet<Pawn>());
             }
 
             return successful;
         }
 
-        public Point SetEntityPosition(Entity entity, Point newPosition) {
-            List<HashSet<Entity>> toRemove = new List<HashSet<Entity>>();
-            List<HashSet<Entity>> toAdd = new List<HashSet<Entity>>();
+        // FUCK: what happens when an pawn stays still
+        // Try keeping collision logic independent from steps? no thats retarded
+        public bool SetPawnPosition(Pawn pawn, Point newPosition) {
+            bool moved = false;
 
-            HashSet<Entity> enterCollisions = new HashSet<Entity>();
-            HashSet<Entity> exitCollisions = new HashSet<Entity>();
+            List<HashSet<Pawn>> toRemove = new List<HashSet<Pawn>>();
+            List<HashSet<Pawn>> toAdd = new List<HashSet<Pawn>>();
 
-            Point point;
+            HashSet<Pawn> enterCollisions = new HashSet<Pawn>();
+            HashSet<Pawn> exitCollisions = new HashSet<Pawn>();
 
-            // Gather all entities that were in the original and new position's footprint
-            foreach (Point offset in entity.Footprint) {
-                HashSet<Entity> oldBucket;
-                HashSet<Entity> newBucket;
+            Point oldPoint;
+            Point newPoint;
+            bool walled = false;
 
-                point = entity.Position + offset;
+            // Gather all pawns that were in the original and new position's footprint
+            foreach (Point offset in pawn.Footprint) {
+                HashSet<Pawn> oldBucket;
+                HashSet<Pawn> newBucket;
 
-                // Add all entities in the current bucket to the exit collision set
-                _entityBuckets.TryGetValue(point, out oldBucket);
-                if (oldBucket != null && oldBucket.Contains(entity)) {
+                oldPoint = pawn.Position + offset;
+                newPoint = newPosition + offset;
+
+                // Check if there's a wall at the new point.  If so, early out.
+                if (pawn.IsSolid) {
+                    if (InBounds(newPoint) && GetTile(newPoint) == WALL_TILE) {
+                        return false;
+                    }
+                }
+
+                // Add all pawns in the current bucket to the exit collision set
+                _pawnBuckets.TryGetValue(oldPoint, out oldBucket);
+                if (oldBucket != null && oldBucket.Contains(pawn)) {
                     exitCollisions.UnionWith(oldBucket);
                     toRemove.Add(oldBucket);
                 }
 
-                // Add all entities in the new position to the enter set
-                newBucket = GetBucket(newPosition + entity.Position);
+                // Add all pawns in the new position to the enter set
+                newBucket = GetBucket(newPosition + pawn.Position);
                 enterCollisions.UnionWith(newBucket);
                 toAdd.Add(newBucket);
             }
 
-            // If the entity is solid, and any of the entering collision entities are solid, don't allow the move
+            // If the pawn is solid, and any of the entering collision pawns are solid, don't allow the move
             bool willMove = true;
-            if (entity.IsSolid) {
-                foreach (Entity other in enterCollisions) {
-                    if (other.IsSolid) {
-                        willMove = false;
-                        break;
-                    }
-                }
+            if (pawn.IsSolid) {
+            	if (walled) {
+            		willMove = false;
+            	} else {
+	                foreach (Pawn other in enterCollisions) {
+	                    if (other.IsSolid) {
+	                        willMove = false;
+	                        break;
+	                    }
+	                }
+	            }
             }
 
-            // Move the entity between buckets
+            // Move the pawn between buckets
             if (willMove) {
                 for (int i = 0; i < toRemove.Count; i++) {
-                    toRemove[i].Remove(entity);
+                    toRemove[i].Remove(pawn);
                 }
 
                 for (int i = 0; i < toAdd.Count; i++) {
-                    toAdd[i].Remove(entity);
+                    toAdd[i].Remove(pawn);
                 }
 
-                entity.Position = newPosition;
+                pawn.SetPositionInternal(newPosition);
+                moved = true;
             }
 
-            // The stay set consists of entities that are in both the exit and enter sets
-            HashSet<Entity> stayCollisions = new HashSet<Entity>(exitCollisions);
-            stayCollisions.IntersectWith(enterCollisions);
+            if (pawn.IsCollidable) {
+	            // The stay set consists of pawns that are in both the exit and enter sets
+	            HashSet<Pawn> stayCollisions = new HashSet<Pawn>(exitCollisions);
+	            stayCollisions.IntersectWith(enterCollisions);
 
-            // Remove the stay collisions from both the exit and enter sets
-            enterCollisions.ExceptWith(stayCollisions);
-            exitCollisions.ExceptWith(stayCollisions);
+	            // Remove the stay collisions from both the exit and enter sets
+	            enterCollisions.ExceptWith(stayCollisions);
+	            exitCollisions.ExceptWith(stayCollisions);
 
-            // Call the collision methods
-            foreach (Entity other in enterCollisions) {
-                entity.OnCollisionEnter(other);
-                other.OnCollisionEnter(entity);
-            }
+	            // Call the collision methods
+	            foreach (Pawn other in enterCollisions) {
+	            	if (other.IsCollidable) {
+		                pawn.OnCollisionEnter(other);
+		                other.OnCollisionEnter(pawn);
+		            }
+	            }
 
-            foreach (Entity other in stayCollisions) {
-                entity.OnCollisionStay(other);
-                other.OnCollisionStay(entity);
-            }
+	            foreach (Pawn other in stayCollisions) {
+	                if (other.IsCollidable) {
+	                	pawn.OnCollisionStay(other);
+	                	other.OnCollisionStay(pawn);
+	            	}
+	            }
 
-            foreach (Entity other in exitCollisions) {
-                entity.OnCollisionExit(other);
-                other.OnCollisionExit(entity);
-            }
+	            foreach (Pawn other in exitCollisions) {
+	                if (other.IsCollidable) {
+	                	pawn.OnCollisionExit(other);
+	                	other.OnCollisionExit(pawn);
+	            	}
+	            }
+	        }
+
+            return moved;
+        }
+
+        public void Step() {
+            foreach (Pawn pawn in _collisions.Keys) {
+        		pawn.Step();
+        	}
+        }
+
+        public void Turn() {
+        	foreach (Pawn pawn in _collisions.Keys) {
+        		pawn.Turn();
+        	}
         }
     }
 }
