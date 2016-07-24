@@ -3,8 +3,8 @@
         public Pawn Target { get; protected set; }
         public bool IsMessageSuppressed;
 
-        public Action(Pawn target) {
-            Target = target;
+        public Action(Pawn source) {
+            Target = source;
         }
 
         protected void SendMessage(MessageArgs message) {

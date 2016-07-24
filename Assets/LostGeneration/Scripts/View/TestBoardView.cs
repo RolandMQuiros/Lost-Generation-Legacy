@@ -18,6 +18,7 @@ public class TestBoardView : MonoBehaviour {
     public float Speed = 20f;
     public Vector2 DebugPosition;
     public int DebugActionCount;
+    public float DebugHorizontal, DebugVertical;
 
 	public void Awake() {
 		int[,] tiles = {
@@ -63,12 +64,13 @@ public class TestBoardView : MonoBehaviour {
 
         GameObject testPawnObj = GameObject.Instantiate(PawnPrefab, new Vector3((float)_testPawn.Position.X, 0f, (float)-_testPawn.Position.Y), Quaternion.identity) as GameObject;
         _testPawnXform = testPawnObj.transform;
+        Camera.main.transform.parent = _testPawnXform;
     }
 
     void Update() {
         if (!_isMoving) {
-            float vert = Input.GetAxis("Vertical");
-            float horz = Input.GetAxis("Horizontal");
+            float vert = Input.GetAxis("HardVertical");
+            float horz = Input.GetAxis("HardHorizontal");
 
             Point offset = Point.Zero;
             if (vert > 0f) {
@@ -84,17 +86,21 @@ public class TestBoardView : MonoBehaviour {
             }
 
             if (!offset.Equals(Point.Zero)) {
-                Move move = new Move(_testPawn, _testPawn.Position + offset);
+                Move move = new Move(_testPawn, _testPawn.Position + offset, true);
                 _testPawn.PushAction(move);
                 _board.Step();
             }
+
+            DebugHorizontal = horz;
+            DebugVertical = vert;
         } else {
             _time += Speed * Time.deltaTime;
-            if (_time > 2f) {
+            if (_time > 1f) {
                 _isMoving = false;
                 _time = 0f;
+                //_testPawnXform.position = _end;
             } else {
-                _testPawnXform.position = Vector3.Lerp(_start, _end, _time);
+                _testPawnXform.position = Vector3.Slerp(_start, _end, _time);
             }
         }
 

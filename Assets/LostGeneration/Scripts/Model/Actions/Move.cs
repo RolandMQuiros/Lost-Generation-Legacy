@@ -9,21 +9,25 @@ namespace LostGen.Actions {
             public Pawn Target;
             public Point From;
             public Point To;
+            public bool IsContinuous;
 
-            public Message(Pawn target, Point from, Point to) {
+            public Message(Pawn target, Point from, Point to, bool isContinuous) {
                 Target = target;
                 From = from;
                 To = to;
+                IsContinuous = isContinuous;
 
                 Text = Target.Name + " moved from " + From + " to " + To;
             }
         }
 
         private Point _destination;
+        private bool _isContinuous;
 
-        public Move(Pawn target, Point destination) 
+        public Move(Pawn target, Point destination, bool isContinuous) 
             : base(target) {
             _destination = destination;
+            _isContinuous = isContinuous;
         }
 
         public override void Run() {
@@ -31,7 +35,7 @@ namespace LostGen.Actions {
 
             if (Target.SetPosition(_destination)) {
                 SendMessage(
-                    new Message(Target, start, _destination)
+                    new Message(Target, start, _destination, _isContinuous)
                 );
             }
         }

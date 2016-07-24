@@ -15,9 +15,10 @@ namespace LostGen {
         public int Height {
         	get { return _tiles.GetLength(0); }
         }
-        
+
+        private HashSet<Pawn> _pawns = new HashSet<Pawn>();
+        private List<Pawn> _pawnOrder = new List<Pawn>();
         private Dictionary<Point, HashSet<Pawn>> _pawnBuckets = new Dictionary<Point, HashSet<Pawn>>();
-        private Dictionary<Pawn, HashSet<Pawn>> _collisions = new Dictionary<Pawn, HashSet<Pawn>>();
 
         public Board(int[,] tiles) {
             _tiles = new int[tiles.GetLength(0), tiles.GetLength(1)];
@@ -37,23 +38,46 @@ namespace LostGen {
                    point.Y >= 0 && point.Y < Height;
         }
 
+        public bool IsOpaque(Point point) {
+            bool isOpaque = GetTile(point) == WALL_TILE;
+            if (!isOpaque) {
+                HashSet<Pawn> pointBucket = GetBucket(point);
+
+                foreach (Pawn pawn in pointBucket) {
+                    if (pawn.IsOpaque) {
+                        isOpaque = true;
+                        break;
+                    }
+                }
+            }
+
+            return isOpaque;
+        }
+
+        public bool IsSolid(Point point) {
+            bool isSolid = GetTile(point) == WALL_TILE;
+            if (!isSolid) {
+                HashSet<Pawn> pawns = PawnsAt(point);
+                foreach (Pawn pawn in pawns) {
+                    if (pawn.IsCollidable && pawn.IsSolid) {
+                        isSolid = true;
+                        break;
+                    }
+                }
+            }
+
+            return isSolid;
+        }
+
         public IEnumerator<Pawn> GetPawnIterator() {
-            return _collisions.Keys.GetEnumerator();
+            return _pawns.GetEnumerator();
         }
 
-        public IEnumerable<Pawn> CollisionsAt(Point point) {
-            HashSet<Pawn> pawns;
-
-            _pawnBuckets.TryGetValue(point, out pawns);
-
-            return pawns;
-        }
-
-        private HashSet<Pawn> GetBucket(Point position) {
+        private HashSet<Pawn> GetBucket(Point position, bool create = false) {
             HashSet<Pawn> bucket;
             _pawnBuckets.TryGetValue(position, out bucket);
 
-            if (bucket == null) {
+            if (create && bucket == null) {
                 bucket = new HashSet<Pawn>();
                 _pawnBuckets.Add(position, bucket);
             }
@@ -61,23 +85,44 @@ namespace LostGen {
             return bucket;
         }
 
+        public HashSet<Pawn> PawnsAt(Point point) {
+            return GetBucket(point, true);
+        }
+
+        public HashSet<Pawn> PawnsAt(IEnumerable<Point> points) {
+            HashSet<Pawn> pawns = new HashSet<Pawn>();
+            foreach (Point point in points) {
+                pawns.UnionWith(PawnsAt(point));
+            }
+
+            return pawns;
+        }
+
         public bool AddPawn(Pawn pawn) {
             bool successful = true;
 
-            if (pawn != null && !_collisions.ContainsKey(pawn)) {
+            if (pawn != null && !_pawns.Contains(pawn)) {
                 foreach (Point point in pawn.Footprint) {
-                    HashSet<Pawn> bucket = GetBucket(pawn.Position + point);
+                    HashSet<Pawn> bucket = GetBucket(pawn.Position + point, true);
                     successful &= bucket.Add(pawn);
                 }
-                _collisions.Add(pawn, new HashSet<Pawn>());
+
+                if (successful) {
+                    successful &= _pawns.Add(pawn);
+                    if (!_pawnOrder.Contains(pawn)) {
+                        _pawnOrder.Add(pawn);
+                    }
+                }
             }
 
             return successful;
         }
-
-        // FUCK: what happens when an pawn stays still
-        // Try keeping collision logic independent from steps? no thats retarded
+        
         public bool SetPawnPosition(Pawn pawn, Point newPosition) {
+            if (!_pawns.Contains(pawn)) {
+                throw new ArgumentException("Pawn " + pawn.Name + " has not been added to this Board", "pawn");
+            }
+
             bool moved = false;
 
             List<HashSet<Pawn>> toRemove = new List<HashSet<Pawn>>();
@@ -106,14 +151,14 @@ namespace LostGen {
                 }
 
                 // Add all pawns in the current bucket to the exit collision set
-                _pawnBuckets.TryGetValue(oldPoint, out oldBucket);
-                if (oldBucket != null && oldBucket.Contains(pawn)) {
+                oldBucket = GetBucket(oldPoint, false);
+                if (oldBucket != null) {
                     exitCollisions.UnionWith(oldBucket);
                     toRemove.Add(oldBucket);
                 }
 
                 // Add all pawns in the new position to the enter set
-                newBucket = GetBucket(newPosition + pawn.Position);
+                newBucket = GetBucket(newPoint, true);
                 enterCollisions.UnionWith(newBucket);
                 toAdd.Add(newBucket);
             }
@@ -158,21 +203,21 @@ namespace LostGen {
 
 	            // Call the collision methods
 	            foreach (Pawn other in enterCollisions) {
-	            	if (other.IsCollidable) {
+	            	if (pawn != other && other.IsCollidable) {
 		                pawn.OnCollisionEnter(other);
 		                other.OnCollisionEnter(pawn);
 		            }
 	            }
 
 	            foreach (Pawn other in stayCollisions) {
-	                if (other.IsCollidable) {
+	                if (pawn != other && other.IsCollidable) {
 	                	pawn.OnCollisionStay(other);
 	                	other.OnCollisionStay(pawn);
 	            	}
 	            }
 
 	            foreach (Pawn other in exitCollisions) {
-	                if (other.IsCollidable) {
+	                if (pawn != other && other.IsCollidable) {
 	                	pawn.OnCollisionExit(other);
 	                	other.OnCollisionExit(pawn);
 	            	}
@@ -182,16 +227,57 @@ namespace LostGen {
             return moved;
         }
 
-        public void Step() {
-            foreach (Pawn pawn in _collisions.Keys) {
-        		pawn.Step();
-        	}
+        public bool Step() {
+            _pawnOrder.Sort();
+            bool actionsLeft = false;
+            for (int i = 0; i < _pawnOrder.Count; i++) {
+                actionsLeft |= _pawnOrder[i].Step();
+            }
+
+            return actionsLeft;
         }
 
         public void Turn() {
-        	foreach (Pawn pawn in _collisions.Keys) {
-        		pawn.Turn();
-        	}
+            while (Step());
         }
+
+        #region SelectAlgs
+
+        public HashSet<Point> LineOfSight(Point position, int range) {
+            HashSet<Point> visible = ShadowCast.ComputeVisibility(this, position, (float)range);
+
+            return visible;
+        }
+
+        // basic flood fill
+        public HashSet<Point> AreaOfEffect(Point point, int range, bool ignoreSolid = false) {
+            HashSet<Point> visited = new HashSet<Point>();
+            Stack<Point> exploreStack = new Stack<Point>();
+
+            Point current, neighbor;
+
+            visited.Add(point);
+            exploreStack.Push(point);
+
+            while (exploreStack.Count > 0) {
+                current = exploreStack.Pop();
+
+                if (exploreStack.Count < range) {
+                    for (int i = 0; i < Point.Neighbors.Length; i++) {
+                        neighbor = current + Point.Neighbors[i];
+
+                        if (!visited.Contains(neighbor) && (ignoreSolid || !IsSolid(neighbor))) {
+                            exploreStack.Push(neighbor);
+                        }
+                    }
+                }
+
+                visited.Add(current);
+            }
+            
+
+            return visited;
+        }
+        #endregion
     }
 }

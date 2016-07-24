@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace LostGen {
-    public class Pawn {
+    public class Pawn : IComparable<Pawn> {
         public string Name { get; set; }
 
         protected Board _board;
+        public Board Board { get; private set; }
 
         protected List<Point> _footprint;
         public ReadOnlyCollection<Point> Footprint {
@@ -24,11 +25,20 @@ namespace LostGen {
             get { return _actions.Count; }
         }
 
+        public int Priority = Int32.MinValue;
+
         public bool IsCollidable;
         public bool IsSolid;
+        public bool IsOpaque;
+
         public event EventHandler<MessageArgs> Messages;
 
-        public Pawn(string name, Board board, Point position, IEnumerable<Point> footprint = null, bool isCollidable = true, bool isSolid = false) {
+        public delegate void CollisionDelegate(Pawn source, Pawn other);
+        public event CollisionDelegate CollisionEntered;
+        public event CollisionDelegate CollisionStayed;
+        public event CollisionDelegate CollisionExited;
+
+        public Pawn(string name, Board board, Point position, IEnumerable<Point> footprint = null, bool isCollidable = true, bool isSolid = false, bool isOpaque = true) {
             Name = name;
 
             if (board == null) {
@@ -46,8 +56,11 @@ namespace LostGen {
             }
 
             _board = board;
-            Position = position;
+            IsCollidable = isCollidable;
             IsSolid = isSolid;
+            IsOpaque = isOpaque;
+
+            _position = position;
         }
 
         ///<summary>Used by internally by Board. Do not use.</summary>
@@ -63,9 +76,22 @@ namespace LostGen {
             return SetPosition(Position + offset);
         }
 
-        public virtual void OnCollisionEnter(Pawn other) { }
-        public virtual void OnCollisionStay(Pawn other) { }
-        public virtual void OnCollisionExit(Pawn other) { }
+        public virtual void OnCollisionEnter(Pawn other) {
+            if (CollisionEntered != null) {
+                CollisionEntered(this, other);
+            }
+        }
+
+        public virtual void OnCollisionStay(Pawn other) {
+            if (CollisionStayed != null) {
+                CollisionStayed(this, other);
+            }
+        }
+        public virtual void OnCollisionExit(Pawn other) {
+            if (CollisionExited != null) {
+                CollisionExited(this, other);
+            }
+        }
 
         public void EmitMessage(MessageArgs message) {
             if (Messages != null) {
@@ -96,11 +122,15 @@ namespace LostGen {
             return _actions.Count > 0;
         }
 
-        ///<summary>
-        ///Runs all the actions in the queue
-        ///</summary>
-        public void Turn() {
-            while (Step()) ;
+        public int CompareTo(Pawn other) {
+            int compare = 0;
+            if (Priority < other.Priority) {
+                compare = -1;
+            } else if (Priority > other.Priority) {
+                compare = 1;
+            }
+
+            return compare;
         }
     }
 }
