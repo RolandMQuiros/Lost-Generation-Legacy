@@ -7,7 +7,9 @@ namespace LostGen {
         public string Name { get; set; }
 
         protected Board _board;
-        public Board Board { get; private set; }
+        public Board Board {
+            get { return _board; }
+        }
 
         protected List<Point> _footprint;
         public ReadOnlyCollection<Point> Footprint {

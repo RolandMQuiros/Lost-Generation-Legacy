@@ -48,8 +48,8 @@ namespace LostGen {
         private List<Gear> _gear = new List<Gear>();
         private Dictionary<string, Skill> _skills = new Dictionary<string, Skill>();
 
-        public Combatant(string name, Board board, Point position, bool isOpaue = true, IEnumerable<Point> footprint = null, bool isCollidable = true, bool isSolid = true)
-            : base(name, board, position, footprint, isCollidable, isSolid){
+        public Combatant(string name, Board board, Point position, bool isOpaque = true, IEnumerable<Point> footprint = null, bool isCollidable = true, bool isSolid = true)
+            : base(name, board, position, footprint, isCollidable, isSolid, isOpaque){
         }
 
         public void AddSkill(Skill skill, string alias = null) {

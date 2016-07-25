@@ -5,18 +5,6 @@ using NUnit.Framework;
 namespace LostGen.Test {
     [TestFixture]
     public class PawnTests {
-        private readonly int[,] _GRID_12X8 = new int[,] {
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
-            { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
-            { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
-            { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
-            { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
-            { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
-        };
-        private readonly Point _CENTER = new Point(6, 4);
-
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void CreateWithoutBoard() {
@@ -27,7 +15,7 @@ namespace LostGen.Test {
 
         [Test]
         public void MoveIntoWall() {
-            Board board = new Board(_GRID_12X8);
+            Board board = new Board(BoardCommon.GRID_12X8);
             Pawn pawn = new Pawn("Mover", board, Point.One, null, true, true);
 
             board.AddPawn(pawn);
@@ -49,7 +37,7 @@ namespace LostGen.Test {
 
         [Test]
         public void MoveSolidPawnIntoSolidPawn() {
-            Board board = new Board(_GRID_12X8);
+            Board board = new Board(BoardCommon.GRID_12X8);
 
             Point pos1 = new Point(6, 4);
             Point pos2 = new Point(8, 4);
@@ -78,7 +66,7 @@ namespace LostGen.Test {
         [Test]
         public void CollisionTest() {
             // Arrange
-            Board board = new Board(_GRID_12X8);
+            Board board = new Board(BoardCommon.GRID_12X8);
 
             Point pos1 = new Point(board.Width / 2, board.Height / 2); // Center of board
             Point pos2 = pos1 + (3 * Point.Right); // Two tiles to the right of center
