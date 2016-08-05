@@ -45,14 +45,14 @@ namespace LostGen.Skills {
         private List<Point> _path;
         private Board _board;
 
-        public Walk(Combatant source)
-            : base(source, "Walk", "Move across tiles within a limited range", 1) {
-            _board = Source.Board;
+        public Walk(Combatant owner)
+            : base(owner, "Walk", "Move across tiles within a limited range", 1) {
+            _board = Owner.Board;
         }
 
         public void SetDestination(Point destination) {
             _destination = destination;
-            _path = new List<Point>(FindPath(_board, Source.Position, _destination));
+            _path = new List<Point>(FindPath(_board, Owner.Position, _destination));
         }
 
         public ReadOnlyCollection<Point> GetPath() {
@@ -63,8 +63,8 @@ namespace LostGen.Skills {
             if (_path != null) {
                 Actions.Move move;
                 for (int i = 0; i < _path.Count; i++) {
-                    move = new Actions.Move(Source, _path[i], true);
-                    Source.PushAction(move);
+                    move = new Actions.Move(Owner, _path[i], true);
+                    Owner.PushAction(move);
                 }
             }
         }
@@ -117,9 +117,9 @@ namespace LostGen.Skills {
 
                 open.RemoveAt(0);
 
-                for (int i = 0; i < Point.OctoNeighbors.Length; i++) {
+                for (int i = 0; i < Point.Neighbors.Length; i++) {
                     Node neighbor = new Node();
-                    neighbor.Point = current.Point + Point.OctoNeighbors[i];
+                    neighbor.Point = current.Point + Point.Neighbors[i];
 
                     if (visited.Contains(neighbor.Point) ||
                         !_board.InBounds(neighbor.Point) ||

@@ -60,6 +60,13 @@ namespace LostGen {
             }
         }
 
+        public Skill GetSkill(string alias) {
+            Skill skill;
+            _skills.TryGetValue(alias, out skill);
+
+            return skill;
+        }
+
         public bool FireSkill(string skillName) {
             bool fired = false;
             Skill skill = _skills[skillName];

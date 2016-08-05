@@ -1,21 +1,8 @@
 ﻿using System;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace LostGen.Test {
-    public class BoardCommon {
-        public static readonly int[,] GRID_12X8 = new int[,] {
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
-            { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
-            { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
-            { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
-            { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
-            { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
-            { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
-        };
-    }
-
     [TestFixture]
     public class BoardTests {
         [Test]

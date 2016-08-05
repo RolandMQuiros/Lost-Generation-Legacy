@@ -8,11 +8,11 @@ namespace LostGen {
         public string Name;
         public string Description;
 
-        public Combatant Source { get; private set; }
+        public Combatant Owner { get; private set; }
         public virtual int Cost { get; protected set; }
 
-        public Skill(Combatant source, string name, string description, int cost = 0) {
-            Source = source;
+        public Skill(Combatant owner, string name, string description, int cost = 0) {
+            Owner = owner;
             Name = name;
             Description = description;
             Cost = cost;
