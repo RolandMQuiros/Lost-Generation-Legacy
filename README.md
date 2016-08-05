@@ -1,2 +1,2 @@
 # Lost-Generation
-A roguelike, squad-tactics hybrid about life after college.
+A roguelike, squad tactics-based hybrid dungeon crawler about life after college.
