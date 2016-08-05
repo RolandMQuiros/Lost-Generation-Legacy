@@ -64,7 +64,7 @@ namespace LostGen {
             bool fired = false;
             Skill skill = _skills[skillName];
 
-            if (skill.Cost < _actionPoints) {
+            if (skill.Cost <= _actionPoints) {
                 _actionPoints -= skill.Cost;
                 skill.Fire();
                 fired = true;

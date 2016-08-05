@@ -1,11 +1,39 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System;
 
 namespace LostGen.Skills {
 
     public class Walk : Skill {
+        private class Node : IComparable<Node>, IEquatable<Node> {
+            public Point Point;
+            public int GScore;
+            public int FScore;
+
+            public Node() {
+                Point = Point.Zero;
+                GScore = 0;
+                FScore = 0;
+            }
+
+            public int CompareTo(Node other) {
+                int compare = 0;
+                if (FScore > other.FScore) {
+                    compare = 1;
+                } else if (FScore < other.FScore) {
+                    compare = -1;
+                }
+
+                return compare;
+            }
+
+            public bool Equals(Node other) {
+                return Point.Equals(other.Point);
+            }
+        }
+
         private int _cost;
         public override int Cost {
             get { return _cost; }
@@ -24,7 +52,11 @@ namespace LostGen.Skills {
 
         public void SetDestination(Point destination) {
             _destination = destination;
-            _path = new List<Point>(FindPathDijkstra(_board, Source.Position, _destination));
+            _path = new List<Point>(FindPath(_board, Source.Position, _destination));
+        }
+
+        public ReadOnlyCollection<Point> GetPath() {
+            return _path.AsReadOnly();
         }
 
         public override void Fire() {
@@ -37,6 +69,16 @@ namespace LostGen.Skills {
             }
         }
 
+        public static int NodeTest() {
+            Node node1 = new Node() { Point = new Point(1, 1), FScore = 5 };
+            Node node2 = new Node() { Point = new Point(1, 1), FScore = 10 };
+
+            List<Node> list = new List<Node>();
+            list.Add(node1);
+
+            return list.IndexOf(node2);
+        }
+
         protected virtual int Heuristic(Point start, Point end) {
             // just use manhattan distance lol
             return Point.TaxicabDistance(start, end);
@@ -47,23 +89,28 @@ namespace LostGen.Skills {
             return cost;
         }
 
-        protected virtual IEnumerable<Point> FindPathDijkstra(Board board, Point start, Point end) {
+        protected virtual IEnumerable<Point> FindPath(Board board, Point start, Point end) {
             HashSet<Point> visited = new HashSet<Point>();
-            SortedList<Point, int> open = new SortedList<Point, int>();
+            List<Node> open = new List<Node>();
             Dictionary<Point, Point> cameFrom = new Dictionary<Point, Point>();
             
             Stack<Point> path = new Stack<Point>();
 
-            open.Add(start, 0);
+            open.Add(new Node() { Point = start, FScore = Heuristic(start, end) } );
+
+            int iterations = 0;
+            int maxIterations = 1000;
 
             while (open.Count > 0) {
-                Point current = open.Keys[0];
-                int currentDistance = 0;
+                open.Sort();
+                Node current = open[0];
 
-                if (current.Equals(end)) {
-                    while (cameFrom.ContainsKey(current)) {
-                        current = cameFrom[current];
-                        path.Push(current);
+                if (current.Point.Equals(end)) {
+                    Point pathPoint = current.Point;
+                    path.Push(pathPoint);
+                    while (cameFrom.ContainsKey(pathPoint)) {
+                        pathPoint = cameFrom[pathPoint];
+                        path.Push(pathPoint);
                     }
                     break;
                 }
@@ -71,95 +118,44 @@ namespace LostGen.Skills {
                 open.RemoveAt(0);
 
                 for (int i = 0; i < Point.OctoNeighbors.Length; i++) {
-                    Point neighbor = current + Point.OctoNeighbors[i];
+                    Node neighbor = new Node();
+                    neighbor.Point = current.Point + Point.OctoNeighbors[i];
 
-                    if (!_board.InBounds(neighbor) ||
-                        _board.GetTile(neighbor) == Board.WALL_TILE) {
+                    if (visited.Contains(neighbor.Point) ||
+                        !_board.InBounds(neighbor.Point) ||
+                        _board.GetTile(neighbor.Point) == Board.WALL_TILE) {
                         continue;
                     }
 
-                    int neighborDistance = currentDistance + TileCost(board, neighbor);
+                    neighbor.GScore = current.GScore + TileCost(board, neighbor.Point);
 
                     // If the recorded distance is less than the neighbor distance, replace it
-                    if (!open.ContainsKey(neighbor)) {
-                        open.Add(neighbor, neighborDistance);
+                    int neighborIdx = open.IndexOf(neighbor);
+
+                    Node oldNeighbor;
+                    if (neighborIdx == -1) {
+                        open.Add(neighbor);
+                        oldNeighbor = neighbor;
                     } else {
-                        int prevDistance = open[neighbor];
-                        if (neighborDistance < prevDistance) {
-                            prevDistance = neighborDistance;
-                            cameFrom[neighbor] = current;
-                        }
+                        oldNeighbor = open[neighborIdx];
                     }
+
+                    if (neighborIdx == -1 || neighbor.GScore < oldNeighbor.GScore) {
+                        oldNeighbor.GScore = neighbor.GScore;
+                        oldNeighbor.FScore = neighbor.GScore + Heuristic(oldNeighbor.Point, end);
+                        cameFrom[oldNeighbor.Point] = current.Point;
+                    }
+                }
+
+                visited.Add(current.Point);
+
+                iterations++;
+                if (iterations > maxIterations) {
+                    break;
                 }
             }
 
             return path;
-        }
-
-        protected virtual List<Point> FindPath(Point start, Point end) {
-
-            HashSet<Point> closedSet = new HashSet<Point>();
-            HashSet<Point> openSet = new HashSet<Point>();
-            openSet.Add(start);
-
-            Dictionary<Point, int> gScore = new Dictionary<Point, int>();
-            gScore.Add(start, 0);
-
-            List<KeyValuePair<int, Point>> fScore = new List<KeyValuePair<int, Point>>();
-            fScore.Add(new KeyValuePair<int, Point>(Heuristic(start, end), start));
-            Point current = start;
-            
-            Dictionary<Point, Point> cameFrom = new Dictionary<Point, Point>();
-
-            Point neighbor;
-            int tentativeGScore = 0;
-            int tentativeFScore = 0;
-            List<Point> finalPath = null;
-
-            while (openSet.Count > 0) {
-                fScore.Sort((x, y) => x.Key.CompareTo(y.Key));
-                current = fScore[0].Value;
-                if (current.Equals(end)) {
-                    // reconstruct path
-                    finalPath = new List<Point>();
-                    while (cameFrom.ContainsKey(current)) {
-                        current = cameFrom[current];
-                        finalPath.Add(current);
-                    }
-                    break;
-                }
-
-                openSet.Remove(current);
-                closedSet.Add(current);
-                for (int i = 0; i < Point.OctoNeighbors.Length; i++) {
-                    neighbor = current + Point.OctoNeighbors[i];
-
-                    if (_board.InBounds(neighbor) &&
-                        closedSet.Contains(neighbor) ||
-                        _board.GetTile(neighbor) == Board.WALL_TILE) {
-                        continue;
-                    }
-
-                    tentativeGScore = gScore[current] + TileCost(_board, current);
-
-                    if (!gScore.ContainsKey(neighbor)) {
-                        gScore.Add(neighbor, Int32.MaxValue);
-                    }
-
-                    if (!openSet.Contains(neighbor)) {
-                        openSet.Add(neighbor);
-                    } else if (tentativeGScore >= gScore[neighbor]) {
-                        continue;
-                    }
-
-                    cameFrom.Add(neighbor, current);
-                    gScore[neighbor] = tentativeGScore;
-                    tentativeFScore = tentativeGScore + Heuristic(neighbor, start);
-                    fScore.Add(new KeyValuePair<int, Point>(tentativeFScore, neighbor));
-                }
-            }
-
-            return finalPath;
         }
     }
 

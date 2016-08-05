@@ -116,9 +116,9 @@ namespace LostGen {
             Action stepAction;
 
             if (_actions.Count > 0) {
-                stepAction = _actions.Last.Value;
+                stepAction = _actions.First.Value;
                 stepAction.Run();
-                _actions.RemoveLast();
+                _actions.RemoveFirst();
             }
 
             return _actions.Count > 0;

@@ -2,6 +2,8 @@
 using UnityEditor;
 using NUnit.Framework;
 
+using System.Collections.Generic;
+
 namespace LostGen.Test {
     [TestFixture]
     public class WalkTests {
@@ -28,7 +30,20 @@ namespace LostGen.Test {
 
             board.Turn();
 
+            
+            List<Point> points = new List<Point>(walk.GetPath());
+            string str = string.Empty;
+            for (int i = 0; i < points.Count; i++) {
+                str += points[i] + "\n";
+            }
+            Assert.Pass("points: " + str);
+
             Assert.AreEqual(destination, combatant.Position);
+        }
+
+        [Test]
+        public void NodeTest() {
+            Assert.AreEqual(0, LostGen.Skills.Walk.NodeTest());
         }
     }
 
