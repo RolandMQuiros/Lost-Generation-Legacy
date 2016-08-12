@@ -20,9 +20,13 @@ namespace LostGen {
         private List<Pawn> _pawnOrder = new List<Pawn>();
         private Dictionary<Point, HashSet<Pawn>> _pawnBuckets = new Dictionary<Point, HashSet<Pawn>>();
 
+        private Pathfinder<Point> _pathfinder;
+
         public Board(int[,] tiles) {
             _tiles = new int[tiles.GetLength(0), tiles.GetLength(1)];
             Array.Copy(tiles, 0, _tiles, 0, tiles.Length);
+
+            _pathfinder = new Pathfinder<Point>(); 
         }
 
         public int GetTile(int x, int y) {
