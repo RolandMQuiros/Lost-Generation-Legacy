@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace LostGen {
-    public struct Point {
+    public struct Point : IEquatable<Point> {
         public static readonly Point Zero = new Point(0, 0);
         public static readonly Point One = new Point(1, 1);
         public static readonly Point Up = new Point(0, -1);
@@ -65,6 +65,10 @@ namespace LostGen {
 
         public override string ToString() {
             return "{x:" + X + ",y:" + Y + "}";
+        }
+
+        public bool Equals(Point other) {
+            return X == other.X && Y == other.Y;
         }
     }
 }
