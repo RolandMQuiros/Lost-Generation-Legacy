@@ -7,11 +7,11 @@ using NUnit.Framework;
 namespace LostGen.Test {
     public class PathfinderTests {
 
-        private class TestGraphNode : AbstractGraphNode<int> {
-            private int _value;
-            public Dictionary<AbstractGraphNode<int>, int> _neighbors = new Dictionary<TestGraphNode, int>();
+        private class TestGraphNode : GraphNode<char> {
+            private char _value;
+            public Dictionary<GraphNode<char>, int> _neighbors = new Dictionary<GraphNode<char>, int>();
 
-            public TestGraphNode(int value) {
+            public TestGraphNode(char value) {
                 _value = value;
             }
 
@@ -19,11 +19,11 @@ namespace LostGen.Test {
                 _neighbors[neighbor] = edgeCost;
             }
 
-            public override int GetData() {
+            public override char GetData() {
                 return _value;
             }
 
-            public override int GetEdgeCost(AbstractGraphNode<int> to) {
+            public override int GetEdgeCost(GraphNode<char> to) {
                 TestGraphNode neighbor = to as TestGraphNode;
                 int cost;
 
@@ -36,48 +36,152 @@ namespace LostGen.Test {
                 return cost;
             }
 
-            public override IEnumerator<AbstractGraphNode<int>> GetNeighborIter() {
-                return _neighbors.Keys.GetEnumerator();
+            public override IEnumerable<GraphNode<char>> GetNeighbors() {
+                return _neighbors.Keys;
             }
-
-
         }
 
         [Test]
         public void StraightShot() {
-
-
             //Arrange
-            var gameObject = new GameObject();
+            TestGraphNode nodeA = new TestGraphNode('A');
+            TestGraphNode nodeB = new TestGraphNode('B');
+            TestGraphNode nodeC = new TestGraphNode('C');
+            TestGraphNode nodeD = new TestGraphNode('D');
+            TestGraphNode nodeE = new TestGraphNode('E');
 
-            //Act
-            //Try to rename the GameObject
-            var newGameObjectName = "My game object";
-            gameObject.name = newGameObjectName;
+            nodeA.AddNeighbor(nodeB, 10);
+            nodeB.AddNeighbor(nodeA, 10);
 
-            //Assert
-            //The object has a new name
-            Assert.AreEqual(newGameObjectName, gameObject.name);
+            nodeB.AddNeighbor(nodeC, 10);
+            nodeC.AddNeighbor(nodeB, 10);
+
+            nodeC.AddNeighbor(nodeD, 10);
+            nodeD.AddNeighbor(nodeC, 10);
+
+            nodeD.AddNeighbor(nodeE, 10);
+            nodeE.AddNeighbor(nodeD, 10);
+
+            List<char> path = new List<char>(
+                Pathfinder<char>.FindPath(nodeA, nodeE, delegate (char start, char end) {
+                    return 10 * Math.Abs(end - start);
+                })
+            );
+
+            string pathStr = new string(path.ToArray());
+            Assert.AreEqual(pathStr, "ABCDE");
         }
 
         [Test]
         public void NoPath() {
-            Dictionary<Point, int> dict = new Dictionary<Point, int>();
+            //Arrange
+            TestGraphNode nodeA = new TestGraphNode('A');
+            TestGraphNode nodeB = new TestGraphNode('B');
+            TestGraphNode nodeC = new TestGraphNode('C');
+            TestGraphNode nodeD = new TestGraphNode('D');
+            TestGraphNode nodeE = new TestGraphNode('E');
+
+            nodeA.AddNeighbor(nodeB, 10);
+            nodeB.AddNeighbor(nodeA, 10);
+
+            nodeB.AddNeighbor(nodeC, 10);
+            nodeC.AddNeighbor(nodeB, 10);
+
+            nodeC.AddNeighbor(nodeD, 10);
+            nodeD.AddNeighbor(nodeC, 10);
+
+            //nodeD.AddNeighbor(nodeE, 10);
+            nodeE.AddNeighbor(nodeD, 10);
+
+            List<char> path = new List<char>(
+                Pathfinder<char>.FindPath(nodeA, nodeE, delegate (char start, char end) {
+                    return 10 * Math.Abs(end - start);
+                })
+            );
+
+            string pathStr = new string(path.ToArray());
+            Assert.IsNullOrEmpty(pathStr);
         }
 
         [Test]
         public void SimpleBranches() {
+            //Arrange
+            TestGraphNode nodeA = new TestGraphNode('A');
+            TestGraphNode nodeB = new TestGraphNode('B');
+            TestGraphNode nodeC = new TestGraphNode('C');
+            TestGraphNode nodeD = new TestGraphNode('D');
+            TestGraphNode nodeE = new TestGraphNode('E');
 
+            nodeA.AddNeighbor(nodeB, 10);
+            nodeB.AddNeighbor(nodeA, 10);
+
+            nodeB.AddNeighbor(nodeC, 10);
+            nodeC.AddNeighbor(nodeB, 10);
+
+            nodeB.AddNeighbor(nodeD, 5);
+            nodeD.AddNeighbor(nodeB, 5);
+
+            nodeC.AddNeighbor(nodeD, 10);
+            nodeD.AddNeighbor(nodeC, 10);
+
+            nodeD.AddNeighbor(nodeE, 10);
+            nodeE.AddNeighbor(nodeD, 10);
+
+            List<char> path = new List<char>(
+                Pathfinder<char>.FindPath(nodeA, nodeE, delegate (char start, char end) {
+                    return 10 * Math.Abs(end - start);
+                })
+            );
+
+            string pathStr = new string(path.ToArray());
+            Assert.AreEqual(pathStr, "ABDE");
         }
 
         [Test]
-        public void StartNotInGraphError() {
+        public void StartNotInGraph() {
+            //Arrange
+            TestGraphNode nodeA = new TestGraphNode('A');
+            TestGraphNode nodeB = new TestGraphNode('B');
+            TestGraphNode nodeC = new TestGraphNode('C');
+            TestGraphNode nodeD = new TestGraphNode('D');
 
+            nodeB.AddNeighbor(nodeC, 10);
+            nodeC.AddNeighbor(nodeB, 10);
+
+            nodeC.AddNeighbor(nodeD, 10);
+            nodeD.AddNeighbor(nodeC, 10);
+
+            List<char> path = new List<char>(
+                Pathfinder<char>.FindPath(nodeA, nodeD, delegate (char start, char end) {
+                    return 10 * Math.Abs(end - start);
+                })
+            );
+
+            string pathStr = new string(path.ToArray());
+            Assert.IsNullOrEmpty(pathStr);
         }
 
         [Test]
-        public void EndNotInGraphError() {
+        public void EndNotInGraph() {
+            TestGraphNode nodeA = new TestGraphNode('A');
+            TestGraphNode nodeB = new TestGraphNode('B');
+            TestGraphNode nodeC = new TestGraphNode('C');
+            TestGraphNode nodeD = new TestGraphNode('D');
 
+            nodeA.AddNeighbor(nodeB, 10);
+            nodeB.AddNeighbor(nodeA, 10);
+
+            nodeB.AddNeighbor(nodeC, 10);
+            nodeC.AddNeighbor(nodeB, 10);
+
+            List<char> path = new List<char>(
+                Pathfinder<char>.FindPath(nodeA, nodeD, delegate (char start, char end) {
+                    return 10 * Math.Abs(end - start);
+                })
+            );
+
+            string pathStr = new string(path.ToArray());
+            Assert.IsNullOrEmpty(pathStr);
         }
     }
 }

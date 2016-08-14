@@ -1,7 +1,7 @@
 Lost Generation TODO
 --------------------
 
-[] Pathfinding Class architecture *
-[] Pathfinding Class unit tests *
-[] Walk Skill + Pathfinding class refactor
+[X] Pathfinding Class architecture *
+[X] Pathfinding Class unit tests *
+[X] Walk Skill + Pathfinding class refactor
 [] Pawn Controller architecture

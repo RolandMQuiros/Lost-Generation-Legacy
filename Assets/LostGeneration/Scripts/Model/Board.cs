@@ -73,6 +73,18 @@ namespace LostGen {
             return _pawns.GetEnumerator();
         }
 
+        public bool PawnExists(Pawn pawn) {
+            return _pawns.Contains(pawn);
+        }
+        
+        public Pawn FindPawnByName(string name) {
+            return _pawnOrder.Find(pawn => pawn.Name == name);
+        }
+
+        public IEnumerable<Pawn> FindPawnsByName(string name) {
+            return _pawnOrder.FindAll(pawn => pawn.Name == name);
+        }
+
         private HashSet<Pawn> GetBucket(Point position, bool create = false) {
             HashSet<Pawn> bucket;
             _pawnBuckets.TryGetValue(position, out bucket);
@@ -225,6 +237,13 @@ namespace LostGen {
 	        }
 
             return moved;
+        }
+
+        public void BeginTurn() {
+            _pawnOrder.Sort();
+            for (int i = 0; i < _pawnOrder.Count; i++) {
+                _pawnOrder[i].BeginTurn();
+            }
         }
 
         public bool Step() {

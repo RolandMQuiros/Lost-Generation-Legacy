@@ -7,35 +7,59 @@ using System;
 namespace LostGen.Skills {
 
     public class Walk : Skill {
-        private class Node : IComparable<Node>, IEquatable<Node> {
-            public Point Point;
-            public int GScore;
-            public int FScore;
+        private class WalkNode : GraphNode<Point> {
+            public delegate int TileCostLookup(int tile);
 
-            public Node() {
-                Point = Point.Zero;
-                GScore = 0;
-                FScore = 0;
+            private Point _point;
+            private Board _board;
+            private List<WalkNode> _neighbors = new List<WalkNode>();
+            private TileCostLookup _tileCostLookup;
+
+            public WalkNode(Board board, Point point, TileCostLookup lookup) {
+                if (board == null) { throw new ArgumentNullException("board"); }
+                if (lookup == null) { throw new ArgumentNullException("lookup"); }
+
+                _board = board;
+                _point = point;
+                _tileCostLookup = lookup;
             }
 
-            public int CompareTo(Node other) {
-                int compare = 0;
-                if (FScore > other.FScore) {
-                    compare = 1;
-                } else if (FScore < other.FScore) {
-                    compare = -1;
+            public override Point GetData() {
+                return _point;
+            }
+
+            public override int GetEdgeCost(GraphNode<Point> neighbor) {
+                Point toPoint = neighbor.GetData();
+                int tile = _board.GetTile(toPoint);
+
+                return _tileCostLookup(tile);
+            }
+
+            /// <summary>
+            /// Coroutine 
+            /// </summary>
+            /// <returns></returns>
+            public override IEnumerable<GraphNode<Point>> GetNeighbors() {
+                for (int i = 0; i < Point.Neighbors.Length; i++) {
+                    Point neighborPoint = _point + Point.Neighbors[i];
+
+                    if (_board.InBounds(neighborPoint) && _board.GetTile(neighborPoint) != Board.WALL_TILE) {
+                        WalkNode neighbor = _neighbors.Find(node => node._point.Equals(neighborPoint));
+                        if (neighbor == null) {
+                            neighbor = new WalkNode(_board, neighborPoint, _tileCostLookup);
+                            _neighbors.Add(neighbor);
+
+                            yield return neighbor;
+                        } else {
+                            yield return neighbor;
+                        }
+                    }
                 }
-
-                return compare;
-            }
-
-            public bool Equals(Node other) {
-                return Point.Equals(other.Point);
             }
         }
 
-        private int _cost;
-        public override int Cost {
+        private int _cost = 0;
+        public override int ActionPoints {
             get { return _cost; }
         }
 
@@ -51,8 +75,29 @@ namespace LostGen.Skills {
         }
 
         public void SetDestination(Point destination) {
-            _destination = destination;
-            _path = new List<Point>(FindPath(_board, Owner.Position, _destination));
+            if (_board.GetTile(destination) != Board.WALL_TILE) {
+                _destination = destination;
+                if (Point.TaxicabDistance(Owner.Position, destination) == 1) {
+                    _path = new List<Point>();
+                    _path.Add(destination);
+                } else {
+                    _path = new List<Point>(
+                        Pathfinder<Point>.FindPath(
+                            new WalkNode(_board, Owner.Position, TileCost),
+                            new WalkNode(_board, destination, TileCost),
+                            Point.TaxicabDistance
+                        )
+                    );
+                }
+
+                _cost = 0;
+                for (int i = 0; i < _path.Count; i++) {
+                    int tile = _board.GetTile(_path[i]);
+                    _cost += TileCost(tile);
+                }
+            } else {
+                _destination = Owner.Position;
+            }
         }
 
         public ReadOnlyCollection<Point> GetPath() {
@@ -69,93 +114,9 @@ namespace LostGen.Skills {
             }
         }
 
-        public static int NodeTest() {
-            Node node1 = new Node() { Point = new Point(1, 1), FScore = 5 };
-            Node node2 = new Node() { Point = new Point(1, 1), FScore = 10 };
-
-            List<Node> list = new List<Node>();
-            list.Add(node1);
-
-            return list.IndexOf(node2);
-        }
-
-        protected virtual int Heuristic(Point start, Point end) {
-            // just use manhattan distance lol
-            return Point.TaxicabDistance(start, end);
-        }
-
-        protected virtual int TileCost(Board board, Point point) {
+        protected virtual int TileCost(int tile) {
             int cost = 1;
             return cost;
-        }
-
-        protected virtual IEnumerable<Point> FindPath(Board board, Point start, Point end) {
-            HashSet<Point> visited = new HashSet<Point>();
-            List<Node> open = new List<Node>();
-            Dictionary<Point, Point> cameFrom = new Dictionary<Point, Point>();
-            
-            Stack<Point> path = new Stack<Point>();
-
-            open.Add(new Node() { Point = start, FScore = Heuristic(start, end) } );
-
-            int iterations = 0;
-            int maxIterations = 1000;
-
-            while (open.Count > 0) {
-                open.Sort();
-                Node current = open[0];
-
-                if (current.Point.Equals(end)) {
-                    Point pathPoint = current.Point;
-                    path.Push(pathPoint);
-                    while (cameFrom.ContainsKey(pathPoint)) {
-                        pathPoint = cameFrom[pathPoint];
-                        path.Push(pathPoint);
-                    }
-                    break;
-                }
-
-                open.RemoveAt(0);
-
-                for (int i = 0; i < Point.Neighbors.Length; i++) {
-                    Node neighbor = new Node();
-                    neighbor.Point = current.Point + Point.Neighbors[i];
-
-                    if (visited.Contains(neighbor.Point) ||
-                        !_board.InBounds(neighbor.Point) ||
-                        _board.GetTile(neighbor.Point) == Board.WALL_TILE) {
-                        continue;
-                    }
-
-                    neighbor.GScore = current.GScore + TileCost(board, neighbor.Point);
-
-                    // If the recorded distance is less than the neighbor distance, replace it
-                    int neighborIdx = open.IndexOf(neighbor);
-
-                    Node oldNeighbor;
-                    if (neighborIdx == -1) {
-                        open.Add(neighbor);
-                        oldNeighbor = neighbor;
-                    } else {
-                        oldNeighbor = open[neighborIdx];
-                    }
-
-                    if (neighborIdx == -1 || neighbor.GScore < oldNeighbor.GScore) {
-                        oldNeighbor.GScore = neighbor.GScore;
-                        oldNeighbor.FScore = neighbor.GScore + Heuristic(oldNeighbor.Point, end);
-                        cameFrom[oldNeighbor.Point] = current.Point;
-                    }
-                }
-
-                visited.Add(current.Point);
-
-                iterations++;
-                if (iterations > maxIterations) {
-                    break;
-                }
-            }
-
-            return path;
         }
     }
 

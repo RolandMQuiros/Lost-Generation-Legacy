@@ -4,6 +4,10 @@ using System.Collections.ObjectModel;
 
 namespace LostGen {
     public class Pawn : IComparable<Pawn> {
+        private static ulong _idCounter;
+        private ulong _id;
+        public ulong ID { get { return _id; } }
+
         public string Name { get; set; }
 
         protected Board _board;
@@ -41,6 +45,8 @@ namespace LostGen {
         public event CollisionDelegate CollisionExited;
 
         public Pawn(string name, Board board, Point position, IEnumerable<Point> footprint = null, bool isCollidable = true, bool isSolid = false, bool isOpaque = true) {
+            _id = _idCounter++;
+
             Name = name;
 
             if (board == null) {
@@ -109,10 +115,12 @@ namespace LostGen {
             _actions.AddFirst(action);
         }
 
+        public virtual void BeginTurn() { }
+
         ///<summary>
 		///Pops and runs a single action in the queue
 		///</summary>
-		public bool Step() {
+		public virtual bool Step() {
             Action stepAction;
 
             if (_actions.Count > 0) {

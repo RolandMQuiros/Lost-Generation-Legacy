@@ -12,12 +12,17 @@ namespace LostGen.Test {
             board = new Board(grid);
             pawn = new Combatant("Walker", board, Point.One);
 
+            Stats stats = new Stats() { Stamina = 100 };
+            pawn.BaseStats = stats;
+
             board.AddPawn(pawn);
 
             Skills.Walk walk = new Skills.Walk(pawn);
             pawn.AddSkill(walk);
 
             walk.SetDestination(end);
+
+            board.BeginTurn();
         }
 
         [Test]
@@ -29,6 +34,9 @@ namespace LostGen.Test {
             ArrangeBoard(BoardCommon.GRID_12X8, start, end, out board, out combatant);
 
             Skills.Walk walk = combatant.GetSkill("Walk") as Skills.Walk;
+
+            Assert.LessOrEqual(walk.ActionPoints, combatant.ActionPoints);
+
             combatant.FireSkill("Walk");
 
             board.Turn();
@@ -57,6 +65,9 @@ namespace LostGen.Test {
             ArrangeBoard(grid, start, end, out board, out combatant);
 
             Skills.Walk walk = combatant.GetSkill("Walk") as Skills.Walk;
+
+            Assert.LessOrEqual(walk.ActionPoints, combatant.ActionPoints);
+            
             combatant.FireSkill("Walk");
 
             board.Turn();
@@ -85,6 +96,9 @@ namespace LostGen.Test {
             ArrangeBoard(grid, start, end, out board, out combatant);
 
             Skills.Walk walk = combatant.GetSkill("Walk") as Skills.Walk;
+
+            Assert.LessOrEqual(walk.ActionPoints, combatant.ActionPoints);
+
             combatant.FireSkill("Walk");
 
             board.Turn();
@@ -92,11 +106,6 @@ namespace LostGen.Test {
             Console.Write(BoardCommon.PrintGrid(grid, walk.GetPath()));
             
             Assert.AreEqual(end, combatant.Position);
-        }
-
-        [Test]
-        public void NodeTest() {
-            Assert.AreEqual(0, LostGen.Skills.Walk.NodeTest());
         }
     }
 

@@ -43,7 +43,7 @@ namespace LostGen {
         }
 
         private int _actionPoints;
-        public int ActionPoints { get; private set; }
+        public int ActionPoints { get { return _actionPoints; } }
 
         private List<Gear> _gear = new List<Gear>();
         private Dictionary<string, Skill> _skills = new Dictionary<string, Skill>();
@@ -71,13 +71,17 @@ namespace LostGen {
             bool fired = false;
             Skill skill = _skills[skillName];
 
-            if (skill.Cost <= _actionPoints) {
-                _actionPoints -= skill.Cost;
+            if (skill.ActionPoints <= _actionPoints) {
+                _actionPoints -= skill.ActionPoints;
                 skill.Fire();
                 fired = true;
             }
 
             return fired;
+        }
+
+        public override void BeginTurn() {
+            _actionPoints = EffectiveStats.Stamina;
         }
     }
 }

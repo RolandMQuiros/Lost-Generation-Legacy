@@ -7,7 +7,7 @@ namespace LostGen {
         public delegate int Heuristic(T start, T end);
 
         private class SortNode : IComparable<SortNode> {
-            public AbstractGraphNode<T> Node;
+            public GraphNode<T> Node;
             public int GScore = 0;
             public int FScore = 0;
 
@@ -21,7 +21,7 @@ namespace LostGen {
             }
         }
 
-        public static IEnumerable<T> FindPath(AbstractGraphNode<T> start, AbstractGraphNode<T> end, Heuristic heuristic) {
+        public static IEnumerable<T> FindPath(GraphNode<T> start, GraphNode<T> end, Heuristic heuristic) {
             HashSet<T> visited = new HashSet<T>();
             List<SortNode> open = new List<SortNode>();
             Dictionary<T, T> cameFrom = new Dictionary<T, T>();
@@ -38,7 +38,7 @@ namespace LostGen {
                 SortNode current = open[0];
                 T currentData = current.Node.GetData();
 
-                if (current.Equals(end)) {
+                if (current.Node.Equals(end)) {
                     T pathData = currentData;
                     path.Push(pathData);
                     while (cameFrom.ContainsKey(pathData)) {
@@ -50,9 +50,7 @@ namespace LostGen {
 
                 open.RemoveAt(0);
 
-                IEnumerator<AbstractGraphNode<T>> neighborIter = current.Node.GetNeighborIter();
-                while (neighborIter.MoveNext()) {
-                    AbstractGraphNode<T> neighbor = neighborIter.Current;
+                foreach (GraphNode<T> neighbor in current.Node.GetNeighbors()) {
                     T neighborData = neighbor.GetData();
 
                     if (visited.Contains(neighborData)) {
