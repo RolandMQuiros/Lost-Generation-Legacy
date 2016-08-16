@@ -31,6 +31,33 @@ namespace LostGen {
             _stateValues[key] = stateValue;
         }
 
+        public void SetStateValue(string key, float value) {
+            StateValue stateValue = new StateValue() {
+                Active = true,
+                FloatValue = value
+            };
+
+            _stateValues[key] = stateValue;
+        }
+
+        public void SetStateValue(string key, bool value) {
+            StateValue stateValue = new StateValue() {
+                Active = true,
+                BoolValue = value
+            };
+
+            _stateValues[key] = stateValue;
+        }
+
+        public void SetStateValue(string key, Point value) {
+            StateValue stateValue = new StateValue() {
+                Active = true,
+                PointValue = value
+            };
+
+            _stateValues[key] = stateValue;
+        }
+
         public int GetStateValue(string key, int defaultValue) {
             StateValue stateValue;
             _stateValues.TryGetValue(key, out stateValue);
@@ -69,6 +96,10 @@ namespace LostGen {
             } else {
                 return defaultValue;
             }
+        }
+
+        public static string CombatantKey(Combatant combatant, string append) {
+            return combatant.ID + append;
         }
 
         public static string CombatantHealthKey(Combatant combatant) {

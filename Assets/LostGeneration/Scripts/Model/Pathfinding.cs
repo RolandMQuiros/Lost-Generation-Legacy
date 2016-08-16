@@ -21,6 +21,45 @@ namespace LostGen {
             }
         }
 
+        public static IEnumerable<T> FloodFill(GraphNode<T> start, int maxCost = -1, int maxDepth = -1) {
+            HashSet<T> domain = new HashSet<T>();
+            Stack<SortNode> open = new Stack<SortNode>();
+
+            open.Push(new SortNode() { Node = start });
+
+            while (open.Count > 0) {
+                SortNode current = open.Peek();
+                T currentData = current.Node.GetData();
+                domain.Add(currentData);
+
+                bool leafFound = true;
+                if (maxDepth == -1 || open.Count < maxDepth) {
+                    foreach (GraphNode<T> neighbor in current.Node.GetNeighbors()) {
+                        T neighborData = neighbor.GetData();
+                        if (domain.Contains(neighborData)) {
+                            continue;
+                        }
+
+                        int tentativeGScore = current.GScore + current.Node.GetEdgeCost(neighbor);
+
+                        if (maxCost == -1 || tentativeGScore < maxCost) {
+                            open.Push(new SortNode() {
+                                Node = neighbor,
+                                GScore = tentativeGScore
+                            });
+                            leafFound = false;
+                        }
+                    }
+                }
+
+                if (leafFound) {
+                    open.Pop();
+                }
+            }
+
+            return domain;
+        }
+
         public static IEnumerable<T> FindPath(GraphNode<T> start, GraphNode<T> end, Heuristic heuristic) {
             HashSet<T> visited = new HashSet<T>();
             List<SortNode> open = new List<SortNode>();

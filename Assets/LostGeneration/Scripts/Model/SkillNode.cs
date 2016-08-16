@@ -9,7 +9,7 @@ namespace LostGen {
     /// </summary>
     public class SkillNode : GraphNode<Skill> {
         private Skill _skill;
-        private List<Skill> _neighbors = new List<Skill>();
+        private List<GraphNode<Skill>> _neighbors = new List<GraphNode<Skill>>();
 
         public SkillNode(Skill skill) {
             _skill = skill;
@@ -22,11 +22,17 @@ namespace LostGen {
         public override int GetEdgeCost(GraphNode<Skill> neighbor) {
             Skill neighborSkill = neighbor.GetData();
 
-            if (!_neighbors.Contains(neighborSkill)) {
+            GraphNode<Skill> neighborNode = _neighbors.Find(node => node.GetData().Equals(neighborSkill));
+
+            if (neighborNode == null) {
                 throw new ArgumentException("Given neighbor SkillNode is not connected to this SkillNode", neighborSkill.Name);
             }
 
             return neighborSkill.ActionPoints;
+        }
+
+        public override IEnumerable<GraphNode<Skill>> GetNeighbors() {
+            return _neighbors;
         }
     }
 }

@@ -183,5 +183,28 @@ namespace LostGen.Test {
             string pathStr = new string(path.ToArray());
             Assert.IsNullOrEmpty(pathStr);
         }
+
+        [Test]
+        public void FloodFillDepthStraightLine() {
+            TestGraphNode[] nodes = new TestGraphNode[26];
+            for (int i = 0; i < nodes.Length; i++) {
+                nodes[i] = new TestGraphNode((char)((int)'A' + i));
+                if (i > 0) {
+                    nodes[i].AddNeighbor(nodes[i - 1], 10);
+                    nodes[i - 1].AddNeighbor(nodes[i], 10);
+                }
+            }
+
+            List<char> depthDomain = new List<char>(Pathfinder<char>.FloodFill(nodes[0], -1, 10));
+            depthDomain.Sort();
+            string depthString = new string(depthDomain.ToArray());
+
+            List<char> costDomain = new List<char>(Pathfinder<char>.FloodFill(nodes[0], 100, -1));
+            costDomain.Sort();
+            string costString = new string(costDomain.ToArray());
+
+            Assert.AreEqual("ABCDEFGHIJ", depthString);
+            Assert.AreEqual("ABCDEFGHIJ", costString);
+        }
     }
 }
