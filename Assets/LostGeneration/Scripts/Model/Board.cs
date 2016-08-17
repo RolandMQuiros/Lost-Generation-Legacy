@@ -61,6 +61,7 @@ namespace LostGen {
                     Point toPoint = neighbor.GetData();
                     cost = _edgeCostLookup(toPoint);
                 }
+
                 return cost;
             }
 
@@ -71,7 +72,7 @@ namespace LostGen {
             /// <returns>An IEnumerable that iterates through this Node's neighboring Points</returns>
             public override IEnumerable<GraphNode<Point>> GetNeighbors() {
                 for (int i = 0; i < Point.OctoNeighbors.Length; i++) {
-                    Point neighborPoint = _point + Point.Neighbors[i];
+                    Point neighborPoint = _point + Point.OctoNeighbors[i];
 
                     if (_board.InBounds(neighborPoint) && _board.GetTile(neighborPoint) != Board.WALL_TILE) {
                         // Check if a Node already exists for the Point
@@ -120,6 +121,14 @@ namespace LostGen {
         public bool InBounds(Point point) {
             return point.X >= 0 && point.X < Width &&
                    point.Y >= 0 && point.Y < Height;
+        }
+
+        public Node GetNode(Point point, Node.EdgeCostLookup lookup = null) {
+            Node node = null;
+            if (InBounds(point)) {
+                node = new Node(this, point, lookup);
+            }
+            return node;
         }
 
         public bool IsOpaque(Point point) {

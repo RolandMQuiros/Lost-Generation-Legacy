@@ -10,19 +10,24 @@ namespace LostGen.Skills {
     /// </summary>
     public class ApproachWithCaution : Walk {
         /// <summary>Reference to the Pawn we're approaching</summary>
-        private Pawn _target;
+        private int _scanRange;
 
-        public ApproachWithCaution(Combatant owner, Pawn target) 
+        public ApproachWithCaution(Combatant owner, int scanRange) 
             : base(owner) {
-            _target = target;
+            _scanRange = scanRange;
         }
 
         protected override int Heuristic(Point start, Point end) {
             int distance = base.Heuristic(start, end);
 
             int cost = distance;
-            // Check current board state for enemies within range of the current starting point
-            
+
+            foreach (Pawn pawn in Owner.GetPawnsInView()) {
+                Combatant enemy = pawn as Combatant;
+                if (enemy != null && Point.Distance(start, enemy.Position) < _scanRange) {
+                    cost += 100;
+                }
+            }
 
             return cost;
         }

@@ -44,9 +44,11 @@ namespace LostGen {
 
         private int _actionPoints;
         public int ActionPoints { get { return _actionPoints; } }
-
+        
         private List<Gear> _gear = new List<Gear>();
         private Dictionary<string, Skill> _skills = new Dictionary<string, Skill>();
+
+        private HashSet<Pawn> _knownPawns = new HashSet<Pawn>();
 
         public Combatant(string name, Board board, Point position, bool isOpaque = true, IEnumerable<Point> footprint = null, bool isCollidable = true, bool isSolid = true)
             : base(name, board, position, footprint, isCollidable, isSolid, isOpaque){
@@ -78,6 +80,24 @@ namespace LostGen {
             }
 
             return fired;
+        }
+
+        public IEnumerable<Pawn> GetPawnsInView() {
+            foreach (Pawn pawn in _knownPawns) {
+                yield return pawn;
+            }
+        }
+
+        public bool AddPawnToView(Pawn pawn) {
+            return _knownPawns.Add(pawn);
+        }
+
+        public void RemovePawnFromView(Pawn pawn) {
+            _knownPawns.Remove(pawn);
+        }
+
+        public bool IsPawnInView(Pawn pawn) {
+            return _knownPawns.Contains(pawn);
         }
 
         public override void BeginTurn() {

@@ -19,16 +19,16 @@ namespace LostGen.Skills {
     /// more specific skills to cover smaller possibility spaces.
     /// </summary>
     public class Walk : Skill {
-        private int _cost = 0;
+        protected int _cost = 0;
         public override int ActionPoints {
             get { return _cost; }
         }
 
-        private Point _destination;
+        protected Point _destination;
         public Point Destination { get { return _destination; } }
 
         private List<Point> _path;
-        private Board _board;
+        protected Board _board;
 
         public Walk(Combatant owner)
             : base(owner, "Walk", "Move across tiles within a limited range") {
