@@ -7,7 +7,91 @@ namespace LostGen {
     	public const int WALL_TILE = 0;
     	public const int FLOOR_TILE = 1;
 
-    	private int[,] _tiles;
+        /// <summary>
+        /// Graph node representation of a Board coordinate. This connects Points on the Board with adjacent
+        /// Points, and sets edge values depending on at those points, or Tile types.
+        /// </summary>
+        public class Node : GraphNode<Point> {
+            /// <summary>
+            /// A function that takes a Point on the Board, and evaluates the AP cost of moving to that Point, often
+            /// depending on the Tile type or what Pawns occupy that Point.
+            /// 
+            /// Having a delegate handle the cost evaluation lets different Pawns decide their movement strategy differently.
+            /// </summary>
+            /// <param name="point">Point to move to. Does not necessarily need to be adjacent to this Node.</param>
+            /// <returns>Cost of moving to point</returns>
+            public delegate int EdgeCostLookup(Point point);
+
+            /// <summary>Point on the Board</summary>
+            protected Point _point;
+            /// <summary>Reference to the Board</summary>
+            protected Board _board;
+            /// <summary>List of adjacent, non-Wall, in-bounds Points on the Board</summary>
+            protected List<GraphNode<Point>> _neighbors = new List<GraphNode<Point>>();
+            /// <summary>Edge cost callback</summary>
+            protected EdgeCostLookup _edgeCostLookup;
+
+            /// <summary>
+            /// Construct a new Node
+            /// </summary>
+            /// <param name="board"></param>
+            /// <param name="point"></param>
+            /// <param name="lookup"></param>
+            public Node(Board board, Point point, EdgeCostLookup lookup = null) {
+                if (board == null) { throw new ArgumentNullException("board"); }
+                if (lookup == null) { throw new ArgumentNullException("lookup"); }
+
+                _board = board;
+                _point = point;
+                _edgeCostLookup = lookup;
+            }
+
+            public override Point GetData() {
+                return _point;
+            }
+
+            /// <summary>
+            /// Returns the cost of moving from the current Node to an adjacent Node
+            /// </summary>
+            /// <param name="neighbor">Another Node. Doesn't actually have to be adjacent to this.</param>
+            /// <returns></returns>
+            public override int GetEdgeCost(GraphNode<Point> neighbor) {
+                int cost = 0;
+                if (_edgeCostLookup != null) {
+                    Point toPoint = neighbor.GetData();
+                    cost = _edgeCostLookup(toPoint);
+                }
+                return cost;
+            }
+
+            /// <summary>
+            /// Iterates through adjacent Points.  To avoid having to construct the entire Board as a graph,
+            /// this function acts as an iterator, and creates neighbor Nodes only as needed.
+            /// </summary>
+            /// <returns>An IEnumerable that iterates through this Node's neighboring Points</returns>
+            public override IEnumerable<GraphNode<Point>> GetNeighbors() {
+                for (int i = 0; i < Point.OctoNeighbors.Length; i++) {
+                    Point neighborPoint = _point + Point.Neighbors[i];
+
+                    if (_board.InBounds(neighborPoint) && _board.GetTile(neighborPoint) != Board.WALL_TILE) {
+                        // Check if a Node already exists for the Point
+                        Node neighbor = _neighbors.Find(node => node.GetData().Equals(neighborPoint)) as Node;
+                        if (neighbor == null) {
+                            // If no Node exists, create one
+                            neighbor = new Node(_board, neighborPoint, _edgeCostLookup);
+                            _neighbors.Add(neighbor);
+
+                            yield return neighbor;
+                        } else {
+                            // If a Node exists, return the stored one
+                            yield return neighbor;
+                        }
+                    }
+                }
+            }
+        }
+
+        private int[,] _tiles;
         public int Width {
         	get { return _tiles.GetLength(1); }
         }

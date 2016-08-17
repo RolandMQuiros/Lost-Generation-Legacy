@@ -19,86 +19,6 @@ namespace LostGen.Skills {
     /// more specific skills to cover smaller possibility spaces.
     /// </summary>
     public class Walk : Skill {
-        /// <summary>
-        /// Graph node representation of a Board coordinate. This connects Points on the Board with adjacent
-        /// Points, and sets edge values depending on at those points, or Tile types.
-        /// </summary>
-        protected class WalkNode : GraphNode<Point> {
-            /// <summary>
-            /// A function that takes a Point on the Board, and evaluates the AP cost of moving to that Point, often
-            /// depending on the Tile type or what Pawns occupy that Point.
-            /// 
-            /// Having a delegate handle the cost evaluation lets different Pawns decide their movement strategy differently.
-            /// </summary>
-            /// <param name="point">Point to move to. Does not necessarily need to be adjacent to this WalkNode.</param>
-            /// <returns>Cost of moving to point</returns>
-            public delegate int EdgeCostLookup(Point point);
-
-            /// <summary>Point on the Board</summary>
-            private Point _point;
-            /// <summary>Reference to the Board</summary>
-            private Board _board;
-            /// <summary>List of adjacent, non-Wall, in-bounds Points on the Board</summary>
-            private List<WalkNode> _neighbors = new List<WalkNode>();
-            /// <summary>Edge cost callback</summary>
-            private EdgeCostLookup _edgeCostLookup;
-
-            /// <summary>
-            /// Construct a new WalkNode
-            /// </summary>
-            /// <param name="board"></param>
-            /// <param name="point"></param>
-            /// <param name="lookup"></param>
-            public WalkNode(Board board, Point point, EdgeCostLookup lookup) {
-                if (board == null) { throw new ArgumentNullException("board"); }
-                if (lookup == null) { throw new ArgumentNullException("lookup"); }
-
-                _board = board;
-                _point = point;
-                _edgeCostLookup = lookup;
-            }
-
-            public override Point GetData() {
-                return _point;
-            }
-
-            /// <summary>
-            /// Returns the cost of moving from the current WalkNode to an adjacent WalkNode
-            /// </summary>
-            /// <param name="neighbor">Another WalkNode. Doesn't actually have to be adjacent to this.</param>
-            /// <returns></returns>
-            public override int GetEdgeCost(GraphNode<Point> neighbor) {
-                Point toPoint = neighbor.GetData();
-                return _edgeCostLookup(toPoint);
-            }
-
-            /// <summary>
-            /// Iterates through adjacent Points.  To avoid having to construct the entire Board as a graph,
-            /// this function acts as an iterator, and creates neighbor WalkNodes only as needed.
-            /// </summary>
-            /// <returns>An IEnumerable that iterates through this WalkNode's neighboring Points</returns>
-            public override IEnumerable<GraphNode<Point>> GetNeighbors() {
-                for (int i = 0; i < Point.OctoNeighbors.Length; i++) {
-                    Point neighborPoint = _point + Point.Neighbors[i];
-
-                    if (_board.InBounds(neighborPoint) && _board.GetTile(neighborPoint) != Board.WALL_TILE) {
-                        // Check if a WalkNode already exists for the Point
-                        WalkNode neighbor = _neighbors.Find(node => node._point.Equals(neighborPoint));
-                        if (neighbor == null) {
-                            // If no WalkNode exists, create one
-                            neighbor = new WalkNode(_board, neighborPoint, _edgeCostLookup);
-                            _neighbors.Add(neighbor);
-
-                            yield return neighbor;
-                        } else {
-                            // If a WalkNode exists, return the stored one
-                            yield return neighbor;
-                        }
-                    }
-                }
-            }
-        }
-
         private int _cost = 0;
         public override int ActionPoints {
             get { return _cost; }
@@ -124,9 +44,9 @@ namespace LostGen.Skills {
                 } else {
                     _path = new List<Point>(
                         Pathfinder<Point>.FindPath(
-                            new WalkNode(_board, Owner.Position, TileCost),
-                            new WalkNode(_board, destination, TileCost),
-                            Point.TaxicabDistance
+                            new Board.Node(_board, Owner.Position, TileCost),
+                            new Board.Node(_board, destination, TileCost),
+                            Heuristic
                         )
                     );
                 }
@@ -158,6 +78,10 @@ namespace LostGen.Skills {
 
         protected void SetPostcondition() {
             _postCondition.SetStateValue(BoardState.CombatantKey(Owner, "position"), Destination);
+        }
+
+        protected virtual int Heuristic(Point start, Point end) {
+            return Point.TaxicabDistance(start, end);
         }
 
         protected virtual int TileCost(Point point) {
