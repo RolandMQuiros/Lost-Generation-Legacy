@@ -15,6 +15,21 @@ namespace LostGen {
             _skill = skill;
         }
 
+        public bool TryToSetNeighbor(SkillNode other) {
+            bool eligible = false;
+            Skill otherSkill = other._skill;
+            BoardState ourPostconditions = new BoardState();
+
+            _skill.GetPostconditions(ourPostconditions);
+
+            if (otherSkill.ArePreconditionsMet(ourPostconditions)) {
+                eligible = true;
+                _neighbors.Add(other);
+            }
+
+            return eligible;
+        }
+
         public override Skill GetData() {
             return _skill;
         }

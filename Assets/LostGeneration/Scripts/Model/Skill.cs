@@ -18,11 +18,6 @@ namespace LostGen {
         /// <summary>The number of Action Points this Skill will consume when fired</summary>
         public virtual int ActionPoints { get; protected set; }
 
-        protected BoardState _postCondition = new BoardState();
-        public BoardState PostCondition {
-            get { return _postCondition; }
-        }
-
         /// <summary>
         /// Creates a new Skill
         /// </summary>
@@ -51,6 +46,19 @@ namespace LostGen {
         /// </summary>
         /// <returns></returns>
         public abstract int GetDecisionCost();
+
+        /// <summary>
+        /// Applies this Skill's postconditions to a BoardState.
+        /// </summary>
+        /// <param name="state"></param>
+        public virtual void GetPostconditions(BoardState state) { }
+
+        /// <summary>
+        /// Checks if a BoardState meets this Skill's current Preconditions.
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns>True,if the BoardState meets this Skill's preconditions. False otherwise.</returns>
+        public virtual bool ArePreconditionsMet(BoardState state) { return true; }
 
         /// <summary>
         /// Performs a reference equality check.  This is here just to make Skills compatible with the Pathfinder. 

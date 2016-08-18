@@ -24,8 +24,8 @@ namespace LostGen.Skills {
             get { return _cost; }
         }
 
-        protected Point _destination;
-        public Point Destination { get { return _destination; } }
+        protected Point? _destination;
+        public Point Destination { get { return _destination.Value; } }
 
         private List<Point> _path;
         protected Board _board;
@@ -55,14 +55,15 @@ namespace LostGen.Skills {
                 for (int i = 0; i < _path.Count; i++) {
                     _cost += TileCost(_path[i]);
                 }
-
-                SetPostcondition();
             } else {
                 _destination = Owner.Position;
             }
         }
 
         public ReadOnlyCollection<Point> GetPath() {
+            if (_destination == null) {
+                throw new NullReferenceException("Destination has not been specified");
+            }
             return _path.AsReadOnly();
         }
 
@@ -76,8 +77,8 @@ namespace LostGen.Skills {
             }
         }
 
-        protected void SetPostcondition() {
-            _postCondition.SetStateValue(BoardState.CombatantKey(Owner, "position"), Destination);
+        public override void GetPostconditions(BoardState state) {
+            state.SetStateValue(BoardState.CombatantKey(Owner, "position"), Destination);
         }
 
         protected virtual int Heuristic(Point start, Point end) {
@@ -93,5 +94,4 @@ namespace LostGen.Skills {
             return ActionPoints;
         }
     }
-
 }

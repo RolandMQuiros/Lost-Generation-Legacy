@@ -11,7 +11,7 @@ namespace LostGen {
         /// Graph node representation of a Board coordinate. This connects Points on the Board with adjacent
         /// Points, and sets edge values depending on at those points, or Tile types.
         /// </summary>
-        public class Node : GraphNode<Point> {
+        public class Node : IGraphNode {
             /// <summary>
             /// A function that takes a Point on the Board, and evaluates the AP cost of moving to that Point, often
             /// depending on the Tile type or what Pawns occupy that Point.
@@ -24,10 +24,11 @@ namespace LostGen {
 
             /// <summary>Point on the Board</summary>
             protected Point _point;
+            public Point Point { get { return _point; } }
             /// <summary>Reference to the Board</summary>
             protected Board _board;
             /// <summary>List of adjacent, non-Wall, in-bounds Points on the Board</summary>
-            protected List<GraphNode<Point>> _neighbors = new List<GraphNode<Point>>();
+            protected List<Node> _neighbors = new List<Node>();
             /// <summary>Edge cost callback</summary>
             protected EdgeCostLookup _edgeCostLookup;
 
@@ -46,20 +47,17 @@ namespace LostGen {
                 _edgeCostLookup = lookup;
             }
 
-            public override Point GetData() {
-                return _point;
-            }
-
             /// <summary>
             /// Returns the cost of moving from the current Node to an adjacent Node
             /// </summary>
             /// <param name="neighbor">Another Node. Doesn't actually have to be adjacent to this.</param>
             /// <returns></returns>
-            public override int GetEdgeCost(GraphNode<Point> neighbor) {
+            public int GetEdgeCost(IGraphNode neighbor) {
+                Node boardNode = (Node)neighbor;
                 int cost = 0;
+                
                 if (_edgeCostLookup != null) {
-                    Point toPoint = neighbor.GetData();
-                    cost = _edgeCostLookup(toPoint);
+                    cost = _edgeCostLookup(boardNode.Point);
                 }
 
                 return cost;
@@ -70,13 +68,13 @@ namespace LostGen {
             /// this function acts as an iterator, and creates neighbor Nodes only as needed.
             /// </summary>
             /// <returns>An IEnumerable that iterates through this Node's neighboring Points</returns>
-            public override IEnumerable<GraphNode<Point>> GetNeighbors() {
+            public IEnumerable<IGraphNode> GetNeighbors() {
                 for (int i = 0; i < Point.OctoNeighbors.Length; i++) {
                     Point neighborPoint = _point + Point.OctoNeighbors[i];
 
                     if (_board.InBounds(neighborPoint) && _board.GetTile(neighborPoint) != Board.WALL_TILE) {
                         // Check if a Node already exists for the Point
-                        Node neighbor = _neighbors.Find(node => node.GetData().Equals(neighborPoint)) as Node;
+                        Node neighbor = _neighbors.Find(node => node.Point.Equals(neighborPoint)) as Node;
                         if (neighbor == null) {
                             // If no Node exists, create one
                             neighbor = new Node(_board, neighborPoint, _edgeCostLookup);
@@ -89,6 +87,11 @@ namespace LostGen {
                         }
                     }
                 }
+            }
+
+            public bool IsMatch(IGraphNode other) {
+                Node otherNode = (Node)other;
+                return Point.Equals(otherNode.Point);
             }
         }
 
@@ -104,10 +107,15 @@ namespace LostGen {
         private HashSet<Pawn> _pawns = new HashSet<Pawn>();
         private List<Pawn> _pawnOrder = new List<Pawn>();
         private Dictionary<Point, HashSet<Pawn>> _pawnBuckets = new Dictionary<Point, HashSet<Pawn>>();
-        
-        public Board(int[,] tiles) {
+
+        public Board(int[,] tiles, int buckets = 4) {
+            if (tiles == null || tiles.Length == 0) {
+                throw new ArgumentNullException("tiles", "Grid is null or empty");
+            }
+
             _tiles = new int[tiles.GetLength(0), tiles.GetLength(1)];
             Array.Copy(tiles, 0, _tiles, 0, tiles.Length);
+            
         }
 
         public int GetTile(int x, int y) {

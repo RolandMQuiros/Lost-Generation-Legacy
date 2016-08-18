@@ -1,0 +1,61 @@
+Skills - Invidivual things a combatant can do
+Decisions - How a combatant does a thing
+Goal - Why a combatant does a thing
+
+E.G.
+Skills.Walk      - Move to an arbitrary location
+Skills.Inventory - Add/Remove/Equip items
+Skills.Throw     - Throws an Item at a target
+
+Decision.PickUpNearestWeapon -
+     Precondition: Does not have Weapon
+           Action: Skills.Walk to Weapon
+                   Add Item to Skills.Inventory
+             Cost: Walk weight * (1 AP * tiles moved) + (2 AP to pick up)
+    Postcondition: position at Weapon
+                   Weapon in inventory
+
+Decision.ThrowWeapon
+     Precondition: Enemy is alive (unspecified conditions handled by Board's actual state)
+                   Enemy within line of sight (Enemy move prediction?)
+                   Enemy within range
+                   Weapon in inventory
+           Action: Skills.Throw an item at enemy
+             Cost: AP weight * (5 AP to throw) + Item weight * Item value index
+    Postcondition: Weapon not in Inventory
+                   Enemy is dead or dying
+
+Decision.ChargeEnemy
+     Precondition: Enemy is alive
+                   Enemy within line of sight
+                   Enemy in melee range
+           Action: Skills.Walk to enemy
+                   Skills.Attack enemy
+             Cost: AP weight * (1 AP * tiles moved + 2 AP to attack) + Caution weight * danger index
+    Postcondition: At new position
+                   Enemy dead or dying
+
+* Decision is a GraphNode<BoardState> where GetData returns postcondition
+* Goals are just BoardState checks?
+* Goals and decisions are the same thing?? fuckin raw
+    * Yes. Goals are just Decisions without a postcondition.  Endpoint decisions.
+
+Goal.KillEnemy
+     Precondition: Enemy is dead
+
+Goal.GetToSafety
+     Precondition: Danger index is beneath a certain threshold
+
+
+E.G.G.
+Goal: GetToSafety
+    1. Construct graph (O(N^2))
+
+-------
+Aside
+Inventory as Skill? You'll need to handle
+    * Asynchronous item adds/removals
+    * /Communication with other Skills/
+Verdict: nah
+    * But Skills should do their own stat calculations
+-------

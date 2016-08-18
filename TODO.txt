@@ -4,4 +4,23 @@ Lost Generation TODO
 [X] Pathfinding Class architecture *
 [X] Pathfinding Class unit tests *
 [X] Walk Skill + Pathfinding class refactor
+
+[] Goal Oriented Action Planning
+	[X] Skill Architecture
+	[] Remove IEquatable dependency in Pathfinding
+	[] Refactor SkillNode into DecisionNode
+	[] Example Skills + Tests
+	
 [] Pawn Controller architecture
+
+[] Visualization Layer
+
+Architecture Notes
+------------------
+* Separate Skills from their Combatants?
+	* Constructing the GOAP Skill Graph is O(n^2), naively. Best if we only have one instance of the graph per enemy type?
+* Should probably separate Skills from SkillNodes
+	* Skills should contain the logic to create certain actions, but don't have a specific outcome
+	* The Decision class
+		* The same as "Action" in all the tutorials, but that name's already taken here.
+		* Uses Skills to generate an outcome (Postcondition / Goal). This is what contains all the GraphNode stuff.
