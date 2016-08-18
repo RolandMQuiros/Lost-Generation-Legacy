@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace LostGen {
+    /*
     public class CombatantActionPlanner {
         private HashSet<Skill> _skills = new HashSet<Skill>();
         private List<SkillNode> _skillNodes = new List<SkillNode>();
@@ -23,13 +24,12 @@ namespace LostGen {
             return success;
         }
 
-        public void FindPlan(IGoal goal) {
+        public void FindPlan(DecisionNode goal) {
             if (_rebuildGraph) {
                 BuildGraph();
             }
 
             BoardState targetState = new BoardState();
-            goal.GetTargetState(targetState);
 
             //
         }
@@ -43,5 +43,5 @@ namespace LostGen {
                 }
             }
         }
-    }
+    }*/
 }

@@ -3,17 +3,17 @@ using System.Collections.Generic;
 
 namespace LostGen {
 
-    public class Pathfinder<T> {
-        public delegate int Heuristic(IGraphNode start, IGraphNode end);
+    public class Pathfinder<T> where T : IGraphNode {
+        public delegate int Heuristic(T start, T end);
 
         private class SortNode : IComparable<SortNode> {
-            public IGraphNode Node;
+            public T Node;
             public int GScore = 0;
             public int FScore = 0;
 
             public int CompareTo(SortNode other) {
                 int compare = 0;
-
+                
                 if (FScore < other.FScore) { compare = -1; }
                 else if (FScore > other.FScore) { compare = 1; }
 
@@ -21,8 +21,8 @@ namespace LostGen {
             }
         }
 
-        public static IEnumerable<IGraphNode> FloodFill(IGraphNode start, int maxCost = -1, int maxDepth = -1) {
-            HashSet<IGraphNode> domain = new HashSet<IGraphNode>();
+        public static IEnumerable<T> FloodFill(T start, int maxCost = -1, int maxDepth = -1) {
+            HashSet<T> domain = new HashSet<T>();
             Stack<SortNode> open = new Stack<SortNode>();
 
             open.Push(new SortNode() { Node = start });
@@ -33,7 +33,7 @@ namespace LostGen {
 
                 bool leafFound = true;
                 if (maxDepth == -1 || open.Count < maxDepth) {
-                    foreach (IGraphNode neighbor in current.Node.GetNeighbors()) {
+                    foreach (T neighbor in current.Node.GetNeighbors()) {
                         if (domain.Contains(neighbor)) {
                             continue;
                         }
@@ -58,21 +58,21 @@ namespace LostGen {
             return domain;
         }
 
-        public static IEnumerable<IGraphNode> FindPath(IGraphNode start, IGraphNode end, Heuristic heuristic) {
-            HashSet<IGraphNode> visited = new HashSet<IGraphNode>();
+        public static IEnumerable<T> FindPath(T start, T end, Heuristic heuristic) {
+            HashSet<T> visited = new HashSet<T>();
             List<SortNode> open = new List<SortNode>();
-            Dictionary<IGraphNode, IGraphNode> cameFrom = new Dictionary<IGraphNode, IGraphNode>();
+            Dictionary<T, T> cameFrom = new Dictionary<T, T>();
 
-            Stack<IGraphNode> path = new Stack<IGraphNode>();
+            Stack<T> path = new Stack<T>();
 
             open.Add(new SortNode() { Node = start });
             
             while (open.Count > 0) {
                 open.Sort();
                 SortNode current = open[0];
-
+                
                 if (current.Node.IsMatch(end)) {
-                    IGraphNode pathNode = current.Node;
+                    T pathNode = current.Node;
                     path.Push(pathNode);
                     while (cameFrom.ContainsKey(pathNode)) {
                         pathNode = cameFrom[pathNode];
@@ -83,7 +83,7 @@ namespace LostGen {
 
                 open.RemoveAt(0);
 
-                foreach (IGraphNode neighbor in current.Node.GetNeighbors()) {
+                foreach (T neighbor in current.Node.GetNeighbors()) {
                     if (visited.Contains(neighbor)) {
                         continue;
                     }

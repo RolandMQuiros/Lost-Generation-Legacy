@@ -7,24 +7,20 @@ using NUnit.Framework;
 namespace LostGen.Test {
     public class PathfinderTests {
 
-        private class TestGraphNode : GraphNode<char> {
-            private char _value;
-            public Dictionary<GraphNode<char>, int> _neighbors = new Dictionary<GraphNode<char>, int>();
+        private class TestNode : IGraphNode, IComparable<TestNode> {
+            public char Value { get; private set; }
+            public Dictionary<IGraphNode, int> _neighbors = new Dictionary<IGraphNode, int>();
 
-            public TestGraphNode(char value) {
-                _value = value;
+            public TestNode(char value) {
+                Value = value;
             }
 
-            public void AddNeighbor(TestGraphNode neighbor, int edgeCost) {
+            public void AddNeighbor(TestNode neighbor, int edgeCost) {
                 _neighbors[neighbor] = edgeCost;
             }
 
-            public override char GetData() {
-                return _value;
-            }
-
-            public override int GetEdgeCost(GraphNode<char> to) {
-                TestGraphNode neighbor = to as TestGraphNode;
+            public int GetEdgeCost(IGraphNode to) {
+                TestNode neighbor = (TestNode)to;
                 int cost;
 
                 if (neighbor == null) {
@@ -36,19 +32,36 @@ namespace LostGen.Test {
                 return cost;
             }
 
-            public override IEnumerable<GraphNode<char>> GetNeighbors() {
+            public IEnumerable<IGraphNode> GetNeighbors() {
                 return _neighbors.Keys;
+            }
+
+            public bool IsMatch(IGraphNode other) {
+                TestNode otherNode = (TestNode)other;
+                return Value == otherNode.Value;
+            }
+
+            public static string PathToString(IEnumerable<TestNode> path) {
+                string pathStr = string.Empty;
+                foreach (TestNode node in path) {
+                    pathStr += node.Value;
+                }
+                return pathStr;
+            }
+
+            public int CompareTo(TestNode other) {
+                return Value.CompareTo(other.Value);
             }
         }
 
         [Test]
         public void StraightShot() {
             //Arrange
-            TestGraphNode nodeA = new TestGraphNode('A');
-            TestGraphNode nodeB = new TestGraphNode('B');
-            TestGraphNode nodeC = new TestGraphNode('C');
-            TestGraphNode nodeD = new TestGraphNode('D');
-            TestGraphNode nodeE = new TestGraphNode('E');
+            TestNode nodeA = new TestNode('A');
+            TestNode nodeB = new TestNode('B');
+            TestNode nodeC = new TestNode('C');
+            TestNode nodeD = new TestNode('D');
+            TestNode nodeE = new TestNode('E');
 
             nodeA.AddNeighbor(nodeB, 10);
             nodeB.AddNeighbor(nodeA, 10);
@@ -62,24 +75,28 @@ namespace LostGen.Test {
             nodeD.AddNeighbor(nodeE, 10);
             nodeE.AddNeighbor(nodeD, 10);
 
-            List<char> path = new List<char>(
-                Pathfinder<char>.FindPath(nodeA, nodeE, delegate (char start, char end) {
-                    return 10 * Math.Abs(end - start);
+            List<TestNode> path = new List<TestNode>(
+                Pathfinder<TestNode>.FindPath(nodeA, nodeE, delegate (TestNode start, TestNode end) {
+                    return 10 * Math.Abs(end.Value - start.Value);
                 })
             );
 
-            string pathStr = new string(path.ToArray());
+            string pathStr = string.Empty;
+            for (int i = 0; i < path.Count; i++) {
+                pathStr += path[i].Value;
+            }
+
             Assert.AreEqual(pathStr, "ABCDE");
         }
 
         [Test]
         public void NoPath() {
             //Arrange
-            TestGraphNode nodeA = new TestGraphNode('A');
-            TestGraphNode nodeB = new TestGraphNode('B');
-            TestGraphNode nodeC = new TestGraphNode('C');
-            TestGraphNode nodeD = new TestGraphNode('D');
-            TestGraphNode nodeE = new TestGraphNode('E');
+            TestNode nodeA = new TestNode('A');
+            TestNode nodeB = new TestNode('B');
+            TestNode nodeC = new TestNode('C');
+            TestNode nodeD = new TestNode('D');
+            TestNode nodeE = new TestNode('E');
 
             nodeA.AddNeighbor(nodeB, 10);
             nodeB.AddNeighbor(nodeA, 10);
@@ -93,24 +110,23 @@ namespace LostGen.Test {
             //nodeD.AddNeighbor(nodeE, 10);
             nodeE.AddNeighbor(nodeD, 10);
 
-            List<char> path = new List<char>(
-                Pathfinder<char>.FindPath(nodeA, nodeE, delegate (char start, char end) {
-                    return 10 * Math.Abs(end - start);
+            string pathStr = TestNode.PathToString(
+                Pathfinder<TestNode>.FindPath(nodeA, nodeE, delegate (TestNode start, TestNode end) {
+                    return 10 * Math.Abs(end.Value - start.Value);
                 })
             );
 
-            string pathStr = new string(path.ToArray());
             Assert.IsNullOrEmpty(pathStr);
         }
 
         [Test]
         public void SimpleBranches() {
             //Arrange
-            TestGraphNode nodeA = new TestGraphNode('A');
-            TestGraphNode nodeB = new TestGraphNode('B');
-            TestGraphNode nodeC = new TestGraphNode('C');
-            TestGraphNode nodeD = new TestGraphNode('D');
-            TestGraphNode nodeE = new TestGraphNode('E');
+            TestNode nodeA = new TestNode('A');
+            TestNode nodeB = new TestNode('B');
+            TestNode nodeC = new TestNode('C');
+            TestNode nodeD = new TestNode('D');
+            TestNode nodeE = new TestNode('E');
 
             nodeA.AddNeighbor(nodeB, 10);
             nodeB.AddNeighbor(nodeA, 10);
@@ -127,23 +143,22 @@ namespace LostGen.Test {
             nodeD.AddNeighbor(nodeE, 10);
             nodeE.AddNeighbor(nodeD, 10);
 
-            List<char> path = new List<char>(
-                Pathfinder<char>.FindPath(nodeA, nodeE, delegate (char start, char end) {
-                    return 10 * Math.Abs(end - start);
+            string pathStr = TestNode.PathToString(
+                Pathfinder<TestNode>.FindPath(nodeA, nodeE, delegate (TestNode start, TestNode end) {
+                    return 10 * Math.Abs(end.Value - start.Value);
                 })
             );
-
-            string pathStr = new string(path.ToArray());
+            
             Assert.AreEqual(pathStr, "ABDE");
         }
 
         [Test]
         public void StartNotInGraph() {
             //Arrange
-            TestGraphNode nodeA = new TestGraphNode('A');
-            TestGraphNode nodeB = new TestGraphNode('B');
-            TestGraphNode nodeC = new TestGraphNode('C');
-            TestGraphNode nodeD = new TestGraphNode('D');
+            TestNode nodeA = new TestNode('A');
+            TestNode nodeB = new TestNode('B');
+            TestNode nodeC = new TestNode('C');
+            TestNode nodeD = new TestNode('D');
 
             nodeB.AddNeighbor(nodeC, 10);
             nodeC.AddNeighbor(nodeB, 10);
@@ -151,22 +166,21 @@ namespace LostGen.Test {
             nodeC.AddNeighbor(nodeD, 10);
             nodeD.AddNeighbor(nodeC, 10);
 
-            List<char> path = new List<char>(
-                Pathfinder<char>.FindPath(nodeA, nodeD, delegate (char start, char end) {
-                    return 10 * Math.Abs(end - start);
+            string pathStr = TestNode.PathToString(
+                Pathfinder<TestNode>.FindPath(nodeA, nodeD, delegate (TestNode start, TestNode end) {
+                    return 10 * Math.Abs(end.Value - start.Value);
                 })
             );
-
-            string pathStr = new string(path.ToArray());
+            
             Assert.IsNullOrEmpty(pathStr);
         }
 
         [Test]
         public void EndNotInGraph() {
-            TestGraphNode nodeA = new TestGraphNode('A');
-            TestGraphNode nodeB = new TestGraphNode('B');
-            TestGraphNode nodeC = new TestGraphNode('C');
-            TestGraphNode nodeD = new TestGraphNode('D');
+            TestNode nodeA = new TestNode('A');
+            TestNode nodeB = new TestNode('B');
+            TestNode nodeC = new TestNode('C');
+            TestNode nodeD = new TestNode('D');
 
             nodeA.AddNeighbor(nodeB, 10);
             nodeB.AddNeighbor(nodeA, 10);
@@ -174,34 +188,35 @@ namespace LostGen.Test {
             nodeB.AddNeighbor(nodeC, 10);
             nodeC.AddNeighbor(nodeB, 10);
 
-            List<char> path = new List<char>(
-                Pathfinder<char>.FindPath(nodeA, nodeD, delegate (char start, char end) {
-                    return 10 * Math.Abs(end - start);
+            string pathStr = TestNode.PathToString(
+                Pathfinder<TestNode>.FindPath(nodeA, nodeD, delegate (TestNode start, TestNode end) {
+                    return 10 * Math.Abs(end.Value - start.Value);
                 })
             );
 
-            string pathStr = new string(path.ToArray());
             Assert.IsNullOrEmpty(pathStr);
         }
 
         [Test]
         public void FloodFillDepthStraightLine() {
-            TestGraphNode[] nodes = new TestGraphNode[26];
+            TestNode[] nodes = new TestNode[26];
             for (int i = 0; i < nodes.Length; i++) {
-                nodes[i] = new TestGraphNode((char)((int)'A' + i));
+                nodes[i] = new TestNode((char)((int)'A' + i));
                 if (i > 0) {
                     nodes[i].AddNeighbor(nodes[i - 1], 10);
                     nodes[i - 1].AddNeighbor(nodes[i], 10);
                 }
             }
 
-            List<char> depthDomain = new List<char>(Pathfinder<char>.FloodFill(nodes[0], -1, 10));
+            List<TestNode> depthDomain = new List<TestNode>(
+                Pathfinder<TestNode>.FloodFill(nodes[0], -1, 10)
+            );
             depthDomain.Sort();
-            string depthString = new string(depthDomain.ToArray());
+            string depthString = TestNode.PathToString(depthDomain);
 
-            List<char> costDomain = new List<char>(Pathfinder<char>.FloodFill(nodes[0], 100, -1));
+            List<TestNode> costDomain = new List<TestNode>(Pathfinder<TestNode>.FloodFill(nodes[0], 100, -1));
             costDomain.Sort();
-            string costString = new string(costDomain.ToArray());
+            string costString = TestNode.PathToString(costDomain);
 
             Assert.AreEqual("ABCDEFGHIJ", depthString);
             Assert.AreEqual("ABCDEFGHIJ", costString);

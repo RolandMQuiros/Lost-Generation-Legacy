@@ -107,48 +107,6 @@ namespace LostGen.Test {
             
             Assert.AreEqual(end, combatant.Position);
         }
-
-        [Test]
-        public void EnemyAvoidanceMaze() {
-            int[,] grid = new int[,] {
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                { 0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0 },
-                { 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0 },
-                { 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0 },
-                { 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0 },
-                { 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0 },
-                { 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0 },
-                { 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0 },
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
-            };
-            Point start = new Point(1, 1);
-            Point end = new Point(10, 6);
-
-            Board board = new Board(grid);
-            Combatant combatant = new Combatant("Walker", board, Point.One);
-            Combatant enemy = new Combatant("Enemy", board, new Point(9, 7));
-
-            Stats stats = new Stats() { Stamina = 100 };
-            combatant.BaseStats = stats;
-
-            board.AddPawn(combatant);
-            board.AddPawn(enemy);
-
-            combatant.AddPawnToView(enemy);
-
-            Skills.ApproachWithCaution walk = new Skills.ApproachWithCaution(combatant, 5);
-            combatant.AddSkill(walk);
-            walk.SetDestination(end);
-            board.BeginTurn();
-            
-            Assert.LessOrEqual(walk.ActionPoints, combatant.ActionPoints);
-
-            combatant.FireSkill("Walk");
-            board.Turn();
-
-            Console.Write(BoardCommon.PrintGrid(grid, walk.GetPath()));
-            Assert.AreEqual(end, combatant.Position);
-        }
     }
 
 }

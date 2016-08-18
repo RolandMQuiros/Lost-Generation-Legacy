@@ -27,7 +27,7 @@ namespace LostGen.Skills {
         protected Point? _destination;
         public Point Destination { get { return _destination.Value; } }
 
-        private List<Point> _path;
+        private List<Board.Node> _path;
         protected Board _board;
 
         public Walk(Combatant owner)
@@ -39,11 +39,11 @@ namespace LostGen.Skills {
             if (_board.GetTile(destination) != Board.WALL_TILE) {
                 _destination = destination;
                 if (Point.TaxicabDistance(Owner.Position, destination) == 1) {
-                    _path = new List<Point>();
-                    _path.Add(destination);
+                    _path = new List<Board.Node>();
+                    _path.Add(_board.GetNode(_destination.Value, TileCost));
                 } else {
-                    _path = new List<Point>(
-                        Pathfinder<Point>.FindPath(
+                    _path = new List<Board.Node>(
+                        Pathfinder<Board.Node>.FindPath(
                             new Board.Node(_board, Owner.Position, TileCost),
                             new Board.Node(_board, destination, TileCost),
                             Heuristic
@@ -53,25 +53,31 @@ namespace LostGen.Skills {
 
                 _cost = 0;
                 for (int i = 0; i < _path.Count; i++) {
-                    _cost += TileCost(_path[i]);
+                    _cost += TileCost(_path[i].Point);
                 }
             } else {
                 _destination = Owner.Position;
             }
         }
 
-        public ReadOnlyCollection<Point> GetPath() {
+        public List<Point> GetPath() {
             if (_destination == null) {
                 throw new NullReferenceException("Destination has not been specified");
             }
-            return _path.AsReadOnly();
+
+            List<Point> pointPath = new List<Point>();
+            for (int i = 0; i < _path.Count; i++) {
+                pointPath.Add(_path[i].Point);
+            }
+
+            return pointPath;
         }
 
         public override void Fire() {
             if (_path != null) {
                 Actions.Move move;
                 for (int i = 0; i < _path.Count; i++) {
-                    move = new Actions.Move(Owner, _path[i], true);
+                    move = new Actions.Move(Owner, _path[i].Point, true);
                     Owner.PushAction(move);
                 }
             }
@@ -81,8 +87,8 @@ namespace LostGen.Skills {
             state.SetStateValue(BoardState.CombatantKey(Owner, "position"), Destination);
         }
 
-        protected virtual int Heuristic(Point start, Point end) {
-            return Point.TaxicabDistance(start, end);
+        protected virtual int Heuristic(Board.Node start, Board.Node end) {
+            return Point.TaxicabDistance(start.Point, end.Point);
         }
 
         protected virtual int TileCost(Point point) {
