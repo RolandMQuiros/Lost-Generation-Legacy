@@ -12,14 +12,8 @@ namespace LostGen {
             Board = board;
         }
 
-        /// <summary>
-        /// Returns the postcondition Board State of this Decision
-        /// </summary>
-        /// <returns>Postcondition BoardState</returns>
         public IEnumerable<IGraphNode> GetNeighbors() {
-            foreach (DecisionNode key in _neighbors.Keys) {
-                yield return key;
-            }
+            return _neighbors.Keys.Cast<IGraphNode>();
         }
 
         public int GetEdgeCost(IGraphNode neighbor) {
@@ -39,14 +33,16 @@ namespace LostGen {
             return false;
         }
 
-        /// <summary>Sets Skills</summary>
+        public abstract bool ArePreconditionsMet(BoardState state);
+        public abstract BoardState GetPostconditions();
+
         public abstract void Setup();
-        /// <summary>Calculates decision cost</summary>
-        /// <returns></returns>
         public abstract int GetCost();
-        /// <summary>Runs Skills</summary>
         public abstract void Run();
 
-        public abstract bool IsMatch(IGraphNode other);
+        public bool IsMatch(IGraphNode other) {
+            DecisionNode otherDecision = (DecisionNode)other;
+            return ArePreconditionsMet(otherDecision.GetPostconditions());
+        }
     }
 }
