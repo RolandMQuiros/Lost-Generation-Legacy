@@ -83,8 +83,8 @@ namespace LostGen.Skills {
             }
         }
 
-        public override void GetPostconditions(BoardState state) {
-            state.SetStateValue(BoardState.CombatantKey(Owner, "position"), Destination);
+        public override void GetPostconditions(StateOffset state) {
+            state.SetStateValue(StateOffset.CombatantKey(Owner, "position"), Destination);
         }
 
         protected virtual int Heuristic(Board.Node start, Board.Node end) {

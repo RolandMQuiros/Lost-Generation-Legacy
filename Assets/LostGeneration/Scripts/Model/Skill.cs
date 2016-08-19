@@ -51,14 +51,14 @@ namespace LostGen {
         /// Applies this Skill's postconditions to a BoardState.
         /// </summary>
         /// <param name="state"></param>
-        public virtual void GetPostconditions(BoardState state) { }
+        public virtual void GetPostconditions(StateOffset state) { }
 
         /// <summary>
         /// Checks if a BoardState meets this Skill's current Preconditions.
         /// </summary>
         /// <param name="state"></param>
         /// <returns>True,if the BoardState meets this Skill's preconditions. False otherwise.</returns>
-        public virtual bool ArePreconditionsMet(BoardState state) { return true; }
+        public virtual bool ArePreconditionsMet(StateOffset state) { return true; }
 
         /// <summary>
         /// Performs a reference equality check.  This is here just to make Skills compatible with the Pathfinder. 

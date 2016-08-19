@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace LostGen {
-    public class BoardState {
+    public class StateOffset {
         [StructLayout(LayoutKind.Explicit)]
         private struct StateValue {
             [FieldOffset(0)]

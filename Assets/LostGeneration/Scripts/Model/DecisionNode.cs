@@ -4,24 +4,19 @@ using System.Linq;
 using System.Text;
 
 namespace LostGen {
-    public abstract class DecisionNode : IGraphNode {
-        public Board Board { get; private set; }
-        private Dictionary<DecisionNode, int> _neighbors = new Dictionary<DecisionNode, int>();
-
-        public DecisionNode(Board board) {
-            Board = board;
-        }
+    public abstract class DecisionNode : IGraphNode, IGoal {
+        private Dictionary<DecisionNode, int> _causes = new Dictionary<DecisionNode, int>();
 
         public IEnumerable<IGraphNode> GetNeighbors() {
-            return _neighbors.Keys.Cast<IGraphNode>();
+            return _causes.Keys.Cast<IGraphNode>();
         }
 
         public int GetEdgeCost(IGraphNode neighbor) {
             DecisionNode neighborDecision = (DecisionNode)neighbor;
             int edgeCost = 0;
 
-            if (_neighbors.ContainsKey(neighborDecision)) {
-                edgeCost = _neighbors[neighborDecision];
+            if (_causes.ContainsKey(neighborDecision)) {
+                edgeCost = _causes[neighborDecision];
             } else {
                 throw new ArgumentOutOfRangeException("neighbor", "Given IGraphNode is not a neighbor of this DecisionNode");
             }
@@ -29,16 +24,26 @@ namespace LostGen {
             return edgeCost;
         }
 
-        public bool TryToAddNeighbor(DecisionNode other) {
-            return false;
+        public void ClearCauses() {
+            _causes.Clear();
         }
 
-        public abstract bool ArePreconditionsMet(BoardState state);
-        public abstract BoardState GetPostconditions();
+        public bool AddCause(DecisionNode other, int cost) {
+            bool added = false;
+            if (!_causes.ContainsKey(other)) {
+                _causes.Add(other, cost);
+                added = true;
+            }
 
-        public abstract void Setup();
-        public abstract int GetCost();
-        public abstract void Run();
+            return added;
+        }
+
+        public abstract bool ArePreconditionsMet(StateOffset state);
+        public abstract StateOffset GetPostconditions(StateOffset state = null);
+
+        public virtual void Setup() { }
+        public abstract int GetCost(StateOffset state = null);
+        public virtual void Run() { }
 
         public bool IsMatch(IGraphNode other) {
             DecisionNode otherDecision = (DecisionNode)other;

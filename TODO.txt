@@ -7,8 +7,10 @@ Lost Generation TODO
 
 [] Goal Oriented Action Planning
 	[X] Skill Architecture
-	[] Remove IEquatable dependency in Pathfinding
-	[] Refactor SkillNode into DecisionNode
+	[x] Remove IEquatable dependency in Pathfinding
+	[*] Refactor SkillNode into DecisionNode
+	[] Graph builder
+		* Figure out endless loop problem
 	[] Example Skills + Tests
 	
 [] Pawn Controller architecture
