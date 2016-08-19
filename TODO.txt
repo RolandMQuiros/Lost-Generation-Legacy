@@ -8,10 +8,14 @@ Lost Generation TODO
 [] Goal Oriented Action Planning
 	[X] Skill Architecture
 	[x] Remove IEquatable dependency in Pathfinding
-	[*] Refactor SkillNode into DecisionNode
+	[X] Refactor SkillNode into DecisionNode
 	[] Graph builder
-		* Figure out endless loop problem
-	[] Example Skills + Tests
+		[] Figure out endless loop problem
+		[] Even/Odd test isn't working how you expected:
+			EvenDecisions - only even causes
+			OddDecisions - only odd causes
+		   Happening b/c of propagated StateOffsets? Is that actually correct?
+	[] GOAP Integration Tests
 	
 [] Pawn Controller architecture
 

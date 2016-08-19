@@ -20,7 +20,15 @@ namespace LostGen {
             static readonly StateValue Empty = new StateValue() { Active = false };
         }
         
-        private Dictionary<string, StateValue> _stateValues = new Dictionary<string, StateValue>();
+        private Dictionary<string, StateValue> _stateValues;
+
+        public StateOffset(StateOffset offset = null) {
+            if (offset == null) {
+                _stateValues = new Dictionary<string, StateValue>();
+            } else {
+                _stateValues = new Dictionary<string, StateValue>(offset._stateValues);
+            }
+        }
 
         public void SetStateValue(string key, int value) {
             StateValue stateValue = new StateValue() {

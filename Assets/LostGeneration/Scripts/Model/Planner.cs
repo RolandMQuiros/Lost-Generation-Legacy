@@ -7,13 +7,13 @@ namespace LostGen {
     
     public class Planner {
         private class StartNode : DecisionNode {
-            public override bool ArePreconditionsMet(StateOffset state) { return true; }
-            public override int GetCost(StateOffset offset = null) { return 0; }
+            public override bool ArePreconditionsMet(StateOffset state) { return false; }
+            public override int GetCost(StateOffset offset = null) { return Int32.MaxValue; }
             public override void Run() { }
             public override void Setup() { }
 
             public override StateOffset GetPostconditions(StateOffset state = null) {
-                return (state == null) ? new StateOffset() : state;
+                return new StateOffset();
             }
         }
 
@@ -37,7 +37,7 @@ namespace LostGen {
 
         public bool AddDecision(DecisionNode decision) {
             bool success = _decisions.Add(decision);
-            _rebuildGraph = success;
+            _rebuildGraph |= success;
             return success;
         }
 
@@ -51,35 +51,49 @@ namespace LostGen {
             }
         }
 
-        private void BuildGraph() {
+        public void BuildGraph() {
             Stack<DecisionNode> open = new Stack<DecisionNode>();
+            Stack<StateOffset> states = new Stack<StateOffset>();
+
             open.Push(_root);
+            states.Push(new StateOffset());
 
-            StateOffset currentPost = new StateOffset();
             while (open.Count > 0) {
-                DecisionNode current = open.Pop();
-                currentPost = current.GetPostconditions(currentPost);
+                DecisionNode current = open.Peek();
+                StateOffset currentPost = states.Peek();
 
-                foreach (DecisionNode other in _decisions) {
-                    if (current == other || !other.ArePreconditionsMet(currentPost)) {
+                bool finishedNode = true;
+                bool causeFound = false;
+                foreach (DecisionNode cause in _decisions) {
+                    if (causeFound) {
+                        // Break on the opening of the following Decision
+                        // This ensures that if the current neighbor is the last, and it is an eligible cause, it triggers the finishing pops
+                        finishedNode = false;
+                        break;
+                    }
+
+                    if (current == cause || !cause.ArePreconditionsMet(currentPost)) {
                         continue;
                     }
 
-                    if (other.AddCause(current, other.GetCost(currentPost))) {
-                        open.Push(other);
-                        break;
+                    if (cause.AddCause(current, cause.GetCost(currentPost))) {
+                        StateOffset nextState = new StateOffset(currentPost);
+                        cause.GetPostconditions(nextState);
+
+                        open.Push(cause);
+                        states.Push(nextState);
+
+                        causeFound = true;
                     }
+                }
+
+                if (finishedNode) {
+                    open.Pop();
+                    states.Pop();
                 }
             }
 
-            foreach (DecisionNode decision in _decisions) {
-                StateOffset post = decision.GetPostconditions();
-                foreach (DecisionNode other in _decisions) {
-                    if (decision != other && other.ArePreconditionsMet(post)) {
-                        
-                    }
-                }
-            }
+            _rebuildGraph = false;
         }
     }
 }

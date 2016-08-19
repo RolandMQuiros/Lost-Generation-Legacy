@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace LostGen {
-    public abstract class DecisionNode : IGraphNode, IGoal {
+    public abstract class DecisionNode : IGraphNode {
         private Dictionary<DecisionNode, int> _causes = new Dictionary<DecisionNode, int>();
 
         public IEnumerable<IGraphNode> GetNeighbors() {
