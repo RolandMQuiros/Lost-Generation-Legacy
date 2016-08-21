@@ -9,12 +9,13 @@ Lost Generation TODO
 	[X] Skill Architecture
 	[x] Remove IEquatable dependency in Pathfinding
 	[X] Refactor SkillNode into DecisionNode
-	[] Graph builder
-		[] Figure out endless loop problem
-		[] Even/Odd test isn't working how you expected:
+	[X] Graph builder
+		[X] Figure out endless loop problem
+			* Builder doesn't process if edge already exists
+		[X] Even/Odd test isn't working how you expected:
 			EvenDecisions - only even causes
 			OddDecisions - only odd causes
-		   Happening b/c of propagated StateOffsets? Is that actually correct?
+		    Happening b/c of propagated StateOffsets? Is that actually correct?
 	[] GOAP Integration Tests
 	
 [] Pawn Controller architecture

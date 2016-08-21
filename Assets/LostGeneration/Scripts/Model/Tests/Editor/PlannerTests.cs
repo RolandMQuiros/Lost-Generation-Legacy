@@ -13,12 +13,12 @@ namespace LostGen.Test {
             public int Cost;
 
             public override bool ArePreconditionsMet(StateOffset state) {
-                int val = state.GetStateValue("value", 0);
-                return val == Value;
+                int val = state.GetStateValue("value", -1);
+                return val == Value - 1;
             }
 
             public override StateOffset GetPostconditions(StateOffset state = null) {
-                state.SetStateValue("value", Value + 1);
+                state.SetStateValue("value", Value);
                 return state;
             }
 
@@ -29,15 +29,15 @@ namespace LostGen.Test {
 
         private class OddDecision : TestDecision {
             public override bool ArePreconditionsMet(StateOffset state) {
-                int val = state.GetStateValue("value", 1);
-                return val <= Value && val % 2 != 0;
+                int val = state.GetStateValue("value", -1);
+                return val < Value && val % 2 == 1;
             }
         }
 
         private class EvenDecision : TestDecision {
             public override bool ArePreconditionsMet(StateOffset state) {
-                int val = state.GetStateValue("value", 1);
-                return val <= Value && val % 2 == 0;
+                int val = state.GetStateValue("value", -1);
+                return val < Value && val % 2 == 0;
             }
         }
 
@@ -96,9 +96,9 @@ namespace LostGen.Test {
                 Pathfinder<DecisionNode>.FloodFill(decisions[9])
             );
 
-            Assert.AreEqual(11, graphList.Count);
-
             PrintGraphList(graphList);
+
+            Assert.AreEqual(11, graphList.Count);
         }
 
         [Test]
@@ -115,6 +115,18 @@ namespace LostGen.Test {
                 planner.AddDecision(decisions[i]);
             }
 
+            // SHIT do we need to rebuild the graph with every state change?
+            // Only if you build the graph using the precondition check outside of isolation
+            // When building graph
+
+            // Limit 1 occurrence of a decision per path
+            // The goal's precondition should check for progress toward goal, not a hard requirement for the goal state
+            // Thus, once the goal's precondition is satisfied, the planner can restart the pathfinding plan?
+
+            // A* doesn't cover repeat visits, so
+            // Design Goals as inclusive of progress as well as ultimate success
+            // e.g. If the ultimate goal is to kill the enemy, for the DecisionNode EnemyDeadOrDying, ArePreconditionsMet returns true
+            // if the Enemy's projected HP is lower than their current HP
             planner.BuildGraph();
 
             List<DecisionNode> graphList = new List<DecisionNode>(

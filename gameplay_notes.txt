@@ -1,0 +1,51 @@
+Control Structure
+-----------------
+
+[] Remove AP check from Combatant
+
+Resources
+Steps + Turns + AP
+	* Every Combatant has Action Points consumed by skills.  Turn ends when all Combatants on the board have used or banked their AP.  AP is replenished with next turn.
+
+Controlling Squad
+	* AI Free Control
+		* Party members have their own Planner and choose their own Goals.
+		* Goals are weighted by their personality and relationship values
+	* Goal chosen
+		* Player puts a heavy weight on a particular goal
+		* The scale of that weight affected by social stats. Party member can choose to ignore.
+	* Direct Control
+		* Player has complete control over squad, but requires micromanagement in the general case. Encourage using this in tense combat situations.
+
+	What does this add?
+		* A sense of progression in the player's relationship with other characters.
+		* The player is a distinct entity from the other characters
+	Challenges?
+		* The Friendly AI could get you killed. Is this fine?
+		* Need a means of anticipating enemy movement
+
+XCOM creates a space for the player to create soldier personalities in the dice rolls, plus the situations.
+Are you in danger of sinking too much time into trying to make this explicit in systems? 
+
+Direct Control Methods
+1. XCOM style. Player issues commands to all characters at beginning of turn. While assigning commands to a character, 'ghosts' of the other characters commands show the anticipated state after each action. Player hits an 'Engage' button to carry out actions.
+	+  Uniform structure for every character
+	++ Requires anticipation from player
+	-- Lower turn granularity than Formation mode. Formation mode might be even more viable, making engagements all really awkward.
+
+2. Rogueish.  Player assigns commands to party members at beginning of turn.  Controls avatar directly using RL controls, and every action controls the turn progression.
+	+ Medium granularity. Player avatar can adapt to new conditions, but party members can't
+	++ Gives an advantage to leader character. Opens possibilities to crawls where the avatar isn't the leader.
+	- Tedious to assign actions to everyone
+
+============================================
+Verdict: Rogueish + AI
+============================================
+
+Each party member can be assigned a general Goal:
+	* Free Action - whatever they want
+	* Attack greatest threat - Prioritize enemies with highest danger index
+	* Attack least threat - Prioritize enemies with lowest danger index
+	* Retreat and Conserve - Prioritize avoiding damage while not using Skills with long cooldowns or one-use items
+	* Survive - Prioritize survival at all costs
+	* Direct Control

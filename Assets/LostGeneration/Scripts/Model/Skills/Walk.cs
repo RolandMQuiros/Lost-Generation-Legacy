@@ -36,8 +36,16 @@ namespace LostGen.Skills {
         }
 
         public void SetDestination(Point destination) {
-            if (_board.GetTile(destination) != Board.WALL_TILE) {
+            Board.Node end = _board.GetNode(destination, TileCost);
+
+            if (end != null) {
                 _destination = destination;
+                Board.Node start = _board.GetNode(Owner.Position, TileCost);
+
+                if (start == null) {
+                    throw new Exception("This Skill's owner is positioned outside the graph");
+                }
+
                 if (Point.TaxicabDistance(Owner.Position, destination) == 1) {
                     _path = new List<Board.Node>();
                     _path.Add(_board.GetNode(_destination.Value, TileCost));
@@ -45,7 +53,7 @@ namespace LostGen.Skills {
                     _path = new List<Board.Node>(
                         Pathfinder<Board.Node>.FindPath(
                             new Board.Node(_board, Owner.Position, TileCost),
-                            new Board.Node(_board, destination, TileCost),
+                            end,
                             Heuristic
                         )
                     );

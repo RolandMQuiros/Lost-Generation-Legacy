@@ -41,7 +41,7 @@ namespace LostGen {
             return success;
         }
 
-        public void FindPlan(DecisionNode goal) {
+        public IEnumerable<DecisionNode> FindPlan(Goal goal) {
             if (!_decisions.Contains(goal)) {
                 throw new ArgumentException("Goal does not exist in Decision graph. Use Planner.AddDecision to add to graph.", "goal");
             }
@@ -49,18 +49,20 @@ namespace LostGen {
             if (_rebuildGraph) {
                 BuildGraph();
             }
+
+            return Pathfinder<DecisionNode>.FindPath(goal, _root, goal.Heuristic);
         }
 
         public void BuildGraph() {
             Stack<DecisionNode> open = new Stack<DecisionNode>();
-            Stack<StateOffset> states = new Stack<StateOffset>();
+            Stack<StateOffset> outcomes = new Stack<StateOffset>();
 
             open.Push(_root);
-            states.Push(new StateOffset());
+            outcomes.Push(new StateOffset());
 
             while (open.Count > 0) {
                 DecisionNode current = open.Peek();
-                StateOffset currentPost = states.Peek();
+                StateOffset currentPost = outcomes.Peek();
 
                 bool finishedNode = true;
                 bool causeFound = false;
@@ -81,7 +83,7 @@ namespace LostGen {
                         cause.GetPostconditions(nextState);
 
                         open.Push(cause);
-                        states.Push(nextState);
+                        outcomes.Push(nextState);
 
                         causeFound = true;
                     }
@@ -89,7 +91,7 @@ namespace LostGen {
 
                 if (finishedNode) {
                     open.Pop();
-                    states.Pop();
+                    outcomes.Pop();
                 }
             }
 

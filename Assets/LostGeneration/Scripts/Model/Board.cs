@@ -133,7 +133,7 @@ namespace LostGen {
 
         public Node GetNode(Point point, Node.EdgeCostLookup lookup = null) {
             Node node = null;
-            if (InBounds(point)) {
+            if (InBounds(point) && _tiles[point.Y, point.X] != WALL_TILE) {
                 node = new Node(this, point, lookup);
             }
             return node;

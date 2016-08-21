@@ -40,7 +40,7 @@ namespace LostGen {
 
         public abstract bool ArePreconditionsMet(StateOffset state);
         public abstract StateOffset GetPostconditions(StateOffset state = null);
-
+        
         public virtual void Setup() { }
         public abstract int GetCost(StateOffset state = null);
         public virtual void Run() { }
