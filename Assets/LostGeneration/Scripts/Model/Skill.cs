@@ -7,8 +7,10 @@ namespace LostGen {
     /// <summary>
     /// Base class for Combatant Skills.  Skills generate the Actions that Pawns execute with every step of the board.
     /// 
+    /// While Actions can be freely added to Pawns, the Skills class acts as a nice constraint on which Actions a Combatant
+    /// is capable of.
     /// </summary>
-    public abstract class Skill : IEquatable<Skill> {
+    public abstract class Skill {
         /// <summary>Name displayed to users</summary>
         public string Name;
         /// <summary>Description of Skill displayed to users</summary>
@@ -31,42 +33,10 @@ namespace LostGen {
         }
 
         /// <summary>
-        /// Used by AIPlanner to set state values before evaluating cost.
+        /// Generates this Skill's Actions and pushes them onto the owning Combatant's Action queue,
+        /// either on the front or back.
         /// </summary>
-        public virtual void Setup() { }
-
-        /// <summary>
-        /// Generates the Actions created by this Skill and enqueues them on the target Pawns
-        /// </summary>
-        public abstract void Fire();
-
-        /// <summary>
-        /// Edge cost in AI planning system.  Calculated using a variety of metrics, specifically the
-        /// combatant's personality values and action point cost.
-        /// </summary>
-        /// <returns></returns>
-        public abstract int GetDecisionCost();
-
-        /// <summary>
-        /// Applies this Skill's postconditions to a BoardState.
-        /// </summary>
-        /// <param name="state"></param>
-        public virtual void GetPostconditions(StateOffset state) { }
-
-        /// <summary>
-        /// Checks if a BoardState meets this Skill's current Preconditions.
-        /// </summary>
-        /// <param name="state"></param>
-        /// <returns>True,if the BoardState meets this Skill's preconditions. False otherwise.</returns>
-        public virtual bool ArePreconditionsMet(StateOffset state) { return true; }
-
-        /// <summary>
-        /// Performs a reference equality check.  This is here just to make Skills compatible with the Pathfinder. 
-        /// </summary>
-        /// <param name="other">Reference to other Skill</param>
-        /// <returns>true, if reference is the same as this</returns>
-        public bool Equals(Skill other) {
-            return this.Equals(other);
-        }
+        /// <returns>Reference to the last Action pushed. Can be used to determine when a Skill is finished.</returns>
+        public abstract Action Fire();
     }
 }

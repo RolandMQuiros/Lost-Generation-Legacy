@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System;
 
-namespace LostGen.Skills {
+namespace LostGen {
     /// <summary>
     /// A Skill that allows Combatants to traverse the Board in a continuous path.
     /// This class provides a graph model of the board and a method of setting the destination,
@@ -18,7 +18,7 @@ namespace LostGen.Skills {
     /// A human player can set Skill parameters more freely than the AI, so we need to derive
     /// more specific skills to cover smaller possibility spaces.
     /// </summary>
-    public class Walk : Skill {
+    public class WalkSkill : Skill {
         protected int _cost = 0;
         public override int ActionPoints {
             get { return _cost; }
@@ -30,7 +30,7 @@ namespace LostGen.Skills {
         private List<Board.Node> _path;
         protected Board _board;
 
-        public Walk(Combatant owner)
+        public WalkSkill(Combatant owner)
             : base(owner, "Walk", "Move across tiles within a limited range") {
             _board = Owner.Board;
         }
@@ -81,18 +81,17 @@ namespace LostGen.Skills {
             return pointPath;
         }
 
-        public override void Fire() {
+        public override Action Fire() {
+            MoveAction move = null;
+
             if (_path != null) {
-                Actions.Move move;
                 for (int i = 0; i < _path.Count; i++) {
-                    move = new Actions.Move(Owner, _path[i].Point, true);
+                    move = new MoveAction(Owner, _path[i].Point, true);
                     Owner.PushAction(move);
                 }
             }
-        }
 
-        public override void GetPostconditions(StateOffset state) {
-            state.SetStateValue(StateOffset.CombatantKey(Owner, "position"), Destination);
+            return move;
         }
 
         protected virtual int Heuristic(Board.Node start, Board.Node end) {
@@ -102,10 +101,6 @@ namespace LostGen.Skills {
         protected virtual int TileCost(Point point) {
             int cost = 1;
             return cost;
-        }
-
-        public override int GetDecisionCost() {
-            return ActionPoints;
         }
     }
 }

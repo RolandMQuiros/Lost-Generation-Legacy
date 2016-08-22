@@ -17,7 +17,7 @@ namespace LostGen.Test {
 
             board.AddPawn(pawn);
 
-            Skills.Walk walk = new Skills.Walk(pawn);
+            WalkSkill walk = new WalkSkill(pawn);
             pawn.AddSkill(walk);
 
             walk.SetDestination(end);
@@ -33,11 +33,11 @@ namespace LostGen.Test {
             Point end = new Point(10, 6);
             ArrangeBoard(BoardCommon.GRID_12X8, start, end, out board, out combatant);
 
-            Skills.Walk walk = combatant.GetSkill("Walk") as Skills.Walk;
+            WalkSkill walk = combatant.GetSkill("Walk") as WalkSkill;
 
             Assert.LessOrEqual(walk.ActionPoints, combatant.ActionPoints);
 
-            combatant.FireSkill("Walk");
+            walk.Fire();
 
             board.Turn();
 
@@ -64,11 +64,11 @@ namespace LostGen.Test {
             Point end = new Point(10, 6);
             ArrangeBoard(grid, start, end, out board, out combatant);
 
-            Skills.Walk walk = combatant.GetSkill("Walk") as Skills.Walk;
+            WalkSkill walk = combatant.GetSkill("Walk") as WalkSkill;
 
             Assert.LessOrEqual(walk.ActionPoints, combatant.ActionPoints);
-            
-            combatant.FireSkill("Walk");
+
+            walk.Fire();
 
             board.Turn();
 
@@ -95,11 +95,11 @@ namespace LostGen.Test {
             Point end = new Point(10, 6);
             ArrangeBoard(grid, start, end, out board, out combatant);
 
-            Skills.Walk walk = combatant.GetSkill("Walk") as Skills.Walk;
+            WalkSkill walk = combatant.GetSkill("Walk") as WalkSkill;
 
             Assert.LessOrEqual(walk.ActionPoints, combatant.ActionPoints);
 
-            combatant.FireSkill("Walk");
+            walk.Fire();
 
             board.Turn();
 

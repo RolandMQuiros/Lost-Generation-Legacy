@@ -31,3 +31,10 @@ Architecture Notes
 	* The Decision class
 		* The same as "Action" in all the tutorials, but that name's already taken here.
 		* Uses Skills to generate an outcome (Postcondition / Goal). This is what contains all the GraphNode stuff.
+
+Import Notes
+------------
+From Blender
+	* Rotate X +90 degrees
+	* Ctrl + A to bake
+	* Export FBX Y Forward Z Up

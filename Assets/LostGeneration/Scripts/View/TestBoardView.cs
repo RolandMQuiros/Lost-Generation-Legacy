@@ -1,6 +1,5 @@
 using UnityEngine;
 using LostGen;
-using LostGen.Actions;
 
 public class TestBoardView : MonoBehaviour {
 	public GameObject QuadPrefab;
@@ -45,20 +44,21 @@ public class TestBoardView : MonoBehaviour {
             for (int i = 0; i < _board.Width; i++) {
                 int tile = _board.GetTile(i, j);
                 Vector3 position = new Vector3((float)i, 0f, (float)-j);
-
-                Quaternion floorRot = Quaternion.Euler(90f, 0f, 0f);
                 GameObject instance = null;
 
                 switch (tile) {
                     case Board.FLOOR_TILE:
-                        instance = GameObject.Instantiate(QuadPrefab, position, floorRot) as GameObject;
+                        if (QuadPrefab != null)
+                            instance = GameObject.Instantiate(QuadPrefab, position, Quaternion.identity) as GameObject;
                         break;
                     case Board.WALL_TILE:
-                        instance = GameObject.Instantiate(BlockPrefab, position, Quaternion.identity) as GameObject;
+                        if (BlockPrefab != null)
+                            instance = GameObject.Instantiate(BlockPrefab, position, Quaternion.identity) as GameObject;
                         break;
                 }
 
-                instance.transform.parent = gameObject.transform;
+                if (instance != null)
+                    instance.transform.parent = gameObject.transform;
             }
         }
 
@@ -86,7 +86,7 @@ public class TestBoardView : MonoBehaviour {
             }
 
             if (!offset.Equals(Point.Zero)) {
-                Move move = new Move(_testPawn, _testPawn.Position + offset, true);
+                MoveAction move = new MoveAction(_testPawn, _testPawn.Position + offset, true);
                 _testPawn.PushAction(move);
                 _board.Step();
             }
@@ -109,7 +109,7 @@ public class TestBoardView : MonoBehaviour {
     }
 
     private void OnPawnMove(object sender, MessageArgs message) {
-        Move.Message move = message as Move.Message;
+        MoveAction.Message move = message as MoveAction.Message;
         if (move != null) {
             _start = new Vector3((float)move.From.X, 0f, (float)-move.From.Y);
             _end = new Vector3((float)move.To.X, 0f, (float)-move.To.Y);

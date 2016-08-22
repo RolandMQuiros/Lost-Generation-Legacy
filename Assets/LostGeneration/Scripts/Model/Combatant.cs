@@ -69,19 +69,6 @@ namespace LostGen {
             return skill;
         }
 
-        public bool FireSkill(string skillName) {
-            bool fired = false;
-            Skill skill = _skills[skillName];
-
-            if (skill.ActionPoints <= _actionPoints) {
-                _actionPoints -= skill.ActionPoints;
-                skill.Fire();
-                fired = true;
-            }
-
-            return fired;
-        }
-
         public IEnumerable<Pawn> GetPawnsInView() {
             foreach (Pawn pawn in _knownPawns) {
                 yield return pawn;

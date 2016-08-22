@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace LostGen.Actions {
-    public class Move : Action {
+namespace LostGen {
+    public class MoveAction : Action {
         public class Message : MessageArgs {
             public Pawn Mover;
             public Point From;
@@ -24,7 +24,7 @@ namespace LostGen.Actions {
         private Point _destination;
         private bool _isContinuous;
 
-        public Move(Pawn owner, Point destination, bool isContinuous) 
+        public MoveAction(Pawn owner, Point destination, bool isContinuous) 
             : base(owner) {
             _destination = destination;
             _isContinuous = isContinuous;

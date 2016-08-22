@@ -4,26 +4,26 @@ using System.Collections.ObjectModel;
 
 namespace LostGen {
     public class Pawn : IComparable<Pawn> {
+        /// <summary>Counter used to generate unique Pawn ID</summary>
         private static ulong _idCounter;
-        private ulong _id;
-        public ulong ID { get { return _id; } }
-
+        /// <summary>Unique identifier number</summary>
+        public ulong ID { get; private set; }
+        /// <summary>User-facing name. Can also be used to search for Pawns on a Board.</summary>
         public string Name { get; set; }
-
-        protected Board _board;
-        public Board Board {
-            get { return _board; }
-        }
-
+        /// <summary>Reference to the Board where this Pawn resides</summary>
+        public Board Board { get; private set; }
+        /// <summary>
+        /// List of offsets that describe the space this Pawn takes up on the Board. For example, a very large door may take
+        /// up four Points.
+        /// </summary>
         protected List<Point> _footprint;
-        public ReadOnlyCollection<Point> Footprint {
-            get { return _footprint.AsReadOnly(); }
-        }
+        /// <summary> Returns a read-only version of the footprint</summary>
+        public ReadOnlyCollection<Point> Footprint { get { return _footprint.AsReadOnly(); } }
 
         private Point _position;
         public Point Position {
             get { return _position; }
-            set { _board.SetPawnPosition(this, value); }
+            set { Board.SetPawnPosition(this, value); }
         }
 
         private LinkedList<Action> _actions = new LinkedList<Action>();
@@ -31,10 +31,25 @@ namespace LostGen {
             get { return _actions.Count; }
         }
 
+        /// <summary>
+        /// Sorting priority. Determines what order the Board executes the Pawn steps.
+        /// 
+        /// Combatants run in a particular order based on their Speed stats.
+        /// Environmental Pawns usually run at the end of a turn, where Priority = Int32.MaxValue.
+        /// </summary>
         public int Priority = Int32.MinValue;
 
+        /// <summary>
+        /// Whether or not this Pawn can collide and be collided with other Pawns
+        /// </summary>
         public bool IsCollidable;
+        /// <summary>
+        /// Whether or not this Pawn stops other Pawns from moving into the same square
+        /// </summary>
         public bool IsSolid;
+        /// <summary>
+        /// Whether or not this Pawn stops field of view or light sources
+        /// </summary>
         public bool IsOpaque;
 
         public event EventHandler<MessageArgs> Messages;
@@ -45,7 +60,7 @@ namespace LostGen {
         public event CollisionDelegate CollisionExited;
 
         public Pawn(string name, Board board, Point position, IEnumerable<Point> footprint = null, bool isCollidable = true, bool isSolid = false, bool isOpaque = true) {
-            _id = _idCounter++;
+            ID = _idCounter++;
 
             Name = name;
 
@@ -63,7 +78,7 @@ namespace LostGen {
                 _footprint.Add(Point.Zero);
             }
 
-            _board = board;
+            Board = board;
             IsCollidable = isCollidable;
             IsSolid = isSolid;
             IsOpaque = isOpaque;
@@ -77,7 +92,7 @@ namespace LostGen {
         }
 
         public bool SetPosition(Point destination) {
-            return _board.SetPawnPosition(this, destination);
+            return Board.SetPawnPosition(this, destination);
         }
 
         public bool Offset(Point offset) {
@@ -107,24 +122,24 @@ namespace LostGen {
             }
         }
 
+        public void PushActions(IEnumerable<Action> actions) {
+            foreach (Action action in actions) {
+                _actions.AddLast(action);
+            }
+        }
+
         public void PushAction(Action action) {
             _actions.AddLast(action);
         }
-
-        public void PushActionToFront(Action action) {
-            _actions.AddFirst(action);
-        }
-
+        
         public virtual void BeginTurn() { }
 
         ///<summary>
 		///Pops and runs a single action in the queue
 		///</summary>
 		public virtual bool Step() {
-            Action stepAction;
-
             if (_actions.Count > 0) {
-                stepAction = _actions.First.Value;
+                Action stepAction = _actions.First.Value;
                 stepAction.Run();
                 _actions.RemoveFirst();
             }
