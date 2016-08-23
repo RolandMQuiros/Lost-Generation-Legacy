@@ -18,12 +18,7 @@ namespace LostGen {
     /// A human player can set Skill parameters more freely than the AI, so we need to derive
     /// more specific skills to cover smaller possibility spaces.
     /// </summary>
-    public class WalkSkill : Skill {
-        protected int _cost = 0;
-        public override int ActionPoints {
-            get { return _cost; }
-        }
-
+    public class WalkSkill : RangedSkill {
         protected Point? _destination;
         public Point Destination { get { return _destination.Value; } }
 
@@ -59,9 +54,9 @@ namespace LostGen {
                     );
                 }
 
-                _cost = 0;
+                ActionPoints = 0;
                 for (int i = 0; i < _path.Count; i++) {
-                    _cost += TileCost(_path[i].Point);
+                    ActionPoints += TileCost(_path[i].Point);
                 }
             } else {
                 _destination = Owner.Position;
@@ -81,7 +76,17 @@ namespace LostGen {
             return pointPath;
         }
 
-        public override Action Fire() {
+        public override HashSet<Point> GetRange() {
+            Board.Node startNode = Owner.Board.GetNode(Owner.Position);
+            HashSet<Point> range = new HashSet<Point>();
+            foreach (Board.Node node in Pathfinder<Board.Node>.FloodFill(startNode, Owner.ActionPoints)) {
+                range.Add(node.Point);
+            }
+
+            return range;
+        }
+
+        public override void Fire() {
             MoveAction move = null;
 
             if (_path != null) {
@@ -90,8 +95,6 @@ namespace LostGen {
                     Owner.PushAction(move);
                 }
             }
-
-            return move;
         }
 
         protected virtual int Heuristic(Board.Node start, Board.Node end) {

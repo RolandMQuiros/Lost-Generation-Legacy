@@ -6,5 +6,4 @@ using UnityEngine;
 public class BoardTheme {
     public GameObject[] WallPrefabs = new GameObject[16];
     public GameObject[] FloorPrefabs = new GameObject[16];
-
 }

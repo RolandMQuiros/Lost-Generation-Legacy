@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace LostGen {
-    public class MeleeAttackSkill : Skill {
+    public class MeleeAttackSkill : RangedSkill {
         private Combatant _attacker;
         private List<Point> _areaOfEffect;
         private Dictionary<CardinalDirection, Point[]> _transforms = new Dictionary<CardinalDirection, Point[]>();
@@ -40,17 +40,25 @@ namespace LostGen {
             }
         }
 
-        public IEnumerable<Point> GetRange(CardinalDirection direction) {
+        public IEnumerable<Point> GetAreaOfEffect(CardinalDirection direction) {
             return _transforms[direction];
         }
 
-        public override Action Fire() {
+        public override HashSet<Point> GetRange() {
+            return new HashSet<Point> {
+                _attacker.Position + Point.Neighbors[0],
+                _attacker.Position + Point.Neighbors[1],
+                _attacker.Position + Point.Neighbors[2],
+                _attacker.Position + Point.Neighbors[3]
+            };
+        }
+
+        public override void Fire() {
             AttackAction attack = null;
             for (int i = 0; i < _transforms[Direction].Length; i++) {
                 attack = new AttackAction(_attacker, _transforms[Direction]);
+                _attacker.PushAction(attack);
             }
-
-            return attack;
         }
     }
 }

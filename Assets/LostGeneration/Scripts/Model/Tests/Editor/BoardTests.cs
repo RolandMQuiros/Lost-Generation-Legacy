@@ -20,17 +20,14 @@ namespace LostGen.Test {
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
-        public void AddPawn() {
+        public void PawnMovedButNotInBoard() {
             Board board = new Board(BoardCommon.GRID_12X8);
             Pawn pawn = new Pawn("Add", board, new Point(board.Width / 2, board.Height / 2));
 
-            pawn.Offset(Point.One);
-        }
-
-        [Test]
-        public void AreaOfEffect() {
-            
+            // Expect an ArgumentException because the pawn doesn't exist on the board yet
+            Assert.Throws<ArgumentException>(delegate () {
+                pawn.Offset(Point.One);
+            }, "Offset was called on a Pawn that was not added to a Board");
         }
     }
 }

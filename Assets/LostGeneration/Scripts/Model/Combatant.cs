@@ -46,7 +46,7 @@ namespace LostGen {
         public int ActionPoints { get { return _actionPoints; } }
         
         private List<Gear> _gear = new List<Gear>();
-        private Dictionary<string, Skill> _skills = new Dictionary<string, Skill>();
+        private Dictionary<string, ISkill> _skills = new Dictionary<string, ISkill>();
 
         private HashSet<Pawn> _knownPawns = new HashSet<Pawn>();
 
@@ -54,7 +54,7 @@ namespace LostGen {
             : base(name, board, position, footprint, isCollidable, isSolid, isOpaque){
         }
 
-        public void AddSkill(Skill skill, string alias = null) {
+        public void AddSkill(ISkill skill, string alias = null) {
             if (alias != null) {
                 _skills.Add(alias, skill);
             } else {
@@ -62,8 +62,8 @@ namespace LostGen {
             }
         }
 
-        public Skill GetSkill(string alias) {
-            Skill skill;
+        public ISkill GetSkill(string alias) {
+            ISkill skill;
             _skills.TryGetValue(alias, out skill);
 
             return skill;
