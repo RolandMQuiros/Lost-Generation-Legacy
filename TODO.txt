@@ -19,7 +19,6 @@ Lost Generation TODO
 	[] GOAP Integration Tests
 	
 [] Pawn Controller architecture
-
 [] Visualization Layer
 
 Architecture Notes
@@ -35,6 +34,4 @@ Architecture Notes
 Import Notes
 ------------
 From Blender
-	* Rotate X +90 degrees
-	* Ctrl + A to bake
 	* Export FBX Y Forward Z Up
