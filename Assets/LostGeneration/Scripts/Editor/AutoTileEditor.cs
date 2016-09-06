@@ -5,87 +5,44 @@ using System.Collections.Generic;
 
 [CustomEditor(typeof(AutoTile))]
 public class AutoTileEditor : Editor {
-    private const int _ROW_WIDTH = 4;
+    private Texture[] _icons = new Texture[(int)AutoTile.TileEdge.Count];
     private AutoTile _autoTile;
-    private bool _showVariations = false;
-    private List<bool> _foldouts;
-    private Vector2 _tileScroll = new Vector2();
 
     public void OnEnable() {
         _autoTile = (AutoTile)target;
-        if (_autoTile.VariationCount == 0) {
-            _autoTile.AddTileVariation(new GameObject[AutoTile.AUTOTILE_COUNT]);
-        }
 
-        _foldouts = new List<bool>();
-        for (int i = 0; i < _autoTile.VariationCount; i++) {
-            _foldouts.Add(false);
-        }
+        _icons[(int)AutoTile.TileEdge.All]          = Resources.Load("Icons/AutoTile/autotile_0000") as Texture;
+        _icons[(int)AutoTile.TileEdge.ThreeSides]    = Resources.Load("Icons/AutoTile/autotile_1000") as Texture;
+        _icons[(int)AutoTile.TileEdge.OppositeSides] = Resources.Load("Icons/AutoTile/autotile_0101") as Texture;
+        _icons[(int)AutoTile.TileEdge.Corner]        = Resources.Load("Icons/AutoTile/autotile_1100") as Texture;
+        _icons[(int)AutoTile.TileEdge.OneSide]       = Resources.Load("Icons/AutoTile/autotile_1101") as Texture;
+        _icons[(int)AutoTile.TileEdge.None]           = Resources.Load("Icons/AutoTile/autotile_1111") as Texture;
     }
 
     public override void OnInspectorGUI() {
-        EditorGUILayout.BeginHorizontal();
-        _showVariations = EditorGUILayout.Foldout(_showVariations, "Tile Variations");
-        bool addVariation = GUILayout.Button("+", GUILayout.ExpandWidth(false));
-        EditorGUILayout.EndHorizontal();
+        EditorGUILayout.BeginVertical();
 
-        if (_showVariations) {
-            _tileScroll = EditorGUILayout.BeginScrollView(_tileScroll, GUILayout.ExpandHeight(false), GUILayout.Height(200f));
-            EditorGUI.indentLevel++;
-            for (int i = 0; i < _autoTile.VariationCount; i++) { 
-                EditorGUILayout.BeginHorizontal();
-                _foldouts[i] = EditorGUILayout.Foldout(_foldouts[i], "Variation #" + (i + 1));
-                bool deleteVariation = false;
-                if (i > 0) {
-                    deleteVariation = GUILayout.Button("-", GUILayout.ExpandWidth(false));
-                }
-                EditorGUILayout.EndHorizontal();
+        EditorGUILayout.LabelField("Tiles");
 
-                if (deleteVariation) {
-                    _autoTile.DeleteTileVariation(i);
-                } else if (_foldouts[i]) {
-                    EditorGUILayout.BeginVertical();
-                    EditorGUILayout.BeginHorizontal();
-                    for (int j = 0; j < AutoTile.AUTOTILE_COUNT; j++) {
-                        if (i > 0 && i % _ROW_WIDTH == 0) {
-                            EditorGUILayout.EndHorizontal();
-                            EditorGUILayout.BeginHorizontal();
-                        }
+        EditorGUIUtility.labelWidth = 32;
+        for (int i = 0; i < (int)AutoTile.TileEdge.Count; i++) {
+            GameObject edge = _autoTile.GetEdge((AutoTile.TileEdge)i);
+            GameObject old = edge;
 
-                        GameObject tile = null;
-                        if (i < _autoTile.VariationCount) {
-                            tile = _autoTile.GetTile(i, j);
-                        }
+            EditorGUILayout.BeginHorizontal();
 
-                        GameObject newTile = EditorGUILayout.ObjectField(
-                            tile,
-                            typeof(GameObject),
-                            true
-                        ) as GameObject;
-                        if (newTile != tile) {
-                            _autoTile.SetTile(i, j, newTile);
-                        }
-                    }
-                    EditorGUILayout.EndHorizontal();
-                    EditorGUILayout.EndVertical();
-                }
+            EditorGUILayout.LabelField(new GUIContent(_icons[i]), GUILayout.Width(32f), GUILayout.Height(32f));
+            edge = (GameObject)EditorGUILayout.ObjectField(edge, typeof(GameObject), false);
+
+            EditorGUILayout.EndHorizontal();
+
+            if (edge != old) {
+                _autoTile.SetEdge((AutoTile.TileEdge)i, edge);
+                EditorUtility.SetDirty(_autoTile);
             }
-            EditorGUI.indentLevel--;
-            EditorGUILayout.EndScrollView();
         }
+        EditorGUIUtility.labelWidth = 0;
 
-        if (addVariation) {
-            AddVariation();
-        }
-    }
-
-    private void AddVariation() {
-        GameObject[] newVariation = new GameObject[AutoTile.AUTOTILE_COUNT];
-        int lastVariation = _autoTile.VariationCount - 1;
-        for (int i = 0; i < AutoTile.AUTOTILE_COUNT; i++) {
-            newVariation[i] = _autoTile.GetTile(lastVariation, i);
-        }
-
-        _autoTile.AddTileVariation(new GameObject[AutoTile.AUTOTILE_COUNT]);
+        EditorGUILayout.EndVertical();
     }
 }

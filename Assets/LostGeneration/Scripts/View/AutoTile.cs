@@ -1,43 +1,102 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
+using LostGen;
 
 [System.Serializable]
 [CreateAssetMenu(fileName = "AutoTile", menuName = "Lost Generation/View/AutoTile", order = 2)]
 public class AutoTile : ScriptableObject {
     public const int AUTOTILE_COUNT = 16;
-    private List<GameObject[]> _variations = new List<GameObject[]>();
-    public int VariationCount { get { return _variations.Count; } }
+    public enum TileEdge {
+        All = 0,          // 0b0000 [ ]
+        OneSide = 1,       // 0b1101  _
+        OppositeSides = 2, // 0b0101  =
+        ThreeSides = 3,    // 0b1000 |_|
+        Corner = 4,        // 0b1100  _|
+        None = 5,           // 0b1111  X
+        Count = 6
+    }
 
-    public void AddTileVariation(GameObject[] objects) {
-        if (objects.Length != AUTOTILE_COUNT) {
-            throw new ArgumentException("Array of GameObjects must contain exactly 16 elements", "objects");
-        }
+    private struct EdgeRotation {
+        public TileEdge Edge;
+        public Quaternion Rotation;
 
-        GameObject[] newVariation = new GameObject[AUTOTILE_COUNT];
-        _variations.Add(newVariation);
-        for (int i = 0; i < objects.Length; i++) {
-            newVariation[i] = objects[i];
+        public EdgeRotation(TileEdge edge, Quaternion rotation) {
+            Edge = edge;
+            Rotation = rotation;
         }
     }
 
-    public void DeleteTileVariation(int variation) {
-        _variations.RemoveAt(variation);
-    }
+    // 0bNWSE
+    private static readonly EdgeRotation[] _ROTATIONS = new EdgeRotation[] {
+        new EdgeRotation(TileEdge.All          , Quaternion.identity),            // 0b0000
+        new EdgeRotation(TileEdge.ThreeSides   , Quaternion.Euler(0f, 90f, 0f)),  // 0b0001
+        new EdgeRotation(TileEdge.ThreeSides   , Quaternion.Euler(0f, 180f, 0f)), // 0b0010
+        new EdgeRotation(TileEdge.Corner       , Quaternion.Euler(0f, 180f, 0f)), // 0b0011
+        new EdgeRotation(TileEdge.ThreeSides   , Quaternion.Euler(0f, -90f, 0f)), // 0b0100
+        new EdgeRotation(TileEdge.OppositeSides, Quaternion.identity),            // 0b0101 
+        new EdgeRotation(TileEdge.Corner       , Quaternion.Euler(0f, -90f, 0f)), // 0b0110
+        new EdgeRotation(TileEdge.OneSide      , Quaternion.Euler(0f, 180f, 0f)), // 0b0111
+        new EdgeRotation(TileEdge.ThreeSides   , Quaternion.identity),            // 0b1000
+        new EdgeRotation(TileEdge.Corner       , Quaternion.Euler(0f, 90f, 0f)),  // 0b1001
+        new EdgeRotation(TileEdge.OppositeSides, Quaternion.Euler(0f, 90f, 0f)),  // 0b1010
+        new EdgeRotation(TileEdge.OneSide      , Quaternion.Euler(0f, 90f, 0f)),  // 0b1011
+        new EdgeRotation(TileEdge.Corner       , Quaternion.identity),            // 0b1100
+        new EdgeRotation(TileEdge.OneSide      , Quaternion.identity),            // 0b1101
+        new EdgeRotation(TileEdge.OneSide      , Quaternion.Euler(0f, -90f, 0f)), // 0b1110 east open
+        new EdgeRotation(TileEdge.None         , Quaternion.identity)             // 0b1111 no sides open
+    };
 
-    public GameObject GetTile(int variation, int autoTileCode) {
-        if (autoTileCode < 0 || autoTileCode >= AUTOTILE_COUNT) {
-            throw new ArgumentOutOfRangeException("The AutoTile code must be between 0 and 15", "autoTileCode");
+    [SerializeField]
+    private GameObject[] _edges = new GameObject[(int)TileEdge.Count];
+
+    public void SetEdge(TileEdge edge, GameObject prefab) {
+        if (edge == TileEdge.Count) {
+            throw new ArgumentException("Invalid Tile Edge", "edge");
         }
 
-        return _variations[variation][autoTileCode];
+        _edges[(int)edge] = prefab;
     }
 
-    public void SetTile(int variation, int autoTileCode, GameObject tile) {
-        if (autoTileCode < 0 || autoTileCode >= AUTOTILE_COUNT) {
-            throw new ArgumentOutOfRangeException("The AutoTile code must be between 0 and 15", "autoTileCode");
+    public GameObject GetEdge(TileEdge edge) {
+        if (edge == TileEdge.Count) {
+            throw new ArgumentException("Invalid Tile Edge", "edge");
         }
 
-        _variations[variation][autoTileCode] = tile;
+        return _edges[(int)edge];
+    }
+
+    public GameObject GetTile(int index, out Quaternion rotation) {
+        if (index >= AUTOTILE_COUNT) {
+            throw new ArgumentException("Index must be in range [0, " + AUTOTILE_COUNT + "]", "index");
+        }
+
+        rotation = _ROTATIONS[index].Rotation;
+        return _edges[(int)_ROTATIONS[index].Edge];
+    }
+
+    public GameObject GetTile(Board board, Point point, int tile) {
+        int edgeIndex = 0;
+
+        if (!board.InBounds(point + Point.Right) || board.GetTile(point + Point.Right) == tile) {
+            edgeIndex += 1;
+        }
+        if (!board.InBounds(point + Point.Down) || board.GetTile(point + Point.Down) == tile) {
+            edgeIndex += 2;
+        }
+        if (!board.InBounds(point + Point.Left) || board.GetTile(point + Point.Left) == tile) {
+            edgeIndex += 4;
+        }
+        if (!board.InBounds(point + Point.Up) || board.GetTile(point + Point.Up) == tile) {
+            edgeIndex += 8;
+        }
+
+        TileEdge edge = _ROTATIONS[edgeIndex].Edge;
+        Quaternion rotation = _ROTATIONS[edgeIndex].Rotation;
+
+        GameObject tileObj = GameObject.Instantiate<GameObject>(_edges[(int)edge]);
+        tileObj.transform.rotation = rotation;
+
+        return tileObj;
     }
 }
