@@ -2,14 +2,15 @@
 using System.Collections;
 
 public class CombatantView : MonoBehaviour {
-    public Animator Animator;
-	// Use this for initialization
-	void Start () {
-	    
+    private Animator _animator;
+	
+    // Use this for initialization
+	public void Awake () {
+        _animator = GetComponent<Animator>();
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	public void Update () {
 	
 	}
 }

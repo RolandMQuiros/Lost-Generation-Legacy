@@ -6,10 +6,12 @@ namespace LostGen {
     public class Pawn : IComparable<Pawn> {
         /// <summary>Counter used to generate unique Pawn ID</summary>
         private static ulong _idCounter;
-        /// <summary>Unique identifier number</summary>
-        public ulong ID { get; private set; }
+        /// <summary>Unique instance identifier number</summary>
+        public ulong InstanceID { get; private set; }
         /// <summary>User-facing name. Can also be used to search for Pawns on a Board.</summary>
         public string Name { get; set; }
+        /// <summary>String representing what type of Pawn this is. Used to generate the display components for this Pawn.</summary>
+        public string TypeName { get; set; }
         /// <summary>Reference to the Board where this Pawn resides</summary>
         public Board Board { get; private set; }
         /// <summary>
@@ -60,7 +62,7 @@ namespace LostGen {
         public event CollisionDelegate CollisionExited;
 
         public Pawn(string name, Board board, Point position, IEnumerable<Point> footprint = null, bool isCollidable = true, bool isSolid = false, bool isOpaque = true) {
-            ID = _idCounter++;
+            InstanceID = _idCounter++;
 
             Name = name;
 

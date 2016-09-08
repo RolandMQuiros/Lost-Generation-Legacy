@@ -104,6 +104,9 @@ namespace LostGen {
         	get { return _tiles.GetLength(0); }
         }
 
+        public event Action<Pawn> PawnAdded;
+        public event Action<Pawn> PawnRemoved;
+
         private HashSet<Pawn> _pawns = new HashSet<Pawn>();
         private List<Pawn> _pawnOrder = new List<Pawn>();
         private Dictionary<Point, HashSet<Pawn>> _pawnBuckets = new Dictionary<Point, HashSet<Pawn>>();
@@ -226,6 +229,34 @@ namespace LostGen {
                         _pawnOrder.Add(pawn);
                     }
                 }
+            }
+
+            if (successful && PawnAdded != null) {
+                PawnAdded(pawn);
+            }
+
+            return successful;
+        }
+
+        public bool RemovePawn(Pawn pawn) {
+            bool successful = true;
+
+            if (pawn != null && _pawns.Contains(pawn)) {
+                foreach (Point point in pawn.Footprint) {
+                    HashSet<Pawn> bucket = GetBucket(pawn.Position + point, true);
+                    successful &= bucket.Remove(pawn);
+                }
+
+                if (successful) {
+                    successful &= _pawns.Remove(pawn);
+                    if (_pawnOrder.Contains(pawn)) {
+                        _pawnOrder.Remove(pawn);
+                    }
+                }
+            }
+
+            if (successful && PawnRemoved != null) {
+                PawnRemoved(pawn);
             }
 
             return successful;

@@ -107,11 +107,11 @@ namespace LostGen {
         }
 
         public static string CombatantKey(Combatant combatant, string append) {
-            return combatant.ID + append;
+            return combatant.InstanceID + append;
         }
 
         public static string CombatantHealthKey(Combatant combatant) {
-            return combatant.ID + "health";
+            return combatant.InstanceID + "health";
         }
     }
 }

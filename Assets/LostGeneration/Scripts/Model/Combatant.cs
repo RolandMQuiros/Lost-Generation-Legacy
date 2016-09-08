@@ -3,9 +3,6 @@ using System.Collections.Generic;
 
 namespace LostGen {
     public class Combatant : Pawn {
-        private bool _didStatsChange;
-
-        private Stats _baseStats;
         public Stats BaseStats
         {
             get { return _baseStats; }
@@ -14,8 +11,7 @@ namespace LostGen {
                 _didStatsChange = true;
             }
         }
-
-        private Stats _effectiveStats;
+        
         public Stats EffectiveStats {
             get {
                 if (_didStatsChange) {
@@ -32,7 +28,6 @@ namespace LostGen {
             }
         }
 
-        private int _health;
         public int Health
         {
             get { return _health; }
@@ -42,11 +37,17 @@ namespace LostGen {
             }
         }
 
-        private int _actionPoints;
         public int ActionPoints { get { return _actionPoints; } }
-        
+
+        private bool _didStatsChange;
+        private Stats _baseStats;
+        private Stats _effectiveStats;
+        private int _health;
+        private int _actionPoints;
+
         private List<Gear> _gear = new List<Gear>();
-        private Dictionary<string, ISkill> _skills = new Dictionary<string, ISkill>();
+        private Dictionary<Type, ISkill> _skills = new Dictionary<Type, ISkill>();
+        private Dictionary<string, ISkill> _aliasedSkills = new Dictionary<string, ISkill>();
 
         private HashSet<Pawn> _knownPawns = new HashSet<Pawn>();
 
@@ -55,18 +56,25 @@ namespace LostGen {
         }
 
         public void AddSkill(ISkill skill, string alias = null) {
+            _skills.Add(skill.GetType(), skill);
             if (alias != null) {
-                _skills.Add(alias, skill);
+                _aliasedSkills.Add(alias, skill);
             } else {
-                _skills.Add(skill.Name, skill);
+                _aliasedSkills.Add(skill.Name, skill);
             }
         }
 
         public ISkill GetSkill(string alias) {
             ISkill skill;
-            _skills.TryGetValue(alias, out skill);
+            _aliasedSkills.TryGetValue(alias, out skill);
 
             return skill;
+        }
+
+        public T GetSkill<T>() where T : ISkill {
+            ISkill skill;
+            _skills.TryGetValue(typeof(T), out skill);
+            return (T)skill;
         }
 
         public IEnumerable<Pawn> GetPawnsInView() {

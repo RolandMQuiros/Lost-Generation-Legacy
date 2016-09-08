@@ -31,6 +31,24 @@ Architecture Notes
 		* The same as "Action" in all the tutorials, but that name's already taken here.
 		* Uses Skills to generate an outcome (Postcondition / Goal). This is what contains all the GraphNode stuff.
 
+
+Assets
+* Scriptable Objects + Assets for data not mutable at runtime
+* JSON for mutable data?
+
+Not mutable:
+	* Enemy templates
+	* Board Themes
+	* Armor and weapon definitions
+
+Mutable
+	* Characters
+	* Character relationships
+	* Character loadouts
+	* Character knowledge
+	* Basically the saved game
+
+
 Import Notes
 ------------
 From Blender
