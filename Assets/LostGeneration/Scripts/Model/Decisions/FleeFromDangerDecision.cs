@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Assets.LostGeneration.Scripts.Model.Decisions {
-    class FleeFromDangerDecision {
+namespace LostGen {
+    public class FleeFromDangerDecision {
     }
 }
