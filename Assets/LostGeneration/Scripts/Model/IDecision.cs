@@ -5,9 +5,10 @@ using System.Text;
 
 namespace LostGen {
     public interface IDecision {
-        StateOffset PostCondition { get; }
         int Cost { get; }
-        bool ArePreConditionsMet(StateOffset offset);
+
+        StateOffset GetPostcondition(StateOffset previous);
+        bool ArePreconditionsMet(StateOffset offset);
 
         void Setup();
         void Run();

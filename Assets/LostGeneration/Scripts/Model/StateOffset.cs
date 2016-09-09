@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace LostGen {
-    public class StateOffset {
+    public class StateOffset : IEquatable<StateOffset> {
         [StructLayout(LayoutKind.Explicit)]
         private struct StateValue {
             [FieldOffset(0)]
@@ -105,6 +105,20 @@ namespace LostGen {
             } else {
                 return defaultValue;
             }
+        }
+
+        public bool IsSubset(StateOffset other) {
+            bool isSubset = true;
+            foreach (string key in _stateValues.Keys) {
+                StateValue value;
+                other._stateValues.TryGetValue(key, out value);
+                if (!_stateValues[key].Equals(value)) {
+                    isSubset = false;
+                    break;
+                }
+            }
+
+            return isSubset;
         }
 
         public static string CombatantKey(Combatant combatant, string append) {
