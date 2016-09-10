@@ -46,8 +46,4 @@ public class Character {
 
         return combatant;
     }
-
-    public Planner CreatePlanner() {
-        Planner planner = new Planner();
-    }
 }

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace LostGen.Test {
-
+    /*
     public class PlannerTests {
         private class TestDecision : DecisionNode {
             public int Value;
@@ -135,5 +135,5 @@ namespace LostGen.Test {
 
             PrintGraphList(graphList);
         }
-    }
+    } */
 }

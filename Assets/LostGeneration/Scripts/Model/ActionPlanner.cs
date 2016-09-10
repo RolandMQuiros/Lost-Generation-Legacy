@@ -4,68 +4,88 @@ using System.Linq;
 using System.Text;
 
 namespace LostGen {
-    public class ActionPlanner {
-        private class GoalNode : IGraphNode {
-            public StateOffset State { get; private set; }
-            private Dictionary<GoalNode, List<IDecision>> _neighbors = new Dictionary<GoalNode, List<IDecision>>();
+    /// <summary>
+    /// A node in the ActionPlanner's decision graph. A GoalNode represents a possible state of the world created
+    /// as the result or cause of an IDecision.
+    /// 
+    /// With a given list of possible IDecisions, a single GoalNode will generate its full graph on its own through
+    /// calls to GetNeighbors. The graphs are constructed from end to start, so the edges are unidirectional and point
+    /// towards the current GoalNode.
+    /// </summary>
+    public class GoalNode : IGraphNode {
+        public StateOffset State { get; private set; }
+        private List<IDecision> _decisions;
+        private Dictionary<GoalNode, IDecision> _edges = new Dictionary<GoalNode, IDecision>();
+        private bool _cacheComplete = false;
 
-            public GoalNode(StateOffset state = null) {
-                if (state == null) {
-                    State = new StateOffset();
-                } else {
-                    State = state;
+        public GoalNode(StateOffset state, List<IDecision> decisions) {
+            State = state ?? new StateOffset();
+            _decisions = decisions ?? new List<IDecision>();
+        }
+
+        public IDecision GetEdge(GoalNode neighbor) {
+            IDecision edge;
+            _edges.TryGetValue(neighbor, out edge);
+
+            if (edge == null) {
+                throw new ArgumentException("neighbor", "Neighbor is not connected to this node");
+            }
+
+            return edge;
+        }
+
+        public int GetEdgeCost(IGraphNode neighbor) {
+            // We're basically banking on GetNeighbor being called BEFORE GetEdgeCost, since the goals won't be
+            // cached until the former is used.
+            // This might bite us in the ass later.
+
+            // While we're at it, we're also assuming that all GoalNodes traversed are generated from the root,
+            // so all nodes used by Pathfinder are actually in the same graph.  This might be sound, but still...
+
+            GoalNode neighborGoal = (GoalNode)neighbor;
+            IDecision edge = GetEdge(neighborGoal);
+
+            return edge.Cost;
+        }
+
+        public bool IsMatch(IGraphNode other) {
+            GoalNode otherGoal = other as GoalNode;
+            bool match = false;
+
+            if (otherGoal != null) {
+                match = IsMatch(otherGoal);
+            }
+
+            return match;
+        }
+
+        public IEnumerable<IGraphNode> GetNeighbors() {
+            if (_cacheComplete) {
+                foreach (GoalNode neighbor in _edges.Keys) {
+                    yield return neighbor;
                 }
-            }
-
-            public void AddNeighbor(GoalNode neighbor, IDecision edge) {
-                List<IDecision> edges;
-                _neighbors.TryGetValue(neighbor, out edges);
-
-                if (edges == null) {
-                    edges = new List<IDecision>();
-                    edges.Add(edge);
-                    _neighbors[neighbor] = edges;
+            } else {
+                for (int i = 0; i < _decisions.Count; i++) {
+                    StateOffset post = _decisions[i].ApplyPostconditions();
+                    if (State.IsSubset(post)) {
+                        StateOffset pre = _decisions[i].ApplyPreconditions(post);
+                        GoalNode previousGoal = new GoalNode(pre, _decisions);
+                        _edges.Add(previousGoal, _decisions[i]);
+                        yield return previousGoal;
+                    }
                 }
-            }
-
-            public bool IsMatch(GoalNode other) {
-                return State.IsSubset(other.State);
-            }
-
-            public int GetEdgeCost(IGraphNode neighbor) {
-                GoalNode neighborGoal = (GoalNode)neighbor;
-                List<IDecision> edges;
-
-                _neighbors.TryGetValue(neighborGoal, out edges);
-                int edgeCost = -1;
-
-                if (edges != null) {
-                    IDecision decision = edges.OrderBy(edge => edge.Cost).First();
-                    edgeCost = decision.Cost;
-                }
-
-                return edgeCost;
-            }
-
-            public bool IsMatch(IGraphNode other) {
-                GoalNode otherGoal = other as GoalNode;
-                bool match = false;
-
-                if (otherGoal != null) {
-                    match = IsMatch(otherGoal);
-                }
-
-                return match;
-            }
-
-            public IEnumerable<IGraphNode> GetNeighbors() {
-                return _neighbors.Keys.Cast<IGraphNode>();
+                _cacheComplete = true;
             }
         }
 
+        private bool IsMatch(GoalNode other) {
+            return State.IsSubset(other.State);
+        }
+    }
+
+    public class ActionPlanner {
         private List<IDecision> _decisions = new List<IDecision>();
         private List<GoalNode> _goals = new List<GoalNode>();
-        private GoalNode _root = new GoalNode();
         private Func<StateOffset, StateOffset, int> _heuristic;
 
         public ActionPlanner(Func<StateOffset, StateOffset, int> heuristic) {
@@ -81,11 +101,25 @@ namespace LostGen {
         }
 
         public Queue<IDecision> CreatePlan(StateOffset goal) {
-            Queue<GoalNode> plan = new Queue<GoalNode>(Pathfinder<GoalNode>.FindPath(goal, _root, Heuristic));
+            GoalNode end = new GoalNode(goal, _decisions);
+            GoalNode start = new GoalNode(new StateOffset(), _decisions);
+            Stack<GoalNode> goals = new Stack<GoalNode>(Pathfinder<GoalNode>.FindPath(end, start, Heuristic));
+
+            Queue<IDecision> plan = new Queue<IDecision>();
+
+            if (goals.Count > 0) {
+                GoalNode previous = goals.Pop();
+                while (goals.Count > 0) {
+                    GoalNode top = goals.Pop();
+                    IDecision edge = top.GetEdge(previous);
+                    plan.Enqueue(edge);
+                }
+            }
 
             return plan;
         }
 
+        /*
         public void BuildGraph() {
             Stack<GoalNode> open = new Stack<GoalNode>();
 
@@ -111,7 +145,7 @@ namespace LostGen {
                         continue;
                     }
 
-                    GoalNode next = new GoalNode(cause.GetPostcondition(current.State));
+                    GoalNode next = new GoalNode(cause.ApplyPostconditions(current.State));
                     next.AddNeighbor(current, cause);
                     open.Push(next);
                     causeFound = true;
@@ -123,7 +157,7 @@ namespace LostGen {
                     open.Pop();
                 }
             }
-        }
+        }*/
 
         private int Heuristic(GoalNode g1, GoalNode g2) {
             return _heuristic(g1.State, g2.State);
