@@ -17,7 +17,6 @@ namespace LostGen {
             public Point PointValue;
         }
 
-        
         private struct StateValue {
             public enum ValueType {
                 Float,
@@ -130,7 +129,6 @@ namespace LostGen {
                 StateValue value = _stateValues[key];
                 StateValue otherVal;
                 other._stateValues.TryGetValue(key, out otherVal);
-
 
                 if ((otherVal.Active && !value.Value.Equals(otherVal.Value)) ||
                     (!otherVal.Active && !value.Value.Equals(value.Default))) {

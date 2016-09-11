@@ -47,13 +47,13 @@ namespace LostGen.Test {
             public StateOffset ApplyPostconditions(StateOffset previous = null) {
                 StateOffset post = previous ?? new StateOffset();
 
-                int currentGuardianHealth = post.GetStateValue("GuardianHealth", 0);
-                if (currentGuardianHealth > 0) {
-                    post.SetStateValue("GuardianHealth", currentGuardianHealth - 1, _startHealth);
+                bool isGuardianDead = post.GetStateValue("GuardianDead", false);
+                if (isGuardianDead) {
+                    post.SetStateValue("GuardianHealth", 0, _startHealth);
                     post.SetStateValue("GuardianDead", false, false);
                     post.SetStateValue("FridgeLocked", true, true);
                 } else {
-                    post.SetStateValue("GuardianHealth", 0, _startHealth);
+                    post.SetStateValue("GuardianHealth", _guardianHealth, _startHealth);
                     post.SetStateValue("GuardianDead", true, false);                                   
                     post.SetStateValue("FridgeLocked", false, true);
                 }
