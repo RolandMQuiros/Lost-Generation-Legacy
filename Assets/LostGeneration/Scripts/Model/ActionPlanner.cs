@@ -66,11 +66,13 @@ namespace LostGen {
                 }
             } else {
                 for (int i = 0; i < _decisions.Count; i++) {
-                    StateOffset post = _decisions[i].ApplyPostconditions();
-                    if (State.IsSubset(post)) {
-                        StateOffset pre = _decisions[i].ApplyPreconditions(post);
-                        GoalNode previousGoal = new GoalNode(pre, _decisions);
+                    if (_decisions[i].ArePreconditionsMet(State)) {
+                        StateOffset post = new StateOffset(State);
+                        _decisions[i].ApplyPostconditions(post);
+
+                        GoalNode previousGoal = new GoalNode(post, _decisions);
                         _edges.Add(previousGoal, _decisions[i]);
+
                         yield return previousGoal;
                     }
                 }
@@ -79,7 +81,7 @@ namespace LostGen {
         }
 
         private bool IsMatch(GoalNode other) {
-            return State.IsSubset(other.State);
+            return other.State.IsSubsetOf(State);
         }
     }
 
@@ -101,18 +103,18 @@ namespace LostGen {
         }
 
         public Queue<IDecision> CreatePlan(StateOffset goal) {
-            GoalNode end = new GoalNode(goal, _decisions);
             GoalNode start = new GoalNode(new StateOffset(), _decisions);
-            Stack<GoalNode> goals = new Stack<GoalNode>(Pathfinder<GoalNode>.FindPath(end, start, Heuristic));
+            GoalNode end = new GoalNode(goal, _decisions);
+            Queue<GoalNode> goals = new Queue<GoalNode>(Pathfinder<GoalNode>.FindPath(start, end, Heuristic));
 
             Queue<IDecision> plan = new Queue<IDecision>();
-
             if (goals.Count > 0) {
-                GoalNode previous = goals.Pop();
+                GoalNode previous = goals.Dequeue();
                 while (goals.Count > 0) {
-                    GoalNode top = goals.Pop();
-                    IDecision edge = top.GetEdge(previous);
+                    GoalNode top = goals.Dequeue();
+                    IDecision edge = previous.GetEdge(top);
                     plan.Enqueue(edge);
+                    previous = top;
                 }
             }
 

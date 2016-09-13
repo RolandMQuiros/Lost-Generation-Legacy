@@ -6,76 +6,71 @@ using System.Collections.Generic;
 
 namespace LostGen.Test {
     public class ActionPlannerTests {
+        private class CurrentState {
+            public int GuardianHealth = 3;
+            public bool IsNearFridge = false;
+            public bool IsFridgeLocked = true;
+            public bool IsFridgeOpen = false;
+            public bool HasBanana = false;
+        }
+
         private class MoveToFridge : IDecision {
             public int Cost { get { return 2; } }
+            private CurrentState _state;
 
-            public StateOffset ApplyPostconditions(StateOffset previous = null) {
-                StateOffset post = previous ?? new StateOffset();
-
-                post.SetStateValue("NearFridge", true, false);
-
-                return post;
+            public MoveToFridge(CurrentState state) {
+                _state = state;
             }
 
-            public StateOffset ApplyPreconditions(StateOffset next = null) {
-                StateOffset pre = next ?? new StateOffset();
+            public StateOffset ApplyPostconditions(StateOffset state) {
+                state.Set("NearFridge", true);
+                return state;
+            }
 
-                pre.SetStateValue("NearFridge", false, false);
-
-                return pre;
+            public bool ArePreconditionsMet(StateOffset state) {
+                return !state.Get("NearFridge", _state.IsNearFridge);
             }
 
             public void Run() {
-                throw new NotImplementedException();
+                Console.Write("Moved near fridge");
+                _state.IsNearFridge = true;
             }
 
-            public void Setup() {
-                throw new NotImplementedException();
-            }
+            public void Setup() { }
         }
 
         private class KillFridgeGuardian : IDecision {
             public int Cost { get { return 3; } }
-            private int _guardianHealth;
-            private int _startHealth;
+            private CurrentState _state;
 
-            public KillFridgeGuardian(int guardianHealth) {
-                _startHealth = guardianHealth;
-                _guardianHealth = guardianHealth;
+            public KillFridgeGuardian(CurrentState state) {
+                _state = state;
             }
 
-            public StateOffset ApplyPostconditions(StateOffset previous = null) {
-                StateOffset post = previous ?? new StateOffset();
-
-                bool isGuardianDead = post.GetStateValue("GuardianDead", false);
-                if (isGuardianDead) {
-                    post.SetStateValue("GuardianHealth", 0, _startHealth);
-                    post.SetStateValue("GuardianDead", false, false);
-                    post.SetStateValue("FridgeLocked", true, true);
+            public StateOffset ApplyPostconditions(StateOffset state) {
+                int guardianHealth = state.Get("GuardianHealth", _state.GuardianHealth) - 1;
+                if (guardianHealth <= 0) {
+                    state.Set("GuardianHealth", 0);
+                    state.Set("GuardianDead", true);
+                    state.Set("FridgeLocked", false);
                 } else {
-                    post.SetStateValue("GuardianHealth", _guardianHealth, _startHealth);
-                    post.SetStateValue("GuardianDead", true, false);                                   
-                    post.SetStateValue("FridgeLocked", false, true);
+                    state.Set("GuardianHealth", guardianHealth);
+                    state.Set("GuardianDead", false);
+                    state.Set("FridgeLocked", true);
                 }
 
-                return post;
+                return state;
             }
 
-            public StateOffset ApplyPreconditions(StateOffset next = null) {
-                StateOffset pre = next ?? new StateOffset();
-
-                int currentGuardianHealth = next.GetStateValue("GuardianHealth", 0);
-                pre.SetStateValue("GuardianHealth", currentGuardianHealth + 1, 0);
-                pre.SetStateValue("GuardianDead", false, false);
-                pre.SetStateValue("FridgeLocked", true, true);
-                pre.SetStateValue("NextToFridge", true, false);
-
-                return pre;
+            public bool ArePreconditionsMet(StateOffset state) {
+                return state.Get("GuardianHealth", _state.GuardianHealth) > 0 &&
+                       state.Get("FridgeLocked", _state.IsFridgeLocked) &&
+                       state.Get("NearFridge", _state.IsNearFridge);
             }
 
             public void Run() {
-                _guardianHealth--;
-                if (_guardianHealth > 0) {
+                _state.GuardianHealth--;
+                if (_state.GuardianHealth > 0) {
                     Console.WriteLine("Attacked Guardian!");
                 } else {
                     Console.WriteLine("Killed Guardian!");
@@ -87,27 +82,25 @@ namespace LostGen.Test {
 
         private class OpenFridgeDecision : IDecision {
             public int Cost { get { return 1; } }
+            private CurrentState _state;
 
-            public StateOffset ApplyPostconditions(StateOffset previous = null) {
-                StateOffset post = previous ?? new StateOffset();
-                
-                post.SetStateValue("FridgeOpen", true, false);
-
-                return post;
+            public OpenFridgeDecision(CurrentState state) {
+                _state = state;
             }
 
-            public StateOffset ApplyPreconditions(StateOffset next = null) {
-                StateOffset pre = next ?? new StateOffset();
+            public StateOffset ApplyPostconditions(StateOffset state) {
+                state.Set("FridgeOpen", true);
+                return state;
+            }
 
-                pre.SetStateValue("GuardianDead", true, false);
-                pre.SetStateValue("FridgeLocked", false, false);
-                pre.SetStateValue("FridgeOpen", false, false);
-
-                return pre;
+            public bool ArePreconditionsMet(StateOffset state) {
+                return !state.Get("FridgeLocked", _state.IsFridgeLocked) &&
+                       !state.Get("FridgeOpen", _state.IsFridgeOpen);
             }
             
             public void Run() {
                 Console.WriteLine("Opened fridge.");
+                _state.IsFridgeOpen = true;
             }
 
             public void Setup() { }
@@ -115,37 +108,37 @@ namespace LostGen.Test {
 
         private class GetBananaFromFridge : IDecision {
             public int Cost { get { return 1; } }
+            private CurrentState _state;
 
-            public StateOffset ApplyPostconditions(StateOffset previous = null) {
-                StateOffset post = previous ?? new StateOffset();
-
-                post.SetStateValue("HasBanana", true, false);
-
-                return post;
+            public GetBananaFromFridge(CurrentState state) {
+                _state = state;
             }
 
-            public StateOffset ApplyPreconditions(StateOffset next = null) {
-                StateOffset pre = next ?? new StateOffset();
+            public StateOffset ApplyPostconditions(StateOffset state) {
+                state.Set("HasBanana", true);
+                return state;
+            }
 
-                pre.SetStateValue("HasBanana", false, false);
-                pre.SetStateValue("FridgeOpen", true, false);
-
-                return pre;
+            public bool ArePreconditionsMet(StateOffset state) {
+                return state.Get("FridgeOpen", _state.IsFridgeOpen) &&
+                       !state.Get("HasBanana", _state.HasBanana);
             }
 
             public void Run() {
                 Console.Write("Got the Banana!");
+                _state.HasBanana = true;
             }
 
             public void Setup() { }
         }
 
         private ActionPlanner BasicPlanner() {
+            CurrentState state = new CurrentState();
             IDecision[] decisions = new IDecision[] {
-                new MoveToFridge(),
-                new KillFridgeGuardian(10),
-                new OpenFridgeDecision(),
-                new GetBananaFromFridge()
+                new MoveToFridge(state),
+                new KillFridgeGuardian(state),
+                new OpenFridgeDecision(state),
+                new GetBananaFromFridge(state)
             };
 
             ActionPlanner planner = new ActionPlanner(StateOffset.Heuristic);
@@ -158,11 +151,12 @@ namespace LostGen.Test {
         
         [Test]
         public void GoalNodeNeighborIterator() {
+            CurrentState state = new CurrentState();
             List<IDecision> decisions = new List<IDecision>() {
-                new MoveToFridge(),
-                new KillFridgeGuardian(1),
-                new OpenFridgeDecision(),
-                new GetBananaFromFridge()
+                new MoveToFridge(state),
+                new KillFridgeGuardian(state),
+                new OpenFridgeDecision(state),
+                new GetBananaFromFridge(state)
             };
 
             StateOffset goal = new StateOffset();
@@ -179,12 +173,12 @@ namespace LostGen.Test {
 
         [Test]
         public void SingleSolution() {
-            //Arrange
+            CurrentState state = new CurrentState();
             IDecision[] decisions = new IDecision[] {
-                new MoveToFridge(),
-                new KillFridgeGuardian(3),
-                new OpenFridgeDecision(),
-                new GetBananaFromFridge()
+                new MoveToFridge(state),
+                new KillFridgeGuardian(state),
+                new OpenFridgeDecision(state),
+                new GetBananaFromFridge(state)
             };
 
             ActionPlanner planner = new ActionPlanner(StateOffset.Heuristic);
@@ -193,17 +187,17 @@ namespace LostGen.Test {
             }
 
             StateOffset goal = new StateOffset();
-            goal.SetStateValue("HasBanana", true, false);
+            goal.Set("HasBanana", true);
 
             Queue<IDecision> plan = planner.CreatePlan(goal);
-            
+
+            Assert.Greater(plan.Count, 0);
             Assert.AreSame(decisions[0], plan.Dequeue()); // MoveToFridge
             Assert.AreSame(decisions[1], plan.Dequeue()); // KillFridgeGuardian
             Assert.AreSame(decisions[1], plan.Dequeue()); // KillFridgeGUardian
             Assert.AreSame(decisions[1], plan.Dequeue()); // KillFridgeGuardian
             Assert.AreSame(decisions[2], plan.Dequeue()); // OpenFridge
             Assert.AreSame(decisions[3], plan.Dequeue()); // GetBananaFromFridge
-
         }
     }
 }

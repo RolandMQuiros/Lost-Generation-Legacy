@@ -7,8 +7,8 @@ namespace LostGen {
     public interface IDecision {
         int Cost { get; }
 
-        StateOffset ApplyPreconditions(StateOffset next = null);
-        StateOffset ApplyPostconditions(StateOffset previous = null);
+        bool ArePreconditionsMet(StateOffset state);
+        StateOffset ApplyPostconditions(StateOffset state);
 
         void Setup();
         void Run();
