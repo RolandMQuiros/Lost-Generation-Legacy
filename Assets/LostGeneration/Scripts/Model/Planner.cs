@@ -4,69 +4,138 @@ using System.Linq;
 using System.Text;
 
 namespace LostGen {
-    
+    /// <summary>
+    /// A node in the Planner's decision graph. A GoalNode represents a possible state of the world created
+    /// as the result or cause of an IDecision.
+    /// 
+    /// With a given list of possible IDecisions, a single GoalNode will generate its full graph on its own through
+    /// calls to GetNeighbors. The graphs are constructed from end to start, so the edges are unidirectional and point
+    /// towards the current GoalNode.
+    /// </summary>
+    public class GoalNode : IGraphNode {
+        public StateOffset State { get; private set; }
+        private List<IDecision> _decisions;
+        private Dictionary<GoalNode, IDecision> _edges = new Dictionary<GoalNode, IDecision>();
+        private bool _cacheComplete = false;
+
+        public GoalNode(StateOffset state, List<IDecision> decisions) {
+            State = state ?? new StateOffset();
+            _decisions = decisions ?? new List<IDecision>();
+        }
+
+        public IDecision GetEdge(GoalNode neighbor) {
+            IDecision edge;
+            _edges.TryGetValue(neighbor, out edge);
+
+            if (edge == null) {
+                throw new ArgumentException("neighbor", "Neighbor is not connected to this node");
+            }
+
+            return edge;
+        }
+
+        public int GetEdgeCost(IGraphNode neighbor) {
+            // We're basically banking on GetNeighbor being called BEFORE GetEdgeCost, since the goals won't be
+            // cached until the former is used.
+            // This might bite us in the ass later.
+
+            // While we're at it, we're also assuming that all GoalNodes traversed are generated from the root,
+            // so all nodes used by Pathfinder are actually in the same graph.  This might be sound, but still...
+
+            GoalNode neighborGoal = (GoalNode)neighbor;
+            IDecision edge = GetEdge(neighborGoal);
+
+            return edge.Cost;
+        }
+
+        public bool IsMatch(IGraphNode other) {
+            GoalNode otherGoal = other as GoalNode;
+            bool match = false;
+
+            if (otherGoal != null) {
+                match = IsMatch(otherGoal);
+            }
+
+            return match;
+        }
+
+        public IEnumerable<IGraphNode> GetNeighbors() {
+            if (_cacheComplete) {
+                foreach (GoalNode neighbor in _edges.Keys) {
+                    yield return neighbor;
+                }
+            } else {
+                for (int i = 0; i < _decisions.Count; i++) {
+                    if (_decisions[i].ArePreconditionsMet(State)) {
+                        StateOffset post = new StateOffset(State);
+                        _decisions[i].ApplyPostconditions(post);
+
+                        GoalNode previousGoal = new GoalNode(post, _decisions);
+                        _edges.Add(previousGoal, _decisions[i]);
+
+                        yield return previousGoal;
+                    }
+                }
+                _cacheComplete = true;
+            }
+        }
+
+        private bool IsMatch(GoalNode other) {
+            return other.State.IsSubsetOf(State);
+        }
+    }
+
     public class Planner {
-        private class StartNode : DecisionNode {
-            public override bool ArePreconditionsMet(StateOffset state) { return false; }
-            public override int GetCost(StateOffset offset = null) { return Int32.MaxValue; }
-            public override void Run() { }
-            public override void Setup() { }
+        private List<IDecision> _decisions = new List<IDecision>();
+        private List<GoalNode> _goals = new List<GoalNode>();
+        private Func<StateOffset, StateOffset, int> _heuristic;
 
-            public override StateOffset GetPostconditions(StateOffset state = null) {
-                return new StateOffset();
-            }
-        }
-
-        private StartNode _root;
-        private HashSet<DecisionNode> _decisions = new HashSet<DecisionNode>();
-        private bool _rebuildGraph = false;
-
-        public Planner() {
-            _root = new StartNode();
-            _decisions.Add(_root);
-        }
-
-        /// <summary>
-        /// Runs the Setup method on each Skill
-        /// </summary>
-        public void Setup() {
-            foreach (DecisionNode decision in _decisions) {
-                decision.Setup();
-            }
-        }
-
-        public bool AddDecision(DecisionNode decision) {
-            bool success = _decisions.Add(decision);
-            _rebuildGraph |= success;
-            return success;
-        }
-
-        public IEnumerable<DecisionNode> FindPlan(Goal goal) {
-            if (!_decisions.Contains(goal)) {
-                throw new ArgumentException("Goal does not exist in Decision graph. Use Planner.AddDecision to add to graph.", "goal");
+        public Planner(Func<StateOffset, StateOffset, int> heuristic) {
+            if (heuristic == null) {
+                throw new ArgumentNullException("heuristic", "The Planner must be constructed with a heuristic");
             }
 
-            if (_rebuildGraph) {
-                BuildGraph();
-            }
-
-            return Pathfinder<DecisionNode>.FindPath(goal, _root, goal.Heuristic);
+            _heuristic = heuristic;
         }
 
+        public void AddDecision(IDecision decision) {
+            _decisions.Add(decision);
+        }
+
+        public Queue<IDecision> CreatePlan(StateOffset goal) {
+            GoalNode start = new GoalNode(new StateOffset(), _decisions);
+            GoalNode end = new GoalNode(goal, _decisions);
+            Queue<GoalNode> goals = new Queue<GoalNode>(Pathfinder<GoalNode>.FindPath(start, end, Heuristic));
+
+            Queue<IDecision> plan = new Queue<IDecision>();
+            if (goals.Count > 0) {
+                GoalNode previous = goals.Dequeue();
+                while (goals.Count > 0) {
+                    GoalNode top = goals.Dequeue();
+                    IDecision edge = previous.GetEdge(top);
+                    plan.Enqueue(edge);
+                    previous = top;
+                }
+            }
+
+            return plan;
+        }
+
+        /*
         public void BuildGraph() {
-            Stack<DecisionNode> open = new Stack<DecisionNode>();
-            Stack<StateOffset> outcomes = new Stack<StateOffset>();
+            Stack<GoalNode> open = new Stack<GoalNode>();
+
+            _goals.Clear();
 
             open.Push(_root);
-            outcomes.Push(new StateOffset());
+            _goals.Add(_root);
 
             while (open.Count > 0) {
-                DecisionNode current = open.Peek();
-                StateOffset currentPost = outcomes.Peek();
+                GoalNode current = open.Peek();
 
                 bool finishedNode = true;
                 bool causeFound = false;
-                foreach (DecisionNode cause in _decisions) {
+                foreach (IDecision cause in _decisions) {
                     if (causeFound) {
                         // Break on the opening of the following Decision
                         // This ensures that if the current neighbor is the last, and it is an eligible cause, it triggers the finishing pops
@@ -74,28 +143,26 @@ namespace LostGen {
                         break;
                     }
 
-                    if (current == cause || !cause.ArePreconditionsMet(currentPost)) {
+                    if (!cause.ArePreconditionsMet(current.State)) {
                         continue;
                     }
 
-                    if (cause.AddCause(current, cause.GetCost(currentPost))) {
-                        StateOffset nextState = new StateOffset(currentPost);
-                        cause.GetPostconditions(nextState);
+                    GoalNode next = new GoalNode(cause.ApplyPostconditions(current.State));
+                    next.AddNeighbor(current, cause);
+                    open.Push(next);
+                    causeFound = true;
 
-                        open.Push(cause);
-                        outcomes.Push(nextState);
-
-                        causeFound = true;
-                    }
+                    _goals.Add(next);
                 }
 
                 if (finishedNode) {
                     open.Pop();
-                    outcomes.Pop();
                 }
             }
+        }*/
 
-            _rebuildGraph = false;
+        private int Heuristic(GoalNode g1, GoalNode g2) {
+            return _heuristic(g1.State, g2.State);
         }
     }
 }

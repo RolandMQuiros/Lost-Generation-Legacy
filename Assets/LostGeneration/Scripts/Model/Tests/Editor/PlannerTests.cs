@@ -3,137 +3,201 @@ using UnityEditor;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace LostGen.Test {
-    /*
     public class PlannerTests {
-        private class TestDecision : DecisionNode {
-            public int Value;
-            public int Cost;
+        private class CurrentState {
+            public int GuardianHealth = 3;
+            public bool IsNearFridge = false;
+            public bool IsFridgeLocked = true;
+            public bool IsFridgeOpen = false;
+            public bool HasBanana = false;
+        }
 
-            public override bool ArePreconditionsMet(StateOffset state) {
-                int val = state.GetStateValue("value", -1);
-                return val == Value - 1;
+        private class MoveToFridge : IDecision {
+            public int Cost { get { return 2; } }
+            private CurrentState _state;
+
+            public MoveToFridge(CurrentState state) {
+                _state = state;
             }
 
-            public override StateOffset GetPostconditions(StateOffset state = null) {
-                state.SetStateValue("value", Value);
+            public StateOffset ApplyPostconditions(StateOffset state) {
+                state.Set("NearFridge", true);
                 return state;
             }
 
-            public override int GetCost(StateOffset state = null) {
-                return Value;
+            public bool ArePreconditionsMet(StateOffset state) {
+                return !state.Get("NearFridge", _state.IsNearFridge);
             }
+
+            public void Run() {
+                Console.Write("Moved near fridge");
+                _state.IsNearFridge = true;
+            }
+
+            public void Setup() { }
         }
 
-        private class OddDecision : TestDecision {
-            public override bool ArePreconditionsMet(StateOffset state) {
-                int val = state.GetStateValue("value", -1);
-                return val < Value && val % 2 == 1;
+        private class KillFridgeGuardian : IDecision {
+            public int Cost { get { return 3; } }
+            private CurrentState _state;
+
+            public KillFridgeGuardian(CurrentState state) {
+                _state = state;
             }
-        }
 
-        private class EvenDecision : TestDecision {
-            public override bool ArePreconditionsMet(StateOffset state) {
-                int val = state.GetStateValue("value", -1);
-                return val < Value && val % 2 == 0;
-            }
-        }
-
-        private void PrintGraphList(List<DecisionNode> graphList) {
-            string print = string.Empty;
-            for (int i = 0; i < graphList.Count; i++) {
-                TestDecision decision = graphList[i] as TestDecision;
-
-                if (decision != null) {
-                    print += decision.Value + ": ";
-                    foreach (DecisionNode neighbor in decision.GetNeighbors()) {
-                        TestDecision neighborTest = neighbor as TestDecision;
-                        if (neighborTest != null) {
-                            print += neighborTest.Value + " ";
-                        } else {
-                            print += "start ";
-                        }
-                    }
+            public StateOffset ApplyPostconditions(StateOffset state) {
+                int guardianHealth = state.Get("GuardianHealth", _state.GuardianHealth) - 1;
+                if (guardianHealth <= 0) {
+                    state.Set("GuardianHealth", 0);
+                    state.Set("GuardianDead", true);
+                    state.Set("FridgeLocked", false);
                 } else {
-                    print += "start ";
+                    state.Set("GuardianHealth", guardianHealth);
+                    state.Set("GuardianDead", false);
+                    state.Set("FridgeLocked", true);
                 }
 
-                print += "\n";
+                return state;
             }
-            Console.Write(print);
+
+            public bool ArePreconditionsMet(StateOffset state) {
+                return state.Get("GuardianHealth", _state.GuardianHealth) > 0 &&
+                       state.Get("FridgeLocked", _state.IsFridgeLocked) &&
+                       state.Get("NearFridge", _state.IsNearFridge);
+            }
+
+            public void Run() {
+                _state.GuardianHealth--;
+                if (_state.GuardianHealth > 0) {
+                    Console.WriteLine("Attacked Guardian!");
+                } else {
+                    Console.WriteLine("Killed Guardian!");
+                }
+            }
+
+            public void Setup() { }
         }
 
-        [Test]
-        public void PreconditionTest() {
-            TestDecision[] decisions = new TestDecision[3];
-            for (int i = 0; i < 3; i++) {
-                decisions[i] = new TestDecision() { Value = i };
+        private class OpenFridgeDecision : IDecision {
+            public int Cost { get { return 1; } }
+            private CurrentState _state;
+
+            public OpenFridgeDecision(CurrentState state) {
+                _state = state;
             }
 
-            StateOffset state = new StateOffset();
+            public StateOffset ApplyPostconditions(StateOffset state) {
+                state.Set("FridgeOpen", true);
+                return state;
+            }
 
+            public bool ArePreconditionsMet(StateOffset state) {
+                return !state.Get("FridgeLocked", _state.IsFridgeLocked) &&
+                       !state.Get("FridgeOpen", _state.IsFridgeOpen);
+            }
+            
+            public void Run() {
+                Console.WriteLine("Opened fridge.");
+                _state.IsFridgeOpen = true;
+            }
+
+            public void Setup() { }
+        }
+
+        private class GetBananaFromFridge : IDecision {
+            public int Cost { get { return 1; } }
+            private CurrentState _state;
+
+            public GetBananaFromFridge(CurrentState state) {
+                _state = state;
+            }
+
+            public StateOffset ApplyPostconditions(StateOffset state) {
+                state.Set("HasBanana", true);
+                return state;
+            }
+
+            public bool ArePreconditionsMet(StateOffset state) {
+                return state.Get("FridgeOpen", _state.IsFridgeOpen) &&
+                       !state.Get("HasBanana", _state.HasBanana);
+            }
+
+            public void Run() {
+                Console.Write("Got the Banana!");
+                _state.HasBanana = true;
+            }
+
+            public void Setup() { }
+        }
+
+        private Planner BasicPlanner() {
+            CurrentState state = new CurrentState();
+            IDecision[] decisions = new IDecision[] {
+                new MoveToFridge(state),
+                new KillFridgeGuardian(state),
+                new OpenFridgeDecision(state),
+                new GetBananaFromFridge(state)
+            };
+
+            Planner planner = new Planner(StateOffset.Heuristic);
             for (int i = 0; i < decisions.Length; i++) {
-                Assert.IsTrue(decisions[i].ArePreconditionsMet(state));
-                decisions[i].GetPostconditions(state);
-            }
-        }
-
-        [Test]
-        public void GraphBuild() {
-            Planner planner = new Planner();
-
-            TestDecision[] decisions = new TestDecision[10];
-            for (int i = 0; i < 10; i++) {
-                decisions[i] = new TestDecision() { Value = i };
                 planner.AddDecision(decisions[i]);
             }
 
-            planner.BuildGraph();
+            return planner;
+        }
+        
+        [Test]
+        public void GoalNodeNeighborIterator() {
+            CurrentState state = new CurrentState();
+            List<IDecision> decisions = new List<IDecision>() {
+                new MoveToFridge(state),
+                new KillFridgeGuardian(state),
+                new OpenFridgeDecision(state),
+                new GetBananaFromFridge(state)
+            };
 
-            List<DecisionNode> graphList = new List<DecisionNode>(
-                Pathfinder<DecisionNode>.FloodFill(decisions[9])
-            );
+            StateOffset goal = new StateOffset();
+            //goal.SetStateValue("HasBanana", true, false);
+            GoalNode end = new GoalNode(goal, decisions);
 
-            PrintGraphList(graphList);
-
-            Assert.AreEqual(11, graphList.Count);
+            int i = decisions.Count - 1;
+            foreach (GoalNode neighbor in end.GetNeighbors()) {
+                Console.WriteLine(end.GetEdge(neighbor));
+                //Assert.AreSame(decisions[i--], end.GetEdge(neighbor));
+            }
         }
 
-        [Test]
-        public void EvenOddGraph() {
-            Planner planner = new Planner();
 
-            TestDecision[] decisions = new TestDecision[10];
-            for (int i = 0; i < 10; i++) {
-                if (i % 2 == 0) {
-                    decisions[i] = new EvenDecision() { Value = i };
-                } else {
-                    decisions[i] = new OddDecision() { Value = i };
-                }
+        [Test]
+        public void SingleSolution() {
+            CurrentState state = new CurrentState();
+            IDecision[] decisions = new IDecision[] {
+                new MoveToFridge(state),
+                new KillFridgeGuardian(state),
+                new OpenFridgeDecision(state),
+                new GetBananaFromFridge(state)
+            };
+
+            Planner planner = new Planner(StateOffset.Heuristic);
+            for (int i = 0; i < decisions.Length; i++) {
                 planner.AddDecision(decisions[i]);
             }
 
-            // SHIT do we need to rebuild the graph with every state change?
-            // Only if you build the graph using the precondition check outside of isolation
-            // When building graph
+            StateOffset goal = new StateOffset();
+            goal.Set("HasBanana", true);
 
-            // Limit 1 occurrence of a decision per path
-            // The goal's precondition should check for progress toward goal, not a hard requirement for the goal state
-            // Thus, once the goal's precondition is satisfied, the planner can restart the pathfinding plan?
+            Queue<IDecision> plan = planner.CreatePlan(goal);
 
-            // A* doesn't cover repeat visits, so
-            // Design Goals as inclusive of progress as well as ultimate success
-            // e.g. If the ultimate goal is to kill the enemy, for the DecisionNode EnemyDeadOrDying, ArePreconditionsMet returns true
-            // if the Enemy's projected HP is lower than their current HP
-            planner.BuildGraph();
-
-            List<DecisionNode> graphList = new List<DecisionNode>(
-                Pathfinder<DecisionNode>.FloodFill(decisions[9])
-            );
-
-            PrintGraphList(graphList);
+            Assert.Greater(plan.Count, 0);
+            Assert.AreSame(decisions[0], plan.Dequeue()); // MoveToFridge
+            Assert.AreSame(decisions[1], plan.Dequeue()); // KillFridgeGuardian
+            Assert.AreSame(decisions[1], plan.Dequeue()); // KillFridgeGUardian
+            Assert.AreSame(decisions[1], plan.Dequeue()); // KillFridgeGuardian
+            Assert.AreSame(decisions[2], plan.Dequeue()); // OpenFridge
+            Assert.AreSame(decisions[3], plan.Dequeue()); // GetBananaFromFridge
         }
-    } */
+    }
 }

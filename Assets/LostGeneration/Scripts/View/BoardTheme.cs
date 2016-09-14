@@ -11,6 +11,6 @@ public class BoardTheme {
     public float TileHeight = 1f;
 
     public Vector3 PointToVector3(Point point) {
-        return new Vector3(-point.X * TileWidth, point.Y * TileHeight);
+        return new Vector3(-point.X * TileWidth, 0f, point.Y * TileHeight);
     }
 }
