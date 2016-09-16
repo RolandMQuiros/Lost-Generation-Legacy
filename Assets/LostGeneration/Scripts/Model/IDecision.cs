@@ -6,11 +6,7 @@ using System.Text;
 namespace LostGen {
     public interface IDecision {
         int Cost { get; }
-
         bool ArePreconditionsMet(StateOffset state);
         StateOffset ApplyPostconditions(StateOffset state);
-
-        void Setup();
-        void Run();
     }
 }

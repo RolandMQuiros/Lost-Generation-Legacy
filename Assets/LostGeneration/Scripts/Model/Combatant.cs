@@ -39,6 +39,8 @@ namespace LostGen {
 
         public int ActionPoints { get { return _actionPoints; } }
 
+        public Team Team;
+
         private bool _didStatsChange;
         private Stats _baseStats;
         private Stats _effectiveStats;
@@ -48,7 +50,7 @@ namespace LostGen {
         private List<Gear> _gear = new List<Gear>();
         private Dictionary<Type, ISkill> _skills = new Dictionary<Type, ISkill>();
         private Dictionary<string, ISkill> _aliasedSkills = new Dictionary<string, ISkill>();
-
+        private HashSet<Pawn> _visiblePawns = new HashSet<Pawn>();
         private HashSet<Pawn> _knownPawns = new HashSet<Pawn>();
 
         public Combatant(string name, Board board, Point position, bool isOpaque = true, IEnumerable<Point> footprint = null, bool isCollidable = true, bool isSolid = true)
@@ -77,22 +79,25 @@ namespace LostGen {
             return (T)skill;
         }
 
+        public IEnumerable<Pawn> GetKnownPawns() {
+            return _knownPawns;
+        }
+
         public IEnumerable<Pawn> GetPawnsInView() {
-            foreach (Pawn pawn in _knownPawns) {
-                yield return pawn;
-            }
+            return _visiblePawns;
         }
 
         public bool AddPawnToView(Pawn pawn) {
-            return _knownPawns.Add(pawn);
+            _knownPawns.Add(pawn);
+            return _visiblePawns.Add(pawn);
         }
 
         public void RemovePawnFromView(Pawn pawn) {
-            _knownPawns.Remove(pawn);
+            _visiblePawns.Remove(pawn);
         }
 
         public bool IsPawnInView(Pawn pawn) {
-            return _knownPawns.Contains(pawn);
+            return _visiblePawns.Contains(pawn);
         }
 
         public override void BeginTurn() {

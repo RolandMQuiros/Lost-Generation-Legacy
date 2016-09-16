@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace LostGen {
-    public class DamageAction : Action {
+    public class DamageAction : PawnAction {
         public int Amount { get; private set; }
         public Combatant Target { get; private set; }
         public Combatant Source { get; private set; }

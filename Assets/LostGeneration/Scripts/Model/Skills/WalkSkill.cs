@@ -63,14 +63,14 @@ namespace LostGen {
             }
         }
 
-        public List<Point> GetPath() {
+        public Queue<Point> GetPath() {
             if (_destination == null) {
                 throw new NullReferenceException("Destination has not been specified");
             }
 
-            List<Point> pointPath = new List<Point>();
+            Queue<Point> pointPath = new Queue<Point>();
             for (int i = 0; i < _path.Count; i++) {
-                pointPath.Add(_path[i].Point);
+                pointPath.Enqueue(_path[i].Point);
             }
 
             return pointPath;

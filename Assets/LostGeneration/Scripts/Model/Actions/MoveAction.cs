@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace LostGen {
-    public class MoveAction : Action {
+    public class MoveAction : PawnAction {
         public class Message : MessageArgs {
             public Pawn Mover;
             public Point From;

@@ -28,7 +28,7 @@ namespace LostGen {
             set { Board.SetPawnPosition(this, value); }
         }
 
-        private LinkedList<Action> _actions = new LinkedList<Action>();
+        private LinkedList<PawnAction> _actions = new LinkedList<PawnAction>();
         public int ActionCount {
             get { return _actions.Count; }
         }
@@ -124,13 +124,13 @@ namespace LostGen {
             }
         }
 
-        public void PushActions(IEnumerable<Action> actions) {
-            foreach (Action action in actions) {
+        public void PushActions(IEnumerable<PawnAction> actions) {
+            foreach (PawnAction action in actions) {
                 _actions.AddLast(action);
             }
         }
 
-        public void PushAction(Action action) {
+        public void PushAction(PawnAction action) {
             _actions.AddLast(action);
         }
         
@@ -141,7 +141,7 @@ namespace LostGen {
 		///</summary>
 		public virtual bool Step() {
             if (_actions.Count > 0) {
-                Action stepAction = _actions.First.Value;
+                PawnAction stepAction = _actions.First.Value;
                 stepAction.Run();
                 _actions.RemoveFirst();
             }

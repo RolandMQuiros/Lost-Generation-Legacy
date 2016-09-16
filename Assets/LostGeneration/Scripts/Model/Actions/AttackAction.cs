@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace LostGen {
-    public class AttackAction : Action {
+    public class AttackAction : PawnAction {
         private Combatant _attacker;
         private List<Point> _areaOfEffect;
 

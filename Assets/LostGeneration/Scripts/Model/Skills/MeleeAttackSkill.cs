@@ -6,6 +6,7 @@ namespace LostGen {
         private Combatant _attacker;
         private List<Point> _areaOfEffect;
         private Dictionary<CardinalDirection, Point[]> _transforms = new Dictionary<CardinalDirection, Point[]>();
+        private HashSet<Point> _fullAreaOfEffect = new HashSet<Point>();
         public CardinalDirection Direction;
 
         /// <summary>
@@ -33,15 +34,37 @@ namespace LostGen {
 
             for (int i = 0; i < _areaOfEffect.Count; i++) {
                 Point east = _areaOfEffect[i];
+                Point south = new Point(-east.Y, east.X);
+                Point west = new Point(-east.X, -east.Y);
+                Point north = new Point(east.Y, east.X);
+
                 _transforms[CardinalDirection.East][i] = east;
-                _transforms[CardinalDirection.South][i] = new Point(-east.Y, east.X);
-                _transforms[CardinalDirection.West][i] = new Point(-east.X, -east.Y);
-                _transforms[CardinalDirection.South][i] = new Point(east.Y, east.X);
+                _transforms[CardinalDirection.South][i] = south;
+                _transforms[CardinalDirection.West][i] = west;
+                _transforms[CardinalDirection.North][i] = north;
+
+                _fullAreaOfEffect.Add(east);
+                _fullAreaOfEffect.Add(south);
+                _fullAreaOfEffect.Add(west);
+                _fullAreaOfEffect.Add(north);
             }
         }
 
         public IEnumerable<Point> GetAreaOfEffect(CardinalDirection direction) {
             return _transforms[direction];
+        }
+
+        public bool InAreaOfEffect(CardinalDirection direction, Point point) {
+            bool found = false;
+            for (int i = 0; !found && i < _transforms[direction].Length; i++) {
+                found = _transforms[direction][i].Equals(_attacker.Position - point);
+            }
+            return found;
+        }
+
+        public bool InFullAreaOfEffect(Point point) {
+            Point offset = point - _attacker.Position;
+            return _fullAreaOfEffect.Contains(offset);
         }
 
         public override HashSet<Point> GetRange() {
