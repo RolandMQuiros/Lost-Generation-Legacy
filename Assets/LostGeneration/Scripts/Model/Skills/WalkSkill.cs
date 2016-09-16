@@ -19,11 +19,14 @@ namespace LostGen {
     /// more specific skills to cover smaller possibility spaces.
     /// </summary>
     public class WalkSkill : RangedSkill {
-        protected Point? _destination;
         public Point Destination { get { return _destination.Value; } }
+        public override int ActionPoints { get { return _actionPoints; } }
+
+        protected Board _board;
+        protected Point? _destination;
 
         private List<Board.Node> _path;
-        protected Board _board;
+        private int _actionPoints;
 
         public WalkSkill(Combatant owner)
             : base(owner, "Walk", "Move across tiles within a limited range") {
@@ -54,9 +57,9 @@ namespace LostGen {
                     );
                 }
 
-                ActionPoints = 0;
+                _actionPoints = 0;
                 for (int i = 0; i < _path.Count; i++) {
-                    ActionPoints += TileCost(_path[i].Point);
+                    _actionPoints += TileCost(_path[i].Point);
                 }
             } else {
                 _destination = Owner.Position;

@@ -3,11 +3,14 @@ using System.Collections.Generic;
 
 namespace LostGen {
     public class MeleeAttackSkill : RangedSkill {
+        public CardinalDirection Direction;
+        public bool PierceSolids { get; set; }
+        public bool PierceWalls { get; set; }
+
         private Combatant _attacker;
         private List<Point> _areaOfEffect;
         private Dictionary<CardinalDirection, Point[]> _transforms = new Dictionary<CardinalDirection, Point[]>();
         private HashSet<Point> _fullAreaOfEffect = new HashSet<Point>();
-        public CardinalDirection Direction;
 
         /// <summary>
         /// Contruct a new MeleeAttackSkill.
@@ -36,7 +39,7 @@ namespace LostGen {
                 Point east = _areaOfEffect[i];
                 Point south = new Point(-east.Y, east.X);
                 Point west = new Point(-east.X, -east.Y);
-                Point north = new Point(east.Y, east.X);
+                Point north = new Point(east.Y, -east.X);
 
                 _transforms[CardinalDirection.East][i] = east;
                 _transforms[CardinalDirection.South][i] = south;
@@ -56,15 +59,47 @@ namespace LostGen {
 
         public bool InAreaOfEffect(CardinalDirection direction, Point point) {
             bool found = false;
-            for (int i = 0; !found && i < _transforms[direction].Length; i++) {
-                found = _transforms[direction][i].Equals(_attacker.Position - point);
+
+            if (_fullAreaOfEffect.Contains(point - _attacker.Position)) {
+                for (int i = 0; !found && i < _transforms[direction].Length; i++) {
+                    Point aoePoint = _transforms[direction][i];
+                    if (aoePoint.Equals(_attacker.Position - point)) {
+                        if (PierceWalls && PierceSolids) {
+                            found = true;
+                        } else if (PierceSolids) {
+                            found = _attacker.Board.LineCastForWalls(_attacker.Position, aoePoint);
+                        } else if (PierceWalls) {
+                            found = _attacker.Board.LineCastForWallsAndSolids(_attacker.Position, aoePoint);
+                        }
+                    }
+                }
             }
+
             return found;
         }
 
         public bool InFullAreaOfEffect(Point point) {
             Point offset = point - _attacker.Position;
             return _fullAreaOfEffect.Contains(offset);
+        }
+
+        public bool CanAttackFrom(Point from, Point point) {
+            bool canAttack = false;
+            bool inFullAOE = _fullAreaOfEffect.Contains(point - from);
+
+            if (_attacker.Board.InBounds(from)) {
+                if (PierceWalls && PierceSolids) {
+                    canAttack = inFullAOE;
+                } else if (inFullAOE) {
+                    if (PierceSolids) {
+                        canAttack = _attacker.Board.LineCastForWalls(from, point);
+                    } else {
+                        canAttack = _attacker.Board.LineCastForWallsAndSolids(from, point);
+                    }
+                }
+            }
+
+            return canAttack;
         }
 
         public override HashSet<Point> GetRange() {
@@ -77,11 +112,8 @@ namespace LostGen {
         }
 
         public override void Fire() {
-            AttackAction attack = null;
-            for (int i = 0; i < _transforms[Direction].Length; i++) {
-                attack = new AttackAction(_attacker, _transforms[Direction]);
-                _attacker.PushAction(attack);
-            }
+            AttackAction attack = new AttackAction(_attacker, _transforms[Direction]);
+            _attacker.PushAction(attack);
         }
     }
 }

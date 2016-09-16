@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace LostGen {
-    public class MoveAction : PawnAction {
+    public class MoveAction : CombatantAction {
         public class Message : MessageArgs {
             public Pawn Mover;
             public Point From;
@@ -21,10 +21,12 @@ namespace LostGen {
             }
         }
 
+        public override int ActionPoints { get { return Point.TaxicabDistance(Owner.Position, _destination); } }
+
         private Point _destination;
         private bool _isContinuous;
 
-        public MoveAction(Pawn owner, Point destination, bool isContinuous) 
+        public MoveAction(Combatant owner, Point destination, bool isContinuous) 
             : base(owner) {
             _destination = destination;
             _isContinuous = isContinuous;
@@ -39,7 +41,5 @@ namespace LostGen {
                 );
             }
         }
-
-
     }
 }

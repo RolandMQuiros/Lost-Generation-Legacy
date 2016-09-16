@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -393,6 +394,32 @@ namespace LostGen {
         }
 
         #region SelectAlgs
+        
+        public bool LineCast(Point start, Point end, HashSet<Pawn> pawns = null, bool passThroughWalls = false, bool passThroughSolids = false) {
+            bool stop = false;
+
+            int dx = end.X - start.X;
+            int dy = end.Y - start.Y;
+            float slope = (float)(end.Y - start.Y) / (end.X - start.X);
+
+            for (int x = start.X; !stop && x <= end.X; x++) {
+                Point point = new Point(x, start.Y + (int)(x * slope + 0.5f));
+                if (InBounds(point)) {
+
+                    if (!passThroughWalls && GetTile(point) == WALL_TILE) {
+                        stop = true;
+                    } else if (!passThroughSolids) {
+                        HashSet<Pawn> pawnsAt = PawnsAt(point);
+                        if (pawns != null) {
+                            pawns.UnionWith(pawnsAt);
+                        }
+                        stop = pawnsAt.FirstOrDefault(pawn => pawn.IsCollidable && pawn.IsSolid) != null;
+                    }
+                }
+            }
+
+            return stop;
+        }
 
         public HashSet<Point> LineOfSight(Point position, int range) {
             HashSet<Point> visible = ShadowCast.ComputeVisibility(this, position, (float)range);

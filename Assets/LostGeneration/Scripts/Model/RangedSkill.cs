@@ -6,7 +6,7 @@ namespace LostGen {
         public Combatant Owner { get; private set; }
         public string Name { get; private set; }
         public string Description { get; private set; }
-        public int ActionPoints { get; protected set; }
+        public virtual int ActionPoints { get; set; }
 
         public RangedSkill(Combatant owner, string name, string description) {
             Owner = owner;

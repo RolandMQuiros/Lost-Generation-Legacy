@@ -100,8 +100,27 @@ namespace LostGen {
             return _visiblePawns.Contains(pawn);
         }
 
+        public IEnumerable<Gear> GetGear() {
+            return _gear;
+        }
+
+        public void AddGear(Gear gear) {
+            _gear.Add(gear);
+        }
+
+        public void RemoteGear(Gear gear) {
+            _gear.Remove(gear);
+        }
+
         public override void BeginTurn() {
             _actionPoints = EffectiveStats.Stamina;
+        }
+
+        protected override void PreprocessAction(PawnAction action) {
+            CombatantAction combatantAction = action as CombatantAction;
+            if (combatantAction != null) {
+                _actionPoints -= combatantAction.ActionPoints;
+            }
         }
     }
 }

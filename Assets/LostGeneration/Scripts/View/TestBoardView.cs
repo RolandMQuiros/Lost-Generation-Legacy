@@ -9,7 +9,7 @@ public class TestBoardView : MonoBehaviour {
     private Transform _testPawnXform;
 
 	private Board _board;
-    private Pawn _testPawn;
+    private Combatant _testPawn;
     public bool _isMoving = false;
     private Vector3 _start, _end;
     private float _time = 0f;
@@ -33,7 +33,7 @@ public class TestBoardView : MonoBehaviour {
 
 		_board = new Board(tiles);
 
-        _testPawn = new Pawn("erho", _board, Point.One, null, true, true);
+        _testPawn = new Combatant("erho", _board, Point.One, true, null, true, true);
         _board.AddPawn(_testPawn);
 
         _testPawn.Messages += OnPawnMove;

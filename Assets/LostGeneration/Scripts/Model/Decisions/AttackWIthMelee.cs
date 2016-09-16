@@ -17,7 +17,7 @@ namespace LostGen.Decision {
         private CardinalDirection _direction;
 
         public StateOffset ApplyPostconditions(StateOffset state) {
-            int targetHealth = state.Get(StateOffset.CombatantHealthKey(_target), _target.Health);
+            int targetHealth = state.Get(StateKey.Health(_target), _target.Health);
             int damage = state.Get(StateOffset.CombatantKey(_target, "attack"), _source.EffectiveStats.Attack);
 
             state.Set(StateOffset.CombatantHealthKey(_target), targetHealth - damage);
@@ -26,16 +26,19 @@ namespace LostGen.Decision {
         }
 
         public bool ArePreconditionsMet(StateOffset state) {
-            Point position = state.Get(StateOffset.CombatantKey(_source, "position"), _source.Position);
-            return _melee.InFullAreaOfEffect(position);
+            Point _targetPos = state.Get(StateKey.Position(_target), _target.Position);
+            return _melee.InFullAreaOfEffect(_targetPos);
         }
 
         public void Run() {
-            
-        }
+            CardinalDirection direction;
+            bool directionFound = false;
+            for (direction = CardinalDirection.East; !directionFound && direction < CardinalDirection.Count; direction++) {
+                directionFound = _melee.GetAreaOfEffect(direction).Contains(_target.Position);
+            }
 
-        public void Setup() {
-            throw new NotImplementedException();
+            _melee.Direction = direction;
+            _melee.Fire();
         }
     }
 }

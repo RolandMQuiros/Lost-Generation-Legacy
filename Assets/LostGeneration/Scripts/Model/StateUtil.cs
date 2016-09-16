@@ -11,8 +11,12 @@ namespace LostGen {
             return Key(pawn, "xy");
         }
 
-        public static string AP(Pawn pawn) {
+        public static string AP(Combatant pawn) {
             return Key(pawn, "ap");
+        }
+
+        public static string Health(Combatant pawn) {
+            return Key(pawn, "health");
         }
     }
 }

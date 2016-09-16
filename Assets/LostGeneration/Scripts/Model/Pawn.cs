@@ -14,21 +14,15 @@ namespace LostGen {
         public string TypeName { get; set; }
         /// <summary>Reference to the Board where this Pawn resides</summary>
         public Board Board { get; private set; }
-        /// <summary>
-        /// List of offsets that describe the space this Pawn takes up on the Board. For example, a very large door may take
-        /// up four Points.
-        /// </summary>
-        protected List<Point> _footprint;
         /// <summary> Returns a read-only version of the footprint</summary>
         public ReadOnlyCollection<Point> Footprint { get { return _footprint.AsReadOnly(); } }
 
-        private Point _position;
+        
         public Point Position {
             get { return _position; }
             set { Board.SetPawnPosition(this, value); }
         }
 
-        private LinkedList<PawnAction> _actions = new LinkedList<PawnAction>();
         public int ActionCount {
             get { return _actions.Count; }
         }
@@ -60,6 +54,14 @@ namespace LostGen {
         public event CollisionDelegate CollisionEntered;
         public event CollisionDelegate CollisionStayed;
         public event CollisionDelegate CollisionExited;
+
+        protected LinkedList<PawnAction> _actions = new LinkedList<PawnAction>();
+        /// <summary>
+        /// List of offsets that describe the space this Pawn takes up on the Board. For example, a very large door may take
+        /// up four Points.
+        /// </summary>
+        protected List<Point> _footprint;
+        private Point _position;
 
         public Pawn(string name, Board board, Point position, IEnumerable<Point> footprint = null, bool isCollidable = true, bool isSolid = false, bool isOpaque = true) {
             InstanceID = _idCounter++;
@@ -133,6 +135,10 @@ namespace LostGen {
         public void PushAction(PawnAction action) {
             _actions.AddLast(action);
         }
+
+        public void ClearActions() {
+            _actions.Clear();
+        }
         
         public virtual void BeginTurn() { }
 
@@ -142,6 +148,7 @@ namespace LostGen {
 		public virtual bool Step() {
             if (_actions.Count > 0) {
                 PawnAction stepAction = _actions.First.Value;
+                PreprocessAction(stepAction);
                 stepAction.Run();
                 _actions.RemoveFirst();
             }
@@ -159,5 +166,7 @@ namespace LostGen {
 
             return compare;
         }
+
+        protected virtual void PreprocessAction(PawnAction action) { }
     }
 }

@@ -1,13 +1,11 @@
 ﻿namespace LostGen {
     public abstract class PawnAction {
-        public Pawn Owner { get; protected set; }
+        public virtual Pawn Owner { get; protected set; }
         public bool IsMessageSuppressed;
-        public bool PauseAfterRun { get; private set; }
 
-        public PawnAction(Pawn owner, bool suppressMessage = false, bool pauseAfterRun = true) {
+        public PawnAction(Pawn owner, bool suppressMessage = false) {
             Owner = owner;
             IsMessageSuppressed = suppressMessage;
-            PauseAfterRun = pauseAfterRun;
         }
 
         protected void SendMessage(MessageArgs message) {

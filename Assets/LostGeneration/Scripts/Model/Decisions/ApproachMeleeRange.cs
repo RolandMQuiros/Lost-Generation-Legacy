@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 
 namespace LostGen.Decision {
-    public class ApproachMeleeRange : PawnDecision {
-        public int Cost { get { return _predictedCost; } }
+    public class ApproachMeleeRange : CombatantDecision {
+        public override int Cost { get { return _predictedCost; } }
         public Combatant Target {
             get { return _target; }
             set { _target = value; }
@@ -19,8 +19,8 @@ namespace LostGen.Decision {
         private Point _destination;
         private int _predictedCost;
 
-        public ApproachMeleeRange(Combatant source) {
-            _source = source;
+        public ApproachMeleeRange(Combatant source) : base(source) {
+            _source = (Combatant)source;
             if ((_walk = _source.GetSkill<WalkSkill>()) == null) {
                 throw new ArgumentException("source", "Combatant " + source.Name + " doesn't have a Walk skill");
             }
@@ -47,6 +47,10 @@ namespace LostGen.Decision {
         }
 
         public override void Run() {
+            _walk.Fire();
+        }
+
+        public override void Setup() {
             // Find all positions where we could effectively attack the enemy using our melee
             List<KeyValuePair<CardinalDirection, Point>> possibleDestinations = new List<KeyValuePair<CardinalDirection, Point>>();
             for (int i = 0; i < (int)CardinalDirection.Count; i++) {
@@ -55,9 +59,10 @@ namespace LostGen.Decision {
                 foreach (Point aoeOffset in _melee.GetAreaOfEffect(direction)) {
                     // For each point in the area of effect, see where we would need to be
                     Point strikePosition = _target.Position - aoeOffset;
-                    if (_source.Board.InBounds(strikePosition) &&
-                        _source.Board.GetTile(strikePosition) == Board.WALL_TILE &&
-                        _source.Board.PawnsAt(strikePosition).FirstOrDefault(pawn => pawn.IsCollidable && pawn.IsSolid) == null) {
+                    if (_source.Board.InBounds(strikePosition) && // Make sure new standing position is on the Board
+                        _source.Board.GetTile(strikePosition) != Board.WALL_TILE && // and that it's not inside a wall
+                        _source.Board.PawnsAt(strikePosition).FirstOrDefault(pawn => pawn.IsCollidable && pawn.IsSolid) == null && // and not inside another solid Pawn
+                        _melee.CanAttackFrom(strikePosition, _target.Position)) { // and there's nothing in the way
 
                         possibleDestinations.Add(new KeyValuePair<CardinalDirection, Point>(direction, strikePosition));
                     }
@@ -70,14 +75,9 @@ namespace LostGen.Decision {
                                                                                    .First();
                 _direction = first.Key;
                 _destination = first.Value;
+
+                _walk.SetDestination(_destination);
             }
-
-            _walk.SetDestination(_destination);
-            _walk.Fire();
-        }
-
-        public override PawnAction Step() {
-            
         }
     }
 }

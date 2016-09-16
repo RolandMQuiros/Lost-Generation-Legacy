@@ -47,10 +47,6 @@ namespace LostGen {
             return Math.Abs(offset.X) + Math.Abs(offset.Y);
         }
 
-        public static Point operator *(float scalar, Point pt) {
-            return new Point((int)(pt.X * scalar + 0.5f), (int)(pt.Y * scalar + 0.5f));
-        }
-
         public static Point operator +(Point p1, Point p2) {
             return new Point(p1.X + p2.X, p1.Y + p2.Y);
         }
@@ -60,8 +56,21 @@ namespace LostGen {
         }
 
         public static Point operator *(Point point, float scalar) {
-            return new Point((int)((float)point.X * scalar + 0.5f), (int)((float)point.Y * scalar + 0.5f));
+            return new Point((int)(point.X * scalar + 0.5f), (int)(point.Y * scalar + 0.5f));
         }
+
+        public static Point operator *(float scalar, Point point) {
+            return new Point((int)(point.X * scalar + 0.5f), (int)(point.Y * scalar + 0.5f));
+        }
+
+        public static Point operator *(Point point, int scalar) {
+            return new Point(point.X * scalar, point.Y * scalar);
+        }
+
+        public static Point operator *(int scalar, Point point) {
+            return new Point(point.X * scalar, point.Y * scalar);
+        }
+
 
         public override string ToString() {
             return "{x:" + X + ",y:" + Y + "}";
