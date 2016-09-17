@@ -10,6 +10,11 @@ public class BoardView : MonoBehaviour {
     private const string _TILE_CHILD_NAME = "_tileChild";
     private GameObject _tileChild;
 
+    public void Awake() {
+        Board.PawnAdded += OnPawnAdded;
+        Board.PawnRemoved += OnPawnRemoved;
+    }
+
     public void RebuildBoard() {
         if (_tileChild != null && _tileChild.transform.childCount > 0) {
             GameObject.Destroy(_tileChild);
@@ -36,5 +41,13 @@ public class BoardView : MonoBehaviour {
                 }
             }
         }
+    }
+
+    private void OnPawnAdded(Pawn pawn) {
+
+    }
+
+    private void OnPawnRemoved(Pawn pawn) {
+
     }
 }

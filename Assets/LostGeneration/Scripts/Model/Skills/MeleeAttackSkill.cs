@@ -66,10 +66,8 @@ namespace LostGen {
                     if (aoePoint.Equals(_attacker.Position - point)) {
                         if (PierceWalls && PierceSolids) {
                             found = true;
-                        } else if (PierceSolids) {
-                            found = _attacker.Board.LineCastForWalls(_attacker.Position, aoePoint);
-                        } else if (PierceWalls) {
-                            found = _attacker.Board.LineCastForWallsAndSolids(_attacker.Position, aoePoint);
+                        } else {
+                            found = _attacker.Board.LineCast(_attacker.Position, aoePoint, null, PierceWalls, PierceSolids);
                         }
                     }
                 }
@@ -91,11 +89,7 @@ namespace LostGen {
                 if (PierceWalls && PierceSolids) {
                     canAttack = inFullAOE;
                 } else if (inFullAOE) {
-                    if (PierceSolids) {
-                        canAttack = _attacker.Board.LineCastForWalls(from, point);
-                    } else {
-                        canAttack = _attacker.Board.LineCastForWallsAndSolids(from, point);
-                    }
+                    canAttack = !_attacker.Board.LineCast(from, point, null, PierceWalls, PierceSolids);
                 }
             }
 

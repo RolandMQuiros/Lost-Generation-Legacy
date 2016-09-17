@@ -27,7 +27,7 @@ public class MessageBuffer {
             }
 
             // If the next message is critical or one of the previous messages acted on the same target,
-            // then 
+            // then stop popping
             if (next.IsCritical ||
                 (next.Target != null && !actingPawns.Add(next.Target))) {
                 stopPopping = true;

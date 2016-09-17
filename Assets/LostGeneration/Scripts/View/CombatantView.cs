@@ -1,8 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+using LostGen;
+
 public class CombatantView : MonoBehaviour {
     private Animator _animator;
+
 	
     // Use this for initialization
 	public void Awake () {
@@ -13,4 +16,8 @@ public class CombatantView : MonoBehaviour {
 	public void Update () {
 	
 	}
+
+    public void OnMessage(MessageArgs message) {
+
+    }
 }

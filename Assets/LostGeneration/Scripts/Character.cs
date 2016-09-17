@@ -5,7 +5,7 @@ using LostGen;
 
 public class Character {
     /// <summary>ID of this character on the central remote database.</summary>
-    public string UniversalID { get; private set; }
+    public string CharacterID { get; private set; }
     /// <summary>Character's first name</summary>
     public string FirstName { get; private set; }
     /// <summary>Character's surname</summary>

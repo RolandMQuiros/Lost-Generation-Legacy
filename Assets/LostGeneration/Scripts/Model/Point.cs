@@ -41,6 +41,10 @@ namespace LostGen {
             return Math.Sqrt(offset.X * offset.X + offset.Y * offset.Y);
         }
 
+        public static float FDistance(Point start, Point end) {
+            return (float)Distance(start, end);
+        }
+
         public static int TaxicabDistance(Point start, Point end) {
             Point offset = end - start;
 
@@ -71,6 +75,57 @@ namespace LostGen {
             return new Point(point.X * scalar, point.Y * scalar);
         }
 
+        public static Point[] Line(Point start, Point end) {
+            bool steep = Math.Abs(end.Y - start.Y) > Math.Abs(end.X - start.Y);
+
+            int swap;
+            if (steep) {
+                swap = start.X;
+                start.X = start.Y;
+                start.Y = swap;
+
+                swap = end.X;
+                end.X = end.Y;
+                end.Y = swap;
+            }
+
+            if (start.X > end.X) {
+                swap = start.X;
+                start.X = end.X;
+                end.X = swap;
+
+                swap = start.Y;
+                start.Y = end.Y;
+                end.Y = swap;
+            }
+
+            int dx = end.X - start.X;
+            int dy = Math.Abs(end.Y - start.Y);
+
+            int err = dx / 2;
+            int ystep = (start.Y < end.Y) ? 1 : -1;
+            int y = start.Y;
+
+            Point[] line = new Point[Math.Abs(end.X - start.X) + 1];
+
+            for (int x = start.X; x <= end.X; x++) {
+                Point point;
+                if (steep) {
+                    point = new Point(y, x);
+                } else {
+                    point = new Point(x, y);
+                }
+                err -= dy;
+                if (err < 0) {
+                    y += ystep;
+                    err += dx;
+                }
+
+                line[x - start.X] = point;
+            }
+
+            return line;
+        }
 
         public override string ToString() {
             return "{x:" + X + ",y:" + Y + "}";
