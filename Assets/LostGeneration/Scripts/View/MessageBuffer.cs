@@ -7,6 +7,11 @@ using LostGen;
 /// That is, this class makes sure that messages that depend on the order of actions are displayed as such.
 /// </summary>
 public class MessageBuffer {
+    public bool IsStepFinished {
+        get {
+            return _messages.Count == 0;
+        }
+    }
     private Queue<MessageArgs> _messages = new Queue<MessageArgs>();
 
     public void HandleMessage(object sender, MessageArgs message) {

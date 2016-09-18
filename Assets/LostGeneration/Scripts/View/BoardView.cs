@@ -65,8 +65,22 @@ public class BoardView : MonoBehaviour {
         }
     }
 
-    public bool Step() {
-        return Board.Step();
+    public void Step() {
+        if (_buffer.IsStepFinished) {
+            Board.Step();
+            Debug.Log("Board stepped");
+        }
+
+        Queue<MessageArgs> messages = _buffer.PopMessages();
+        while (messages.Count > 0) {
+            MessageArgs message = messages.Dequeue();
+
+            Combatant source = message.Source as Combatant;
+            if (source != null) {
+                CombatantView view = _combatantViews[source];
+                view.OnMessage(message);
+            }
+        }
     }
 
     private void OnPawnAdded(Pawn pawn) {
