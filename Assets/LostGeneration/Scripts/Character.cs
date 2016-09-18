@@ -5,13 +5,13 @@ using LostGen;
 
 public class Character {
     /// <summary>ID of this character on the central remote database.</summary>
-    public string CharacterID { get; private set; }
+    public int CharacterID { get; private set; }
     /// <summary>Character's first name</summary>
     public string FirstName { get; private set; }
     /// <summary>Character's surname</summary>
     public string LastName { get; private set; }
     /// <summary>Character's nickname</summary>
-    public string NickName { get; private set; }
+    public string Nickname { get; private set; }
 
     public int Neuroticism;
     public int Agreeableness;
@@ -25,22 +25,38 @@ public class Character {
 
     public Stats BaseStats;
 
-    private HashSet<ISkill> _skills = new HashSet<ISkill>();
+    private ISkillManager _skillManager;
+    private HashSet<int> _skills;
 
-    public bool AddSkill(ISkill skill) {
-        return _skills.Add(skill);
+    public Character(int characterID, string firstName, string lastName, string nickname, int[] skills, ISkillManager skillManager) {
+        CharacterID = characterID;
+        FirstName = firstName;
+        LastName = lastName;
+        Nickname = nickname;
+        
+        if (skills.Length > 0) {
+            _skills = new HashSet<int>(skills);
+        } else {
+            _skills = new HashSet<int>();
+        }
+        _skillManager = skillManager;
+    }
+
+    public bool AddSkill(int skillID) {
+        return _skills.Add(skillID);
     }
 
     public Combatant CreateCombatant(Board board, Point position) {
         string name;
-        if (NickName != null) {
-            name = NickName;
+        if (Nickname != null && Nickname.Length > 0) {
+            name = Nickname;
         } else {
             name = FirstName + " " + LastName;
         }
 
         Combatant combatant = new Combatant(name, board, position);
-        foreach (ISkill skill in _skills) {
+        foreach (int skillID in _skills) {
+            ISkill skill = _skillManager.GetSkill(skillID, combatant);
             combatant.AddSkill(skill);
         }
 
