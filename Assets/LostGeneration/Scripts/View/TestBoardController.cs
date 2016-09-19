@@ -6,6 +6,8 @@ public class TestBoardController : MonoBehaviour {
     private Board _board;
     private BoardView _boardView;
 
+    private Plane _plane;
+
     private TestCharacterManager _characters = new TestCharacterManager();
 
     private Combatant _combatant;
@@ -48,24 +50,27 @@ public class TestBoardController : MonoBehaviour {
 	
 	// Update is called once per frame
     public void Update () {
+        bool move = false;
 	    if (Input.GetKeyDown(KeyCode.UpArrow)) {
             _walk.SetDestination(_combatant.Position + Point.Up);
-            Debug.Log("Destination: " + _walk.Destination);
+            move = true;
         } else if (Input.GetKeyDown(KeyCode.RightArrow)) {
             _walk.SetDestination(_combatant.Position + Point.Right);
-            Debug.Log("Destination: " + _walk.Destination);
+            move = true;
         } else if (Input.GetKeyDown(KeyCode.DownArrow)) {
             _walk.SetDestination(_combatant.Position + Point.Down);
-            Debug.Log("Destination: " + _walk.Destination);
+            move = true;
         } else if (Input.GetKeyDown(KeyCode.LeftArrow)) {
             _walk.SetDestination(_combatant.Position + Point.Left);
-            Debug.Log("Destination: " + _walk.Destination);
+            move = true;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space)) {
+        if (move) {
             _walk.Fire();
             _boardView.Step();
-            Debug.Log("Move, dammit");
         }
+
+
+        
     }
 }

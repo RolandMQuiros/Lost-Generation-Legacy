@@ -6,18 +6,17 @@ using System.Text;
 namespace LostGen {
     public class MoveAction : CombatantAction {
         public class Message : MessageArgs {
-            public Pawn Mover;
             public Point From;
             public Point To;
             public bool IsContinuous;
 
             public Message(Pawn mover, Point from, Point to, bool isContinuous) {
-                Mover = mover;
+                Source = mover;
                 From = from;
                 To = to;
                 IsContinuous = isContinuous;
 
-                Text = Mover.Name + " moved from " + From + " to " + To;
+                Text = Source.Name + " moved from " + From + " to " + To;
             }
         }
 

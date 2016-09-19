@@ -9,7 +9,7 @@ namespace LostGen {
         public abstract int ActionPoints { get; }
         private Combatant _combatantOwner;
 
-        public CombatantAction(Combatant owner, bool suppressMessage = true) : base(owner, suppressMessage) {
+        public CombatantAction(Combatant owner, bool suppressMessage = false) : base(owner, suppressMessage) {
             _combatantOwner = owner;
         }
 
