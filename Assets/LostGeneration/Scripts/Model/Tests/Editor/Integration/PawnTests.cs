@@ -65,6 +65,48 @@ namespace Tests.Integration {
         }
 
         [Test]
+        public void SolidPawnsMoveIntoEachOther() {
+            Board board = new Board(BoardCommon.GRID_12X8);
+
+            Point pos1 = new Point(6, 4);
+            Point pos2 = new Point(7, 4);
+
+            Pawn pawn1 = new Pawn("First", board, pos1, null, true, true, true);
+            Pawn pawn2 = new Pawn("Second", board, pos2, null, true, true, true);
+
+            board.AddPawn(pawn1);
+            board.AddPawn(pawn2);
+
+            Assert.IsFalse(pawn1.Offset(Point.Right));
+            Assert.IsFalse(pawn2.Offset(Point.Left));
+
+            Assert.AreEqual(pos1, pawn1.Position);
+            Assert.AreEqual(pos2, pawn2.Position);
+        }
+
+        [Test]
+        public void SolidPawnsMoveIntoSharedCell() {
+            Board board = new Board(BoardCommon.GRID_12X8);
+
+            Point pos1 = new Point(6, 4);
+            Point pos2 = new Point(8, 4);
+
+            Point pos3 = new Point(7, 4);
+
+            Pawn pawn1 = new Pawn("First", board, pos1, null, true, true, true);
+            Pawn pawn2 = new Pawn("Second", board, pos2, null, true, true, true);
+
+            board.AddPawn(pawn1);
+            board.AddPawn(pawn2);
+
+            Assert.IsTrue(pawn1.Offset(Point.Right),"Pawn tried to move from " + pos1 + " to " + pos3 + " but was blocked by something");
+            Assert.IsFalse(pawn2.Offset(Point.Left), "Pawn moved from " + pos2 + " to " + pos3 + " when it should've been blocked");
+
+            Assert.AreEqual(pos3, pawn1.Position, "Pawn was not able to move from " + pos1 + " to " + pos3);
+            Assert.AreEqual(pos2, pawn2.Position, "Pawn was able to move from " + pos3 + " to " + pos2);
+        }
+
+        [Test]
         public void CollisionTest() {
             // Arrange
             Board board = new Board(BoardCommon.GRID_12X8);

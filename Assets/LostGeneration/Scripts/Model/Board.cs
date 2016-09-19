@@ -330,7 +330,7 @@ namespace LostGen {
                 }
 
                 for (int i = 0; i < toAdd.Count; i++) {
-                    toAdd[i].Remove(pawn);
+                    toAdd[i].Add(pawn);
                 }
 
                 pawn.SetPositionInternal(newPosition);
