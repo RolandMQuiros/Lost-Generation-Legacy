@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using LostGen;
 
-namespace LostGen.Test {
+namespace Tests {
     public class BoardCommon {
         public static readonly int[,] GRID_12X8 = new int[,] {
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },

@@ -1,12 +1,11 @@
-﻿using UnityEngine;
-using UnityEditor;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using LostGen;
 
-namespace LostGen.Test {
+namespace Tests {
     public class PathfinderTests {
 
         private class TestNode : IGraphNode, IComparable<TestNode> {

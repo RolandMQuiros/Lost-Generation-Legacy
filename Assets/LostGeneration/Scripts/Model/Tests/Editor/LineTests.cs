@@ -1,11 +1,10 @@
-﻿using UnityEngine;
-using UnityEditor;
-using System;
+﻿using System;
 using System.Linq;
 using System.Collections.Generic;
 using NUnit.Framework;
+using LostGen;
 
-namespace LostGen.Test {
+namespace Tests {
     public class LineTests {
 
         [Test]

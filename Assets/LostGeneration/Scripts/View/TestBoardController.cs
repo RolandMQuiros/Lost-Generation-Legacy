@@ -13,6 +13,8 @@ public class TestBoardController : MonoBehaviour {
     private Combatant _combatant;
     private WalkSkill _walk;
 
+    private CharacterGoalSelector _enemyAI;
+
     // Use this for initialization
     public void Awake () {
         _board = new Board(new int[,] {
@@ -43,9 +45,18 @@ public class TestBoardController : MonoBehaviour {
 
         Character chara = _characters.GetCharacter(1);
         _combatant = chara.CreateCombatant(_board, new Point(1, 14));
+        _combatant.Team = new Team(1, 1, 0, 2);
         _walk = _combatant.GetSkill<WalkSkill>();
 
+        chara = _characters.GetCharacter(2);
+        Combatant enemy = chara.CreateCombatant(_board, new Point(18, 1));
+        enemy.Team = new Team(2, 2, 0, 1);
+        _enemyAI = new CharacterGoalSelector(enemy);
+
+        enemy.AddPawnToView(_combatant);
+
         _board.AddPawn(_combatant);
+        _board.AddPawn(enemy);
     }
 	
 	// Update is called once per frame
@@ -67,7 +78,9 @@ public class TestBoardController : MonoBehaviour {
 
         if (move) {
             _walk.Fire();
-            _boardView.Step();
+            if (!_boardView.Step()) {
+                _enemyAI.BeginTurn();
+            }
         }
 
 

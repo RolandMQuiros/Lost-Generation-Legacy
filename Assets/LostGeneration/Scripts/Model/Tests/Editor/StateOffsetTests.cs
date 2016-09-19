@@ -1,13 +1,10 @@
-﻿using UnityEngine;
-using UnityEditor;
-using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using NUnit.Framework;
+using LostGen;
 
-namespace LostGen.Test {
-
+namespace Tests {
     public class StateOffsetTests {
-
         [Test]
         public void GetSetFloat() {
             StateOffset state = new StateOffset();

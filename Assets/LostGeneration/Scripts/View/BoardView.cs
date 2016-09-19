@@ -65,10 +65,15 @@ public class BoardView : MonoBehaviour {
         }
     }
 
-    public void Step() {
+    public bool Step() {
+        bool areThereStepsRemaining = false;
         if (_buffer.IsStepFinished) {
-            Board.Step();
             Debug.Log("Board stepped");
+            if (!(areThereStepsRemaining = Board.Step())) {
+                Board.BeginTurn();
+                Debug.Log("Board turn");
+            }
+            
         }
 
         Queue<MessageArgs> messages = _buffer.PopMessages();
@@ -81,6 +86,8 @@ public class BoardView : MonoBehaviour {
                 view.OnMessage(message);
             }
         }
+
+        return areThereStepsRemaining;
     }
 
     private void OnPawnAdded(Pawn pawn) {

@@ -1,10 +1,8 @@
-﻿using UnityEngine;
-using UnityEditor;
-using NUnit.Framework;
+﻿using NUnit.Framework;
+using LostGen;
 
-namespace LostGen.Test {
+namespace Tests.Decisions {
     public class ApproachAndAttack {
-
         [Test]
         public void StationaryMelee() {
             Board board = new Board(BoardCommon.GRID_12X8);
@@ -71,7 +69,7 @@ namespace LostGen.Test {
             WalkSkill walk = new WalkSkill(attacker);
             attacker.AddSkill(walk);
 
-            Decision.ApproachMeleeRange approach = new Decision.ApproachMeleeRange(attacker);
+            LostGen.Decision.ApproachMeleeRange approach = new LostGen.Decision.ApproachMeleeRange(attacker);
             approach.Target = defender;
 
             approach.Setup();

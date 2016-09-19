@@ -60,6 +60,8 @@ public class Character {
             combatant.AddSkill(skill);
         }
 
+        combatant.BaseStats = BaseStats;
+
         return combatant;
     }
 }

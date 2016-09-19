@@ -1,12 +1,11 @@
-﻿using UnityEngine;
-using UnityEditor;
-using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using NUnit.Framework;
+using LostGen;
 
-namespace LostGen.Test {
+namespace Tests.Skills {
     [TestFixture]
-    public class WalkTests {
+    public class Walk {
 
         private void ArrangeBoard(int[,] grid, Point start, Point end, out Board board, out Combatant pawn) {
             board = new Board(grid);

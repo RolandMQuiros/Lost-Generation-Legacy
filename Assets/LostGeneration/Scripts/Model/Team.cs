@@ -9,8 +9,8 @@ namespace LostGen {
         private long _neutral;
         private long _hostile;
 
-        public Team(int team, long friendly, long neutral, long hostile) {
-            _team = (1 << team);
+        public Team(long team, long friendly, long neutral, long hostile) {
+            _team = team;
             _friendly = friendly;
             _neutral = neutral;
             _hostile = hostile;

@@ -41,7 +41,7 @@ namespace LostGen.Decision {
             int actionPoints = state.Get(StateKey.AP(_source), _source.ActionPoints);
             Point position = state.Get(StateKey.Position(_source), _source.Position);
 
-            int predictedCost = Point.TaxicabDistance(position, _destination);
+            int predictedCost = Point.TaxicabDistance(position, _target.Position);
 
             return actionPoints > predictedCost;
         }

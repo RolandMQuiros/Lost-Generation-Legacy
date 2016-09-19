@@ -1,10 +1,9 @@
-﻿using UnityEngine;
-using UnityEditor;
-using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using NUnit.Framework;
+using LostGen;
 
-namespace LostGen.Test {
+namespace Tests.Integration {
     public class PlannerTests {
         private class CurrentState {
             public int GuardianHealth = 3;

@@ -16,6 +16,11 @@ namespace LostGen.Decision {
         private Combatant _target;
         private CardinalDirection _direction;
 
+        public AttackWithMelee(Combatant source) {
+            _source = source;
+            _melee = _source.GetSkill<MeleeAttackSkill>();
+        }
+
         public StateOffset ApplyPostconditions(StateOffset state) {
             int targetHealth = state.Get(StateKey.Health(_target), _target.Health);
             int damage = state.Get(StateOffset.CombatantKey(_target, "attack"), _source.EffectiveStats.Attack);

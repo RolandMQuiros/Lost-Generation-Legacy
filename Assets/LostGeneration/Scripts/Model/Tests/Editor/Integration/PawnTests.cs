@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using LostGen;
 
-namespace LostGen.Test {
+namespace Tests.Integration {
     [TestFixture]
     public class PawnTests {
         [Test]
