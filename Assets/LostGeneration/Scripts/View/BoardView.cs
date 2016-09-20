@@ -18,12 +18,6 @@ public class BoardView : MonoBehaviour {
     private Dictionary<Combatant, CombatantView> _combatantViews = new Dictionary<Combatant, CombatantView>();
     private MessageBuffer _buffer = new MessageBuffer();
 
-    public void Start() {
-        //if (CombatantViewPrefab.GetComponent<CombatantView>()) {
-        //    throw new MissingComponentException("The Combatant View prefab is missing a CombatantView component");
-        //}
-    }
-
     public void AttachBoard(Board board) {
         Board = board;
         Board.PawnAdded += OnPawnAdded;

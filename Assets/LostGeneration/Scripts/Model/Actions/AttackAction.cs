@@ -7,13 +7,13 @@ namespace LostGen {
         private List<Point> _areaOfEffect;
 
         public AttackAction(Combatant source, Point point)
-            : base(source, false) {
+            : base(source) {
             _areaOfEffect = new List<Point>();
             _areaOfEffect.Add(point);
         }
 
         public AttackAction(Combatant source, IEnumerable<Point> area)
-            :base(source, false) {
+            :base(source) {
             _areaOfEffect = new List<Point>(area);
         }
 

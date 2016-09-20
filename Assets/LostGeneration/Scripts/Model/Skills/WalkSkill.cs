@@ -19,12 +19,9 @@ namespace LostGen {
     /// more specific skills to cover smaller possibility spaces.
     /// </summary>
     public class WalkSkill : RangedSkill {
-        public Point Destination { get { return _destination.Value; } }
         public override int ActionPoints { get { return _actionPoints; } }
 
         protected Board _board;
-        protected Point? _destination;
-
         private List<Board.Node> _path;
         private int _actionPoints;
 
@@ -37,7 +34,7 @@ namespace LostGen {
             Board.Node end = _board.GetNode(destination, TileCost);
 
             if (end != null) {
-                _destination = destination;
+                Target = destination;
                 Board.Node start = _board.GetNode(Owner.Position, TileCost);
 
                 if (start == null) {
@@ -46,7 +43,7 @@ namespace LostGen {
 
                 if (Point.TaxicabDistance(Owner.Position, destination) == 1) {
                     _path = new List<Board.Node>();
-                    _path.Add(_board.GetNode(_destination.Value, TileCost));
+                    _path.Add(_board.GetNode(Target, TileCost));
                 } else {
                     _path = new List<Board.Node>(
                         Pathfinder<Board.Node>.FindPath(
@@ -62,15 +59,11 @@ namespace LostGen {
                     _actionPoints += TileCost(_path[i].Point);
                 }
             } else {
-                _destination = Owner.Position;
+                Target = Owner.Position;
             }
         }
 
         public Queue<Point> GetPath() {
-            if (_destination == null) {
-                throw new NullReferenceException("Destination has not been specified");
-            }
-
             Queue<Point> pointPath = new Queue<Point>();
             for (int i = 0; i < _path.Count; i++) {
                 pointPath.Enqueue(_path[i].Point);
@@ -79,14 +72,15 @@ namespace LostGen {
             return pointPath;
         }
 
-        public override HashSet<Point> GetRange() {
+        public override IEnumerable<Point> GetRange() {
             Board.Node startNode = Owner.Board.GetNode(Owner.Position);
-            HashSet<Point> range = new HashSet<Point>();
             foreach (Board.Node node in Pathfinder<Board.Node>.FloodFill(startNode, Owner.ActionPoints)) {
-                range.Add(node.Point);
+                yield return node.Point;
             }
+        }
 
-            return range;
+        public override IEnumerable<Point> GetAreaOfEffect() {
+            yield return Target;
         }
 
         public override void Fire() {

@@ -116,7 +116,7 @@ namespace LostGen {
             _actionPoints = EffectiveStats.Stamina;
         }
 
-        protected override void PreprocessAction(PawnAction action) {
+        protected override void PreprocessAction(IPawnAction action) {
             CombatantAction combatantAction = action as CombatantAction;
             if (combatantAction != null) {
                 _actionPoints -= combatantAction.ActionPoints;

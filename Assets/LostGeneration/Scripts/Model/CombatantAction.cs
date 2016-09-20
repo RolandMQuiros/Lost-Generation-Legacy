@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 
 namespace LostGen {
-    public abstract class CombatantAction : PawnAction {
+    public abstract class CombatantAction : IPawnAction {
         public new Combatant Owner { get { return _combatantOwner; } }
         public abstract int ActionPoints { get; }
         private Combatant _combatantOwner;
 
-        public CombatantAction(Combatant owner, bool suppressMessage = false) : base(owner, suppressMessage) {
+        public CombatantAction(Combatant owner) : base(owner) {
             _combatantOwner = owner;
         }
 

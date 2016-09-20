@@ -2,19 +2,13 @@
 using System.Collections.Generic;
 
 namespace LostGen {
-    public abstract class RangedSkill : ISkill {
-        public Combatant Owner { get; private set; }
-        public string Name { get; private set; }
-        public string Description { get; private set; }
-        public virtual int ActionPoints { get; set; }
+    public abstract class RangedSkill : AreaOfEffectSkill {
+        public Point Target { get; protected set; }
 
-        public RangedSkill(Combatant owner, string name, string description) {
-            Owner = owner;
-            Name = name;
-            Description = description;
+        public RangedSkill(Combatant owner, string name, string description)
+            : base(owner, name, description) {
         }
 
-        public abstract HashSet<Point> GetRange();
-        public abstract void Fire();
+        public abstract IEnumerable<Point> GetRange();
     }
 }

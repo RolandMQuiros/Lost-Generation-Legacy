@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 
 namespace LostGen {
-    public class MeleeAttackSkill : RangedSkill {
-        public CardinalDirection Direction;
+    public class MeleeAttackSkill : DirectionalSkill {
         public bool PierceSolids { get; set; }
         public bool PierceWalls { get; set; }
 
@@ -53,8 +52,17 @@ namespace LostGen {
             }
         }
 
-        public IEnumerable<Point> GetAreaOfEffect(CardinalDirection direction) {
+        public override IEnumerable<Point> GetAreaOfEffect(CardinalDirection direction) {
             return _transforms[direction];
+        }
+
+        public override IEnumerable<Point> GetAreaOfEffect() {
+            return new HashSet<Point> {
+                _attacker.Position + Point.Neighbors[0],
+                _attacker.Position + Point.Neighbors[1],
+                _attacker.Position + Point.Neighbors[2],
+                _attacker.Position + Point.Neighbors[3]
+            };
         }
 
         public bool InAreaOfEffect(CardinalDirection direction, Point point) {
@@ -94,15 +102,6 @@ namespace LostGen {
             }
 
             return canAttack;
-        }
-
-        public override HashSet<Point> GetRange() {
-            return new HashSet<Point> {
-                _attacker.Position + Point.Neighbors[0],
-                _attacker.Position + Point.Neighbors[1],
-                _attacker.Position + Point.Neighbors[2],
-                _attacker.Position + Point.Neighbors[3]
-            };
         }
 
         public override void Fire() {

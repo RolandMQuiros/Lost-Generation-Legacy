@@ -55,7 +55,7 @@ namespace LostGen {
         public event CollisionDelegate CollisionStayed;
         public event CollisionDelegate CollisionExited;
 
-        protected LinkedList<PawnAction> _actions = new LinkedList<PawnAction>();
+        protected LinkedList<IPawnAction> _actions = new LinkedList<IPawnAction>();
         /// <summary>
         /// List of offsets that describe the space this Pawn takes up on the Board. For example, a very large door may take
         /// up four Points.
@@ -126,13 +126,13 @@ namespace LostGen {
             }
         }
 
-        public void PushActions(IEnumerable<PawnAction> actions) {
-            foreach (PawnAction action in actions) {
+        public void PushActions(IEnumerable<IPawnAction> actions) {
+            foreach (IPawnAction action in actions) {
                 _actions.AddLast(action);
             }
         }
 
-        public void PushAction(PawnAction action) {
+        public void PushAction(IPawnAction action) {
             _actions.AddLast(action);
         }
 
@@ -147,7 +147,7 @@ namespace LostGen {
 		///</summary>
 		public virtual bool Step() {
             if (_actions.Count > 0) {
-                PawnAction stepAction = _actions.First.Value;
+                IPawnAction stepAction = _actions.First.Value;
                 PreprocessAction(stepAction);
                 stepAction.Run();
                 _actions.RemoveFirst();
@@ -167,6 +167,6 @@ namespace LostGen {
             return compare;
         }
 
-        protected virtual void PreprocessAction(PawnAction action) { }
+        protected virtual void PreprocessAction(IPawnAction action) { }
     }
 }

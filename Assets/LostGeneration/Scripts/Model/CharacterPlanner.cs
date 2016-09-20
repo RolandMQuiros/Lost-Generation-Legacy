@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 namespace LostGen {
-    public class CharacterGoalSelector {
+    public class CharacterController {
         private Planner _planner = new Planner(StateOffset.Heuristic);
         private Combatant _owner;
         private Combatant _target;
@@ -13,7 +13,7 @@ namespace LostGen {
         private Decision.AttackWithMelee _attackDecision;
         private Decision.ApproachMeleeRange _approachDecision;
 
-        public CharacterGoalSelector(Combatant owner) {
+        public CharacterController(Combatant owner) {
             _owner = owner;
             _approachDecision = new Decision.ApproachMeleeRange(_owner);
             _planner.AddDecision(_approachDecision);

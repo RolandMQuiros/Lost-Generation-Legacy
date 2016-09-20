@@ -13,7 +13,7 @@ public class TestBoardController : MonoBehaviour {
     private Combatant _combatant;
     private WalkSkill _walk;
 
-    private CharacterGoalSelector _enemyAI;
+    private LostGen.CharacterController _enemyAI;
 
     // Use this for initialization
     public void Awake () {
@@ -51,7 +51,7 @@ public class TestBoardController : MonoBehaviour {
         chara = _characters.GetCharacter(2);
         Combatant enemy = chara.CreateCombatant(_board, new Point(18, 1));
         enemy.Team = new Team(2, 2, 0, 1);
-        _enemyAI = new CharacterGoalSelector(enemy);
+        _enemyAI = new LostGen.CharacterController(enemy);
 
         enemy.AddPawnToView(_combatant);
 
