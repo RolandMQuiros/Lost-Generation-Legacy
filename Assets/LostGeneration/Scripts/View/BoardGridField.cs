@@ -7,13 +7,18 @@ using LostGen;
 public class BoardGridField : MonoBehaviour {
     public BoardView BoardView;
     public BoardCursor Cursor;
-    public Rect SpriteUV;
+    public Sprite Sprite;
 
     private MeshFilter _meshFilter;
     private HashSet<Point> _points = new HashSet<Point>();
 
     public void Awake() {
         _meshFilter = GetComponent<MeshFilter>();
+
+        Debug.Log(Sprite.uv[0]);
+        Debug.Log(Sprite.uv[1]);
+        Debug.Log(Sprite.uv[2]);
+        Debug.Log(Sprite.uv[3]);
     }
 
     // Use this for initialization
@@ -21,19 +26,11 @@ public class BoardGridField : MonoBehaviour {
         RecreateMesh();
 	}
 
-	// Update is called once per frame
-	public void Update () {
-	    if (!_points.Contains(Cursor.Point)) {
-            _points.Add(Cursor.Point);
-            RecreateMesh();
-        }
-	}
-
     private void RecreateMesh() {
         List<Vector3> vertices = new List<Vector3>();
         List<Vector2> uvs = new List<Vector2>();
         List<int> triangles = new List<int>();
-
+        
         int triangleOffset = 0;
 
         float halfWidth = BoardView.Theme.TileWidth / 2f;
@@ -51,19 +48,19 @@ public class BoardGridField : MonoBehaviour {
             Vector3 bottomRight = center + down + right;
             Vector3 upperRight = center + up + right;
 
-            vertices.Add(upperLeft);
             vertices.Add(bottomLeft);
             vertices.Add(bottomRight);
+            vertices.Add(upperLeft);
             vertices.Add(upperRight);
 
-            uvs.Add(new Vector2(SpriteUV.xMin, SpriteUV.yMin));
-            uvs.Add(new Vector2(SpriteUV.xMin, SpriteUV.yMax));
-            uvs.Add(new Vector2(SpriteUV.xMax, SpriteUV.yMax));
-            uvs.Add(new Vector2(SpriteUV.xMax, SpriteUV.yMin));
+            uvs.Add(Sprite.uv[0]);
+            uvs.Add(Sprite.uv[1]);
+            uvs.Add(Sprite.uv[2]);
+            uvs.Add(Sprite.uv[3]);
 
-            triangles.Add(triangleOffset);
+            triangles.Add(triangleOffset + 2);
             triangles.Add(triangleOffset + 1);
-            triangles.Add(triangleOffset + 3);
+            triangles.Add(triangleOffset);
 
             triangles.Add(triangleOffset + 3);
             triangles.Add(triangleOffset + 1);

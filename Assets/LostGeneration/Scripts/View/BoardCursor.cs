@@ -9,7 +9,7 @@ public class BoardCursor : MonoBehaviour {
     public Vector3 WorldPoint { get; private set; }
 
     public Plane Plane { get; private set; }
-    public Point Point { get; private set; }
+    public Point BoardPoint { get; private set; }
 
     public void Awake() {
         Plane = new Plane(Vector3.up, transform.position.y);
@@ -28,6 +28,6 @@ public class BoardCursor : MonoBehaviour {
         snapped.y = transform.position.y;
         transform.position = snapped;
 
-        Point = BoardView.Theme.Vector3ToPoint(snapped);
+        BoardPoint = BoardView.Theme.Vector3ToPoint(snapped);
     }
 }
