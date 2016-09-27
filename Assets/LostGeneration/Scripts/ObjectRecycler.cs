@@ -6,21 +6,13 @@ using UnityEngine;
 [Serializable]
 public class ObjectRecycler : MonoBehaviour {
     [Serializable]
-    private struct Entry : IEquatable<Entry> {
+    private struct Entry {
         public GameObject Prefab;
         public int Capacity;
 
         public Entry(GameObject prefab, int capacity = 1) {
             Prefab = prefab;
             Capacity = capacity;
-        }
-
-        public bool Equals(Entry other) {
-            return Prefab == other.Prefab;
-        }
-
-        public override int GetHashCode() {
-            return Prefab.GetHashCode();
         }
     }
 
@@ -36,7 +28,7 @@ public class ObjectRecycler : MonoBehaviour {
         }
 
         Entry newEntry = new Entry(prefab, capacity);
-        int idx = _register.FindIndex(ent => ent.Prefab == prefab);
+        int idx = _register.FindIndex(entry => entry.Prefab == prefab);
         if (idx < 0) {
             _register.Add(newEntry);
         } else {
@@ -44,8 +36,15 @@ public class ObjectRecycler : MonoBehaviour {
         }
     }
 
-    public void UnregisterPrefab() {
+    public void UnregisterPrefab(GameObject prefab) {
+        int idx = _register.FindIndex(entry => entry.Prefab == prefab);
+        if (idx >= 0) {
+            _register.RemoveAt(idx);
+        }
+    }
 
+    public bool IsRegistered(GameObject prefab) {
+        return _register.FindIndex(entry => entry.Prefab == prefab) >= 0;
     }
 
     public IEnumerable<KeyValuePair<GameObject, int>> GetRegistry() {

@@ -75,21 +75,11 @@ public class AutoTile : ScriptableObject {
         return _edges[(int)_ROTATIONS[index].Edge];
     }
 
-    public GameObject GetTile(Board board, Point point, int tile) {
-        int edgeIndex = 0;
-
-        if (!board.InBounds(point + Point.Right) || board.GetTile(point + Point.Right) == tile) {
-            edgeIndex += 1;
-        }
-        if (!board.InBounds(point + Point.Down) || board.GetTile(point + Point.Down) == tile) {
-            edgeIndex += 2;
-        }
-        if (!board.InBounds(point + Point.Left) || board.GetTile(point + Point.Left) == tile) {
-            edgeIndex += 4;
-        }
-        if (!board.InBounds(point + Point.Up) || board.GetTile(point + Point.Up) == tile) {
-            edgeIndex += 8;
-        }
+    public GameObject GetTile(bool right, bool down, bool left, bool up) {
+        int edgeIndex = (right ? 1 : 0) +
+                        (down  ? 2 : 0) +
+                        (left  ? 4 : 0) + 
+                        (up    ? 8 : 0);
 
         TileEdge edge = _ROTATIONS[edgeIndex].Edge;
         Quaternion rotation = _ROTATIONS[edgeIndex].Rotation;

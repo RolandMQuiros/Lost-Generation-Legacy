@@ -6,19 +6,14 @@ using LostGen;
 
 public class BoardGridField : MonoBehaviour {
     public BoardView BoardView;
-    public BoardCursor Cursor;
     public Sprite Sprite;
 
     private MeshFilter _meshFilter;
     private HashSet<Point> _points = new HashSet<Point>();
 
     public void Awake() {
+        BoardView = BoardView ?? GetComponentInParent<BoardView>();
         _meshFilter = GetComponent<MeshFilter>();
-
-        Debug.Log(Sprite.uv[0]);
-        Debug.Log(Sprite.uv[1]);
-        Debug.Log(Sprite.uv[2]);
-        Debug.Log(Sprite.uv[3]);
     }
 
     // Use this for initialization
@@ -82,5 +77,13 @@ public class BoardGridField : MonoBehaviour {
 
     public void AddPoint(Point point) {
         _points.Add(point);
+    }
+
+    public void RemovePoint(Point point) {
+        _points.Remove(point);
+    }
+
+    public void ClearPoints() {
+        _points.Clear();
     }
 }

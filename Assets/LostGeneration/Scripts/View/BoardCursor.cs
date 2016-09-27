@@ -14,6 +14,7 @@ public class BoardCursor : MonoBehaviour {
     public void Awake() {
         Plane = new Plane(Vector3.up, transform.position.y);
         Camera = Camera ?? Camera.main;
+        BoardView = BoardView ?? GetComponentInParent<BoardView>();
     }
 
     public void Update() {

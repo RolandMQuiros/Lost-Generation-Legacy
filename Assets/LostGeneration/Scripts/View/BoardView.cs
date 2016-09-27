@@ -50,7 +50,7 @@ public class BoardView : MonoBehaviour {
                         newTile.transform.position = position;
                         break;
                     case Board.WALL_TILE:
-                        newTile = Theme.WallTile.GetTile(Board, new Point(x, y), Board.WALL_TILE);
+                        newTile = GetBoardTile(Theme.WallTile, new Point(x, y), Board.WALL_TILE);
                         newTile.transform.SetParent(_tileChild.transform);
                         newTile.transform.position = position;
                         break;
@@ -123,5 +123,14 @@ public class BoardView : MonoBehaviour {
                 _combatantViews.Remove(combatant);
             }
         }
+    }
+
+    private GameObject GetBoardTile(AutoTile autoTile, Point point, int tile) {
+        return autoTile.GetTile(
+            !Board.InBounds(point + Point.Right) || Board.GetTile(point + Point.Right) == tile,
+            !Board.InBounds(point + Point.Down) || Board.GetTile(point + Point.Down) == tile,
+            !Board.InBounds(point + Point.Left) || Board.GetTile(point + Point.Left) == tile,
+            !Board.InBounds(point + Point.Up) || Board.GetTile(point + Point.Up) == tile
+        );
     }
 }
