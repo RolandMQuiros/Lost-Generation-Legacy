@@ -1,5 +1,5 @@
 ﻿using LostGen;
 
-public interface ISkillManager {
+public interface ISkillFactory {
     ISkill GetSkill(int skillID, Combatant owner);    
 }

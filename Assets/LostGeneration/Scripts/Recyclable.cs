@@ -15,4 +15,8 @@ public class Recyclable : MonoBehaviour {
             Spawned(this);
         }
     }
+
+    public void Despawn() {
+        Recycler.Despawn(this);
+    }
 }

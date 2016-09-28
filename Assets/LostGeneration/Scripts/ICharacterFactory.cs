@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using LostGen;
 
-public interface ICharacterManager {
+public interface ICharacterFactory {
     Character GetCharacter(int characterID);
 }

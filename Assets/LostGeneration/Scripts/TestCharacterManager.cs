@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using LostGen;
 
-public class TestCharacterManager : ICharacterManager {
+public class TestCharacterFactory : ICharacterFactory {
     private TestSkillManager _skillManager = new TestSkillManager();
     private Dictionary<int, Character> _characterCache;
 
-    public TestCharacterManager() {
+    public TestCharacterFactory() {
         _characterCache = new Dictionary<int, Character>() {
             {
                 1,

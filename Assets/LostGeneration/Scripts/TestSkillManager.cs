@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using LostGen;
 
-public class TestSkillManager : ISkillManager {
+public class TestSkillManager : ISkillFactory {
     public ISkill GetSkill(int skillID, Combatant owner) {
         ISkill skill = null;
 

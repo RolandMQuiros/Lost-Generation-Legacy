@@ -25,10 +25,10 @@ public class Character {
 
     public Stats BaseStats;
 
-    private ISkillManager _skillManager;
+    private ISkillFactory _skillManager;
     private HashSet<int> _skills;
 
-    public Character(int characterID, string firstName, string lastName, string nickname, int[] skills, ISkillManager skillManager) {
+    public Character(int characterID, string firstName, string lastName, string nickname, int[] skills, ISkillFactory skillManager) {
         CharacterID = characterID;
         FirstName = firstName;
         LastName = lastName;

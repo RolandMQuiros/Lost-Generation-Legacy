@@ -8,7 +8,7 @@ public class TestBoardController : MonoBehaviour {
 
     private Plane _plane;
 
-    private TestCharacterManager _characters = new TestCharacterManager();
+    private TestCharacterFactory _characters = new TestCharacterFactory();
 
     private Combatant _combatant;
     private WalkSkill _walk;

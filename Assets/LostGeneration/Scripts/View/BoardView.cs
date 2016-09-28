@@ -3,20 +3,32 @@ using System;
 using System.Collections.Generic;
 using LostGen;
 
+[RequireComponent(typeof(ObjectRecycler))]
 public class BoardView : MonoBehaviour {
     public BoardTheme Theme;
     public GameObject CombatantViewPrefab;
 
     public Board Board { get; private set; }
-    public ICharacterManager Characters;
+    public ICharacterFactory Characters;
 
     private const string _TILE_CHILD_NAME = "_tileChild";
     private const string _PAWN_CHILD_NAME = "_pawnChild";
+    private const string _GRID_PREFAB_NAME = "BoardGridField";
     private GameObject _tileChild;
     private GameObject _pawnChild;
     
     private Dictionary<Combatant, CombatantView> _combatantViews = new Dictionary<Combatant, CombatantView>();
     private MessageBuffer _buffer = new MessageBuffer();
+
+    private ObjectRecycler _recycler;
+
+    public void Awake() {
+        _recycler = GetComponent<ObjectRecycler>();
+
+        if (!_recycler.IsRegistered(_GRID_PREFAB_NAME)) {
+            throw new MissingReferenceException("The " + _GRID_PREFAB_NAME + " prefab is not registered with this game object's ObjectRecycler");
+        }
+    }
 
     public void AttachBoard(Board board) {
         Board = board;
@@ -82,6 +94,16 @@ public class BoardView : MonoBehaviour {
         }
 
         return areThereStepsRemaining;
+    }
+
+    public GameObject SpawnGridField(Sprite sprite = null) {
+        GameObject gridField = _recycler.Spawn(_GRID_PREFAB_NAME);
+
+        if (gridField != null) {
+            gridField.transform.parent = gameObject.transform;
+        }
+
+        return gridField;
     }
 
     private void OnPawnAdded(Pawn pawn) {
