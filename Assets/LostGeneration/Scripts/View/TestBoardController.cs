@@ -2,6 +2,7 @@
 using System.Collections;
 using LostGen;
 
+
 public class TestBoardController : MonoBehaviour {
     private Board _board;
     private BoardView _boardView;
@@ -37,7 +38,6 @@ public class TestBoardController : MonoBehaviour {
         });
 
         _boardView = GetComponent<BoardView>();
-        _boardView.Characters = _characters;
 	}
 
     public void Start() {
@@ -82,8 +82,5 @@ public class TestBoardController : MonoBehaviour {
                 _enemyAI.BeginTurn();
             }
         }
-
-
-        
     }
 }

@@ -379,6 +379,10 @@ namespace LostGen {
             }
         }
 
+        /// <summary>
+        /// Calls the Step() function of each Pawn on the Board.
+        /// </summary>
+        /// <returns>true if a Pawn still has actions to perform in this step, false otherwise</returns>
         public bool Step() {
             _pawnOrder.Sort();
             bool actionsLeft = false;

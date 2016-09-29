@@ -6,41 +6,15 @@ using LostGen;
 [RequireComponent(typeof(ObjectRecycler))]
 public class BoardView : MonoBehaviour {
     public BoardTheme Theme;
-    public GameObject CombatantViewPrefab;
-
     public Board Board { get; private set; }
-    public ICharacterFactory Characters;
 
     private const string _TILE_CHILD_NAME = "_tileChild";
-    private const string _PAWN_CHILD_NAME = "_pawnChild";
     private const string _GRID_PREFAB_NAME = "BoardGridField";
     private GameObject _tileChild;
-    private GameObject _pawnChild;
-    
-    private Dictionary<Combatant, CombatantView> _combatantViews = new Dictionary<Combatant, CombatantView>();
-    private MessageBuffer _buffer = new MessageBuffer();
-
-    private ObjectRecycler _recycler;
-
-    public void Awake() {
-        _recycler = GetComponent<ObjectRecycler>();
-
-        if (!_recycler.IsRegistered(_GRID_PREFAB_NAME)) {
-            throw new MissingReferenceException("The " + _GRID_PREFAB_NAME + " prefab is not registered with this game object's ObjectRecycler");
-        }
-    }
 
     public void AttachBoard(Board board) {
         Board = board;
-        Board.PawnAdded += OnPawnAdded;
-        Board.PawnRemoved += OnPawnRemoved;
-
         RebuildBoard();
-
-        IEnumerator<Pawn> pawnIter = Board.GetPawnIterator();
-        while (pawnIter.MoveNext()) {
-            OnPawnAdded(pawnIter.Current);
-        }
     }
 
     public void RebuildBoard() {
@@ -67,82 +41,6 @@ public class BoardView : MonoBehaviour {
                         newTile.transform.position = position;
                         break;
                 }
-            }
-        }
-    }
-
-    public bool Step() {
-        bool areThereStepsRemaining = false;
-        if (_buffer.IsStepFinished) {
-            Debug.Log("Board stepped");
-            if (!(areThereStepsRemaining = Board.Step())) {
-                Board.BeginTurn();
-                Debug.Log("Board turn");
-            }
-            
-        }
-
-        Queue<MessageArgs> messages = _buffer.PopMessages();
-        while (messages.Count > 0) {
-            MessageArgs message = messages.Dequeue();
-
-            Combatant source = message.Source as Combatant;
-            if (source != null) {
-                CombatantView view = _combatantViews[source];
-                view.OnMessage(message);
-            }
-        }
-
-        return areThereStepsRemaining;
-    }
-
-    public GameObject SpawnGridField(Sprite sprite = null) {
-        GameObject gridField = _recycler.Spawn(_GRID_PREFAB_NAME);
-
-        if (gridField != null) {
-            gridField.transform.parent = gameObject.transform;
-        }
-
-        return gridField;
-    }
-
-    private void OnPawnAdded(Pawn pawn) {
-        Combatant combatant = pawn as Combatant;
-        if (combatant != null) {
-            Character character = Characters.GetCharacter(combatant.CharacterID);
-            Vector3 position = Theme.PointToVector3(pawn.Position);
-
-            GameObject combatantObj = GameObject.Instantiate<GameObject>(CombatantViewPrefab);
-            CombatantView combatantView = combatantObj.GetComponent<CombatantView>();
-
-            if (_pawnChild == null) {
-                _pawnChild = new GameObject(_PAWN_CHILD_NAME);
-                _pawnChild.transform.SetParent(transform);
-            }
-
-            combatantObj.transform.SetParent(_pawnChild.transform);
-            combatantObj.transform.position = Theme.PointToVector3(combatant.Position);
-            combatantObj.name = combatant.Name;
-
-            combatantView.BoardTheme = Theme;
-            combatantView.Combatant = combatant;
-
-            combatant.Messages += _buffer.HandleMessage;
-
-            _combatantViews.Add(combatant, combatantView); 
-        }
-    }
-
-    private void OnPawnRemoved(Pawn pawn) {
-        Combatant combatant = pawn as Combatant;
-        if (combatant != null) {
-            CombatantView view;
-            _combatantViews.TryGetValue(combatant, out view);
-            if (view != null) {
-                combatant.Messages -= _buffer.HandleMessage;
-
-                view.gameObject.SetActive(false);
-                _combatantViews.Remove(combatant);
             }
         }
     }
