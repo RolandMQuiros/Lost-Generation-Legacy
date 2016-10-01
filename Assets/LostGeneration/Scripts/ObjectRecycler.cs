@@ -5,6 +5,13 @@ using UnityEngine;
 
 [Serializable]
 public class ObjectRecycler : MonoBehaviour {
+    public class NotRegisteredException : Exception {
+        public NotRegisteredException(string prefabName)
+            : base("Prefab with name \"" + prefabName + "\" was not registered with this ObjectRecycler") { }
+        public NotRegisteredException(GameObject prefab)
+            : base("Prefab " + prefab + " is not registered with this ObjectRecycler") { }
+    }
+
     [Serializable]
     private struct Entry {
         public GameObject Prefab;
@@ -28,7 +35,7 @@ public class ObjectRecycler : MonoBehaviour {
             throw new ArgumentException("Prefab must have a Recyclable component to be added to an ObjectRecycler.", "prefab");
         }
 
-        if (_register.Exists(entry => entry.Prefab.name == prefab.name)) {
+        if (_register.Exists(entry => entry.Prefab != prefab && entry.Prefab.name == prefab.name)) {
             throw new ArgumentException("Prefab must have a name unique from other prefabs in this ObjectRecycler's registry", "prefab");
         }
 
@@ -75,7 +82,7 @@ public class ObjectRecycler : MonoBehaviour {
         _pool.TryGetValue(prefab, out instances);
 
         if (instances == null) {
-            throw new ArgumentException("The given prefab is not registered with this pool", "prefab");
+            throw new NotRegisteredException(prefab);
         } else {
             Recyclable recyclable = null;
 

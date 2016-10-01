@@ -5,12 +5,7 @@ using LostGen;
 
 public class TestBoardController : MonoBehaviour {
     private Board _board;
-    private BoardView _boardView;
-
-    private Plane _plane;
-
-    private TestCharacterFactory _characters = new TestCharacterFactory();
-
+    private BoardController _controller;
     private Combatant _combatant;
     private WalkSkill _walk;
 
@@ -37,18 +32,17 @@ public class TestBoardController : MonoBehaviour {
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
         });
 
-        _boardView = GetComponent<BoardView>();
+        _controller = GetComponent<BoardController>();
+        _controller.Board = _board;
 	}
 
     public void Start() {
-        _boardView.AttachBoard(_board);
-
-        Character chara = _characters.GetCharacter(1);
+        Character chara = _controller.Characters.GetCharacter(1);
         _combatant = chara.CreateCombatant(_board, new Point(1, 14));
         _combatant.Team = new Team(1, 1, 0, 2);
         _walk = _combatant.GetSkill<WalkSkill>();
 
-        chara = _characters.GetCharacter(2);
+        chara = _controller.Characters.GetCharacter(2);
         Combatant enemy = chara.CreateCombatant(_board, new Point(18, 1));
         enemy.Team = new Team(2, 2, 0, 1);
         _enemyAI = new LostGen.CharacterController(enemy);
@@ -78,7 +72,7 @@ public class TestBoardController : MonoBehaviour {
 
         if (move) {
             _walk.Fire();
-            if (!_boardView.Step()) {
+            if (!_controller.Step()) {
                 _enemyAI.BeginTurn();
             }
         }

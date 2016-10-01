@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 
 namespace LostGen {
-    public class PlayerSquadController : PawnController {
+    public class PlayerSquadController : IPawnController {
+        public event Action<IPawnController> Ready;
+
         private struct SquadUnit {
             public Combatant Unit;
             public StateOffset Goal;
@@ -20,7 +22,7 @@ namespace LostGen {
         }
 
         private Dictionary<Combatant, SquadUnit> _units = new Dictionary<Combatant, SquadUnit>();
-        
+
         public void AddUnit(Combatant unit) {
             if (!_units.ContainsKey(unit)) {
                 _units[unit] = new SquadUnit(unit);
@@ -33,6 +35,6 @@ namespace LostGen {
             }
         }
 
-        public override void BeginTurn() { }
+        public void BeginTurn() { }
     }
 }

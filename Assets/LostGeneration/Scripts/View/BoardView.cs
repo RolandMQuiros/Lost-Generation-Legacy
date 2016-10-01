@@ -7,10 +7,15 @@ using LostGen;
 public class BoardView : MonoBehaviour {
     public BoardTheme Theme;
     public Board Board { get; private set; }
+    public Plane Plane { get; private set; }
 
     private const string _TILE_CHILD_NAME = "_tileChild";
     private const string _GRID_PREFAB_NAME = "BoardGridField";
     private GameObject _tileChild;
+
+    public void Start() {
+        Plane = new Plane(Vector3.up, transform.position.y);
+    }
 
     public void AttachBoard(Board board) {
         Board = board;

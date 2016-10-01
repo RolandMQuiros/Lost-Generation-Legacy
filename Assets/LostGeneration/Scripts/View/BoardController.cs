@@ -8,7 +8,9 @@ using LostGen;
 [RequireComponent(typeof(CombatantViewManager))]
 public class BoardController : MonoBehaviour {
     public Board Board { get; set; }
-    public ICharacterFactory Characters = new TestCharacterFactory();
+    public ICharacterFactory Characters {
+        get { return _characters; }
+    }
 
     private const string _PAWN_CHILD_NAME = "_pawnChild";
     private const string _GRID_PREFAB_NAME = "BoardGridField";
@@ -17,6 +19,9 @@ public class BoardController : MonoBehaviour {
     private BoardView _boardView;
     private CombatantViewManager _combatantManager;
 
+    private ICharacterFactory _characters = new TestCharacterFactory();
+
+    private bool _actionsLeft = false;
     private bool _readyToStep = true;
 
     public void Awake() {
@@ -24,17 +29,25 @@ public class BoardController : MonoBehaviour {
         _recycler = GetComponent<ObjectRecycler>();
         _combatantManager = GetComponent<CombatantViewManager>();
 
-        _boardView.AttachBoard(Board);
-        _combatantManager.AttachBoard(Board);
+        if (!_recycler.IsRegistered(_GRID_PREFAB_NAME)) {
+            throw new ObjectRecycler.NotRegisteredException(_GRID_PREFAB_NAME);
+        }
     }
 
-    public void Step() {
+    public void Start() {
+        _boardView.AttachBoard(Board);
+        _combatantManager.Initialize(Board, _characters);
+    }
+
+    public bool Step() {
         if (_readyToStep) {
-            Board.Step();
+            _actionsLeft = Board.Step();
         }
 
         _readyToStep = true;
         _readyToStep &= !_combatantManager.OnStep();
+
+        return _actionsLeft;
     }
 
     public GameObject GetBoardFieldObject() {

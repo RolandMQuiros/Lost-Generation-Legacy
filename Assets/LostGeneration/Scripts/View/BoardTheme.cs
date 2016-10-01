@@ -4,7 +4,8 @@ using UnityEngine;
 using LostGen;
 
 [Serializable]
-public class BoardTheme {
+[CreateAssetMenu(fileName = "BoardTheme", menuName = "Lost Generation/View/Board Theme", order = 3)]
+public class BoardTheme : ScriptableObject {
     public GameObject FloorTile;
     public AutoTile WallTile;
     public float TileWidth = 1f;

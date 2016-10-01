@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 using LostGen;
 
 public class TestCharacterFactory : ICharacterFactory {
@@ -73,5 +74,14 @@ public class TestCharacterFactory : ICharacterFactory {
         Character character;
         _characterCache.TryGetValue(characterID, out character);
         return character;
+    }
+
+    public GameObject GetCombatantViewObject(int characterID) {
+        /*GameObject combatantObj = GameObject.Instantiate<GameObject>(CombatantViewPrefab);
+        CombatantView combatantView = combatantObj.GetComponent<CombatantView>();
+
+        combatantObj.transform.SetParent(_pawnChild.transform);
+        */
+        throw new NotImplementedException();
     }
 }

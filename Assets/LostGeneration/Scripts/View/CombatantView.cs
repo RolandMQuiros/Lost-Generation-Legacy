@@ -8,8 +8,6 @@ public class CombatantView : MonoBehaviour {
         get { return _messages.Count > 0; }
     }
     public Combatant Combatant;
-
-    [HideInInspector]
     public BoardTheme BoardTheme;
 
     private Animator _animator;

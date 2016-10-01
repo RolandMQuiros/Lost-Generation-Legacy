@@ -14,7 +14,7 @@ public class CombatantViewManager : MonoBehaviour {
     private MessageBuffer _buffer = new MessageBuffer();
     private Transform _pawnChild;
 
-    public void Awake() {
+    public void Start() {
         _pawnChild = transform.FindChild(_PAWN_CHILD_NAME);
 
         if (CombatantViewPrefab == null) {
@@ -24,16 +24,13 @@ public class CombatantViewManager : MonoBehaviour {
         if (BoardTheme == null) {
             throw new NullReferenceException("BoardTheme was not set");
         }
-
-        if (Characters == null) {
-            throw new NullReferenceException("CharacterFactory was not set");
-        }
     }
 
-    public void AttachBoard(Board board) {
+    public void Initialize(Board board, ICharacterFactory characters) {
         Board = board;
         Board.PawnAdded += OnPawnAdded;
         Board.PawnRemoved += OnPawnRemoved;
+        Characters = characters;
 
         IEnumerator<Pawn> pawnIter = Board.GetPawnIterator();
         while (pawnIter.MoveNext()) {
@@ -66,14 +63,16 @@ public class CombatantViewManager : MonoBehaviour {
             Character character = Characters.GetCharacter(combatant.CharacterID);
             Vector3 position = BoardTheme.PointToVector3(pawn.Position);
 
-            GameObject combatantObj = GameObject.Instantiate<GameObject>(CombatantViewPrefab);
-            CombatantView combatantView = combatantObj.GetComponent<CombatantView>();
-
             if (_pawnChild == null) {
                 GameObject pawnChildObj = new GameObject(_PAWN_CHILD_NAME);
                 _pawnChild = pawnChildObj.transform;
                 _pawnChild.transform.SetParent(transform);
             }
+
+            Transform parentTransform = transform;
+            GameObject combatantObj = GameObject.Instantiate<GameObject>(CombatantViewPrefab);
+
+            CombatantView combatantView = combatantObj.GetComponent<CombatantView>();
 
             combatantObj.transform.SetParent(_pawnChild.transform);
             combatantObj.transform.position = ViewCommon.PointToVector3(combatant.Position);

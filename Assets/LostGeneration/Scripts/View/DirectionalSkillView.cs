@@ -5,30 +5,37 @@ using LostGen;
 
 public class DirectionalSkillView : MonoBehaviour {
     public DirectionalSkill Skill;
+    public BoardController BoardController;
     public BoardView BoardView;
     public BoardGridField AreaOfEffect;
     public BoardCursor Cursor;
 
     private CardinalDirection _direction;
 
-    public void Awake() {
+    public void Start() {
+        BoardController = BoardController ?? GetComponentInParent<BoardController>();
         BoardView = BoardView ?? GetComponentInParent<BoardView>();
         Cursor = Cursor ?? BoardView.GetComponentInChildren<BoardCursor>();
+
+        GameObject fieldObj = BoardController.GetBoardFieldObject();
+        AreaOfEffect = fieldObj.GetComponent<BoardGridField>();
     }
 
     public void Update() {
-        CardinalDirection direction = DirectionBetweenPoints(Skill.Owner.Position, Cursor.BoardPoint);
+        if (Skill != null) {
+            CardinalDirection direction = DirectionBetweenPoints(Skill.Owner.Position, Cursor.BoardPoint);
 
-        if (_direction != direction) {
-            _direction = direction;
-            AreaOfEffect.ClearPoints();
-            foreach (Point point in Skill.GetAreaOfEffect(_direction)) {
-                AreaOfEffect.AddPoint(point);
+            if (_direction != direction) {
+                _direction = direction;
+                AreaOfEffect.ClearPoints();
+                foreach (Point point in Skill.GetAreaOfEffect(_direction)) {
+                    AreaOfEffect.AddPoint(point);
+                }
             }
-        }
 
-        if (Input.GetButtonDown("Click")) {
-            Skill.Direction = direction;
+            if (Input.GetButtonDown("Click")) {
+                Skill.Direction = direction;
+            }
         }
     }
 
