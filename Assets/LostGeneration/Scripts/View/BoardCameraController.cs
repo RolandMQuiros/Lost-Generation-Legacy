@@ -7,6 +7,14 @@ public class BoardCameraController : MonoBehaviour {
     public Camera Camera;
     public BoardView BoardView;
 
+    public float Zoom {
+        get { return _zoom; }
+        set {
+            _zoom = value;
+            transform.position = _originalOffset * _zoom;
+        }
+    }
+
     #region MotionDefs
     private abstract class Motion {
         protected Transform _camera;
@@ -19,7 +27,9 @@ public class BoardCameraController : MonoBehaviour {
             _pivot = pivot;
             _duration = duration;
         }
-        public virtual void Begin() { }
+        public virtual void Begin() {
+            _time = 0f;
+        }
         public abstract bool Update(float deltaTime);
     }
 
@@ -33,7 +43,7 @@ public class BoardCameraController : MonoBehaviour {
 
         public override bool Update(float deltaTime) {
             _time += deltaTime;
-            _pivot.position = Vector3.Lerp(_pivot.position, _target, deltaTime / _duration);
+            _pivot.position = Vector3.Lerp(_pivot.position, _target, _time / _duration);
             return _time >= _duration;
         }
     }
@@ -49,7 +59,7 @@ public class BoardCameraController : MonoBehaviour {
 
         public override bool Update(float deltaTime) {
             _time += deltaTime;
-            _camera.localPosition = Vector3.Lerp(_camera.localPosition, _scale * _offset, _time / _duration);
+            _camera.localPosition = Vector3.Lerp(_camera.localPosition, _offset - (_scale * _offset), _time / _duration);
             return _time >= _duration;
         }
     }
@@ -60,6 +70,7 @@ public class BoardCameraController : MonoBehaviour {
     private Vector3 _directionToCamera;
     private Vector3 _target;
     private float _timer;
+    private float _zoom = 1f;
 
     public void Awake() {
         Camera = Camera ?? GetComponentInChildren<Camera>() ?? Camera.main;
@@ -75,6 +86,9 @@ public class BoardCameraController : MonoBehaviour {
         if (_motions.Count > 0) {
             if (_motions.Peek().Update(Time.deltaTime)) {
                 _motions.Dequeue();
+                if (_motions.Count > 0) {
+                    _motions.Peek().Begin();
+                }
             }
         }
     }
