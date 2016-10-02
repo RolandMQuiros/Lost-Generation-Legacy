@@ -3,17 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using LostGen;
 
-public class BoardCameraController : MonoBehaviour {
+public class BoardCamera : MonoBehaviour {
     public Camera Camera;
     public BoardView BoardView;
-
-    public float Zoom {
-        get { return _zoom; }
-        set {
-            _zoom = value;
-            transform.position = _originalOffset * _zoom;
-        }
-    }
 
     #region MotionDefs
     private abstract class Motion {
@@ -31,6 +23,7 @@ public class BoardCameraController : MonoBehaviour {
             _time = 0f;
         }
         public abstract bool Update(float deltaTime);
+        public virtual void End() { }
     }
 
     private class PanMotion : Motion {
@@ -46,6 +39,10 @@ public class BoardCameraController : MonoBehaviour {
             _pivot.position = Vector3.Lerp(_pivot.position, _target, _time / _duration);
             return _time >= _duration;
         }
+
+        public override void End() {
+            _pivot.position = _target;
+        }
     }
 
     private class ZoomMotion : Motion {
@@ -59,13 +56,37 @@ public class BoardCameraController : MonoBehaviour {
 
         public override bool Update(float deltaTime) {
             _time += deltaTime;
-            _camera.localPosition = Vector3.Lerp(_camera.localPosition, _offset - (_scale * _offset), _time / _duration);
+            _camera.localPosition = Vector3.Lerp(_camera.localPosition, _offset / _scale, _time / _duration);
             return _time >= _duration;
+        }
+
+        public override void End() {
+            _camera.localPosition = _offset / _scale;
+        }
+    }
+
+    private class RotateMotion : Motion {
+        private Quaternion _targetRot;
+        public RotateMotion(Transform pivot, float angle, float duration)
+            : base(null, pivot, duration) {
+            _targetRot = Quaternion.Euler(0f, angle, 0f);
+        }
+
+        public override bool Update(float deltaTime) {
+            _time += deltaTime;
+            _pivot.rotation = Quaternion.Lerp(_pivot.rotation, _targetRot, _time / _duration);
+            return _time >= _duration;
+        }
+
+        public override void End() {
+            _pivot.rotation = _targetRot;
         }
     }
     #endregion
 
-    private Queue<Motion> _motions = new Queue<Motion>(); 
+    private Queue<Motion> _motions = new Queue<Motion>();
+    private Motion _currentMotion;
+
     private Vector3 _originalOffset;
     private Vector3 _directionToCamera;
     private Vector3 _target;
@@ -78,19 +99,29 @@ public class BoardCameraController : MonoBehaviour {
 
     public void Start() {
         BoardView = BoardView ?? GetComponentInParent<BoardView>();
-        _originalOffset = transform.localPosition;
+        _originalOffset = Camera.transform.localPosition;
         _directionToCamera = _originalOffset.normalized;
     }
 
     public void Update() {
-        if (_motions.Count > 0) {
-            if (_motions.Peek().Update(Time.deltaTime)) {
-                _motions.Dequeue();
+        if (_currentMotion != null) {
+            if (_currentMotion.Update(Time.deltaTime)) {
+                _currentMotion.End();
                 if (_motions.Count > 0) {
-                    _motions.Peek().Begin();
+                    _currentMotion = _motions.Dequeue();
                 }
             }
         }
+    }
+
+    public void Pan(Point point, float duration) {
+        Vector3 end = BoardView.Theme.PointToVector3(point);
+
+        if (_currentMotion != null && !(_currentMotion is PanMotion)) {
+            _currentMotion.End();
+        }
+        _currentMotion = new PanMotion(transform, BoardView.Plane, end, duration);
+        _motions.Clear();
     }
 
     public void AddPan(Point point, float duration) {
@@ -98,7 +129,28 @@ public class BoardCameraController : MonoBehaviour {
         _motions.Enqueue(new PanMotion(transform, BoardView.Plane, end, duration));
     }
 
+    public void Zoom(float scale, float duration) {
+        if (_currentMotion != null) {
+            _currentMotion.End();
+        }
+        _currentMotion = new ZoomMotion(Camera.transform, transform, _originalOffset, scale, duration);
+        _motions.Clear();
+    }
+
     public void AddZoom(float scale, float duration) {
         _motions.Enqueue(new ZoomMotion(Camera.transform, transform, _originalOffset, scale, duration));
+    }
+
+    public void Rotate(float angle, float duration) {
+        if (_currentMotion != null && !(_currentMotion is RotateMotion)) {
+            _currentMotion.End();
+        }
+
+        _currentMotion = new RotateMotion(transform, angle, duration);
+        _motions.Clear();
+    }
+
+    public void AddRotate(float angle, float duration) {
+        _motions.Enqueue(new RotateMotion(transform, angle, duration));
     }
 }

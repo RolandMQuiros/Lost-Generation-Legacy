@@ -20,10 +20,16 @@ namespace LostGen {
     /// </summary>
     public class WalkSkill : RangedSkill {
         public override int ActionPoints { get { return _actionPoints; } }
+        public override Point Target {
+            get { return base.Target; }
+            set { SetDestination(value); }
+        }
 
         protected Board _board;
         private List<Board.Node> _path;
         private int _actionPoints;
+
+        private HashSet<Point> _range;
 
         public WalkSkill(Combatant owner)
             : base(owner, "Walk", "Move across tiles within a limited range") {
@@ -34,7 +40,7 @@ namespace LostGen {
             Board.Node end = _board.GetNode(destination, TileCost);
 
             if (end != null) {
-                Target = destination;
+                base.Target = destination;
                 Board.Node start = _board.GetNode(Owner.Position, TileCost);
 
                 if (start == null) {
@@ -59,7 +65,7 @@ namespace LostGen {
                     _actionPoints += TileCost(_path[i].Point);
                 }
             } else {
-                Target = Owner.Position;
+                base.Target = Owner.Position;
             }
         }
 
@@ -73,10 +79,13 @@ namespace LostGen {
         }
 
         public override IEnumerable<Point> GetRange() {
-            Board.Node startNode = Owner.Board.GetNode(Owner.Position);
-            foreach (Board.Node node in Pathfinder<Board.Node>.FloodFill(startNode, Owner.ActionPoints)) {
-                yield return node.Point;
-            }
+            InitializeRange();
+            return _range;
+        }
+
+        public override bool InRange(Point point) {
+            InitializeRange();
+            return _range.Contains(point);
         }
 
         public override IEnumerable<Point> GetAreaOfEffect() {
@@ -90,6 +99,19 @@ namespace LostGen {
                 for (int i = 0; i < _path.Count; i++) {
                     move = new MoveAction(Owner, _path[i].Point, true);
                     Owner.PushAction(move);
+                }
+
+                // Clear the range for the next step
+                _range = null;
+            }
+        }
+
+        private void InitializeRange() {
+            if (_range == null) {
+                _range = new HashSet<Point>();
+                Board.Node startNode = Owner.Board.GetNode(Owner.Position, TileCost);
+                foreach (Board.Node node in Pathfinder<Board.Node>.FloodFill(startNode, Owner.ActionPoints)) {
+                    _range.Add(node.Point);
                 }
             }
         }

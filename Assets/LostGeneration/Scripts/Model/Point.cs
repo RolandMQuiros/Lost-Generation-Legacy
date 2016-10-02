@@ -35,6 +35,14 @@ namespace LostGen {
             Y = y;
         }
 
+        public override string ToString() {
+            return "{x:" + X + ",y:" + Y + "}";
+        }
+
+        public bool Equals(Point other) {
+            return X == other.X && Y == other.Y;
+        }
+
         public static double Distance(Point start, Point end) {
             Point offset = end - start;
 
@@ -73,6 +81,14 @@ namespace LostGen {
 
         public static Point operator *(int scalar, Point point) {
             return new Point(point.X * scalar, point.Y * scalar);
+        }
+
+        public static bool operator ==(Point p1, Point p2) {
+            return p1.Equals(p2);
+        }
+
+        public static bool operator !=(Point p1, Point p2) {
+            return !p1.Equals(p2);
         }
 
         public static Point[] Line(Point start, Point end) {
@@ -125,14 +141,6 @@ namespace LostGen {
             }
 
             return line;
-        }
-
-        public override string ToString() {
-            return "{x:" + X + ",y:" + Y + "}";
-        }
-
-        public bool Equals(Point other) {
-            return X == other.X && Y == other.Y;
         }
     }
 }

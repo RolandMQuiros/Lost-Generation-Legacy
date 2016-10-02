@@ -8,6 +8,9 @@ public class BoardCursor : MonoBehaviour {
     public Vector3 ScreenPoint { get; private set; }
     public Vector3 WorldPoint { get; private set; }
 
+    public bool TapDown { get; private set; }
+    public bool TapUp { get; private set; }
+
     public Plane Plane { get; private set; }
     public Point BoardPoint { get; private set; }
 
@@ -17,7 +20,7 @@ public class BoardCursor : MonoBehaviour {
         BoardView = BoardView ?? GetComponentInParent<BoardView>();
     }
 
-    public void Update() {
+    public void LateUpdate() {
         ScreenPoint = Input.mousePosition;
 
         Ray screenCast = Camera.ScreenPointToRay(ScreenPoint);
@@ -30,5 +33,8 @@ public class BoardCursor : MonoBehaviour {
         transform.position = snapped;
 
         BoardPoint = BoardView.Theme.Vector3ToPoint(snapped);
+
+        TapDown = Input.GetMouseButtonDown(0);
+        TapUp = Input.GetMouseButtonUp(0);
     }
 }

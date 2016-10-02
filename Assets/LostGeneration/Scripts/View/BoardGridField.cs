@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LostGen;
 
+[RequireComponent(typeof(MeshFilter))]
 public class BoardGridField : MonoBehaviour {
     public BoardView BoardView;
     public Sprite Sprite;
@@ -12,16 +13,18 @@ public class BoardGridField : MonoBehaviour {
     private HashSet<Point> _points = new HashSet<Point>();
 
     public void Awake() {
-        BoardView = BoardView ?? GetComponentInParent<BoardView>();
         _meshFilter = GetComponent<MeshFilter>();
     }
 
-    // Use this for initialization
+    public void Start() {
+        BoardView = BoardView ?? GetComponentInParent<BoardView>();
+    }
+
     public void OnEnable() {
-        RecreateMesh();
+        RebuildMesh();
 	}
 
-    private void RecreateMesh() {
+    public void RebuildMesh() {
         List<Vector3> vertices = new List<Vector3>();
         List<Vector2> uvs = new List<Vector2>();
         List<int> triangles = new List<int>();
