@@ -4,24 +4,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using LostGen;
 
+[RequireComponent(typeof(BoardView))]
 [RequireComponent(typeof(MeshFilter))]
 public class BoardGridField : MonoBehaviour {
-    public BoardView BoardView;
-    public Sprite Sprite;
-
+    private BoardView _boardView;
     private MeshFilter _meshFilter;
-    private HashSet<Point> _points = new HashSet<Point>();
+    private Dictionary<Point, Sprite> _points = new Dictionary<Point, Sprite>();
+    private bool _wasChanged = true;
 
     public void Awake() {
+        _boardView = GetComponent<BoardView>();
         _meshFilter = GetComponent<MeshFilter>();
     }
 
     public void Start() {
-        BoardView = BoardView ?? GetComponentInParent<BoardView>();
+        _boardView = _boardView ?? GetComponentInParent<BoardView>();
     }
 
-    public void OnEnable() {
-        RebuildMesh();
+    public void LateUpdate() {
+        if (_wasChanged) {
+            RebuildMesh();
+            _wasChanged = false;
+        }
 	}
 
     public void RebuildMesh() {
@@ -31,16 +35,16 @@ public class BoardGridField : MonoBehaviour {
         
         int triangleOffset = 0;
 
-        float halfWidth = BoardView.Theme.TileWidth / 2f;
-        float halfHeight = BoardView.Theme.TileHeight / 2f;
+        float halfWidth = _boardView.Theme.TileWidth / 2f;
+        float halfHeight = _boardView.Theme.TileHeight / 2f;
 
-        Vector3 up = BoardView.Theme.PointToVector3(Point.Up) * halfHeight;
-        Vector3 left = BoardView.Theme.PointToVector3(Point.Left) * halfWidth;
-        Vector3 down = BoardView.Theme.PointToVector3(Point.Down) * halfHeight;
-        Vector3 right = BoardView.Theme.PointToVector3(Point.Right) * halfWidth;
+        Vector3 up = _boardView.Theme.PointToVector3(Point.Up) * halfHeight;
+        Vector3 left = _boardView.Theme.PointToVector3(Point.Left) * halfWidth;
+        Vector3 down = _boardView.Theme.PointToVector3(Point.Down) * halfHeight;
+        Vector3 right = _boardView.Theme.PointToVector3(Point.Right) * halfWidth;
 
-        foreach (Point point in _points) {
-            Vector3 center = BoardView.Theme.PointToVector3(point);
+        foreach (KeyValuePair<Point, Sprite> pointSprite in _points) {
+            Vector3 center = _boardView.Theme.PointToVector3(pointSprite.Key);
             Vector3 upperLeft = center + up + left;
             Vector3 bottomLeft = center + down + left;
             Vector3 bottomRight = center + down + right;
@@ -51,10 +55,10 @@ public class BoardGridField : MonoBehaviour {
             vertices.Add(upperLeft);
             vertices.Add(upperRight);
 
-            uvs.Add(Sprite.uv[0]);
-            uvs.Add(Sprite.uv[1]);
-            uvs.Add(Sprite.uv[2]);
-            uvs.Add(Sprite.uv[3]);
+            uvs.Add(pointSprite.Value.uv[0]);
+            uvs.Add(pointSprite.Value.uv[1]);
+            uvs.Add(pointSprite.Value.uv[2]);
+            uvs.Add(pointSprite.Value.uv[3]);
 
             triangles.Add(triangleOffset + 2);
             triangles.Add(triangleOffset + 1);
@@ -78,15 +82,32 @@ public class BoardGridField : MonoBehaviour {
         mesh.RecalculateNormals();
     }
 
-    public void AddPoint(Point point) {
-        _points.Add(point);
+    public void AddPoint(Point point, Sprite sprite) {
+        _points.Add(point, sprite);
+        _wasChanged = true;
+    }
+
+    public void AddPoints(IEnumerable<Point> points, Sprite sprite) {
+        foreach (Point point in points) {
+            _points.Add(point, sprite);
+            _wasChanged = true;
+        }
     }
 
     public void RemovePoint(Point point) {
         _points.Remove(point);
+        _wasChanged = true;
+    }
+
+    public void RemovePoints(IEnumerable<Point> points) {
+        foreach (Point point in points) {
+            _points.Remove(point);
+            _wasChanged = true;
+        }
     }
 
     public void ClearPoints() {
         _points.Clear();
+        _wasChanged = true;
     }
 }

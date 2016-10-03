@@ -16,7 +16,7 @@ public class BoardTheme : ScriptableObject {
     }
 
     public Vector3 Snap(Vector3 vector) {
-        return new Vector3(Mathf.Floor(vector.x / TileWidth), vector.y, Mathf.Floor(vector.z / TileHeight));
+        return new Vector3(Mathf.Round(vector.x / TileWidth), vector.y, Mathf.Round(vector.z / TileHeight));
     }
 
     public Point Vector3ToPoint(Vector3 vector) {

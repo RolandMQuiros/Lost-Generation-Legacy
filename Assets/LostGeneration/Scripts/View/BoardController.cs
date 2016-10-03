@@ -21,6 +21,9 @@ public class BoardController : MonoBehaviour {
 
     private ICharacterFactory _characters = new TestCharacterFactory();
 
+    private List<IPawnController> _pawnControllers = new List<IPawnController>();
+    private int _finishedControllers = 0;
+
     private bool _actionsLeft = false;
     private bool _readyToStep = true;
 
@@ -36,7 +39,7 @@ public class BoardController : MonoBehaviour {
 
     public void Start() {
         _boardView.AttachBoard(Board);
-        _combatantManager.Initialize(Board, _characters);
+        _combatantManager.Initialize(_characters);
     }
 
     public bool Step() {
