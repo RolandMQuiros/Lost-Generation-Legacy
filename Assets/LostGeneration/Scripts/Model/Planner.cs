@@ -105,7 +105,7 @@ namespace LostGen {
         public Queue<IDecision> CreatePlan(StateOffset goal) {
             GoalNode start = new GoalNode(new StateOffset(), _decisions);
             GoalNode end = new GoalNode(goal, _decisions);
-            Queue<GoalNode> goals = new Queue<GoalNode>(Pathfinder<GoalNode>.FindPath(start, end, Heuristic));
+            Queue<GoalNode> goals = new Queue<GoalNode>(GraphMethods<GoalNode>.FindPath(start, end, Heuristic));
 
             Queue<IDecision> plan = new Queue<IDecision>();
             if (goals.Count > 0) {

@@ -43,6 +43,7 @@ public class TestBoardController : MonoBehaviour {
         _walk = _combatant.GetSkill<WalkSkill>();
 
         chara = _controller.Characters.GetCharacter(2);
+
         Combatant enemy = chara.CreateCombatant(_board, new Point(18, 1));
         enemy.Team = new Team(2, 2, 0, 1);
         _enemyAI = new LostGen.CharacterController(enemy);

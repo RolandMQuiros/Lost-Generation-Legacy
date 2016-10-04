@@ -76,8 +76,6 @@ public class CombatantView : MonoBehaviour {
         _moveEnd = BoardTheme.PointToVector3(move.To);
 
         transform.position = _moveStart;
-
-        Debug.Log("Move message " + _moveStart + "->" + _moveEnd + " received");
     }
 
     private void MoveUpdate() {

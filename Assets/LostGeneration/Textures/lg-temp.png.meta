@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: c118794b946de074e99f7c97f9f84258
-timeCreated: 1474476525
+timeCreated: 1475556277
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -13,6 +13,7 @@ TextureImporter:
     21300012: Sprite_Enemy1
     21300014: Sprite_Enemy2
     21300016: Sprite_Dither
+    21300018: Sprite_DitherRed
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -55,11 +56,14 @@ TextureImporter:
   spriteBorder: {x: 16, y: 56, z: 40, w: 0}
   spritePixelsToUnits: 8
   alphaIsTransparency: 1
+  spriteTessellationDetail: -1
   textureType: 8
   buildTargetSettings: []
   spriteSheet:
+    serializedVersion: 2
     sprites:
-    - name: Sprite_TileSelector
+    - serializedVersion: 2
+      name: Sprite_TileSelector
       rect:
         serializedVersion: 2
         x: 16
@@ -70,7 +74,9 @@ TextureImporter:
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: Sprite_TileNode
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Sprite_TileNode
       rect:
         serializedVersion: 2
         x: 24
@@ -81,7 +87,9 @@ TextureImporter:
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: Sprite_Hero1
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Sprite_Hero1
       rect:
         serializedVersion: 2
         x: 32
@@ -92,7 +100,9 @@ TextureImporter:
       pivot: {x: 0.5362821, y: 0.13059235}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: Sprite_Hero2
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Sprite_Hero2
       rect:
         serializedVersion: 2
         x: 40
@@ -103,7 +113,9 @@ TextureImporter:
       pivot: {x: 0.50000054, y: 0.130592}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: Sprite_Hero3
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Sprite_Hero3
       rect:
         serializedVersion: 2
         x: 48
@@ -114,7 +126,9 @@ TextureImporter:
       pivot: {x: 0.5000005, y: 0.11904803}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: Sprite_Hero4
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Sprite_Hero4
       rect:
         serializedVersion: 2
         x: 57
@@ -125,7 +139,9 @@ TextureImporter:
       pivot: {x: 0.46371952, y: 0.130592}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: Sprite_Enemy1
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Sprite_Enemy1
       rect:
         serializedVersion: 2
         x: 33
@@ -136,7 +152,9 @@ TextureImporter:
       pivot: {x: 0.5, y: 0.1}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: Sprite_Enemy2
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Sprite_Enemy2
       rect:
         serializedVersion: 2
         x: 19
@@ -147,7 +165,9 @@ TextureImporter:
       pivot: {x: 0.5, y: 0.1}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-    - name: Sprite_Dither
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Sprite_Dither
       rect:
         serializedVersion: 2
         x: 17
@@ -158,6 +178,20 @@ TextureImporter:
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Sprite_DitherRed
+      rect:
+        serializedVersion: 2
+        x: 25
+        y: 31
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
     outline: []
   spritePackingTag: 
   userData: 

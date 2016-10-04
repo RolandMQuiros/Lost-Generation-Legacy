@@ -52,7 +52,7 @@ namespace LostGen {
                     _path.Add(_board.GetNode(Target, TileCost));
                 } else {
                     _path = new List<Board.Node>(
-                        Pathfinder<Board.Node>.FindPath(
+                        GraphMethods<Board.Node>.FindPath(
                             new Board.Node(_board, Owner.Position, TileCost),
                             end,
                             Heuristic
@@ -110,7 +110,7 @@ namespace LostGen {
             if (_range == null) {
                 _range = new HashSet<Point>();
                 Board.Node startNode = Owner.Board.GetNode(Owner.Position, TileCost);
-                foreach (Board.Node node in Pathfinder<Board.Node>.FloodFill(startNode, Owner.ActionPoints)) {
+                foreach (Board.Node node in GraphMethods<Board.Node>.FloodFill(startNode, Owner.ActionPoints)) {
                     _range.Add(node.Point);
                 }
             }

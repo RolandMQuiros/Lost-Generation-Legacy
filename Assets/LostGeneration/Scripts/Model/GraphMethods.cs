@@ -1,15 +1,17 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace LostGen {
-
-    public class Pathfinder<T> where T : IGraphNode {
+    public static class GraphMethods<T> where T : IGraphNode {
         public delegate int Heuristic(T start, T end);
 
         private class SortNode : IComparable<SortNode> {
             public T Node;
             public int GScore = 0;
             public int FScore = 0;
+            public int Level = 0;
 
             public int CompareTo(SortNode other) {
                 int compare = 0;
@@ -23,16 +25,19 @@ namespace LostGen {
 
         public static IEnumerable<T> FloodFill(T start, int maxCost = -1, int maxDepth = -1) {
             HashSet<T> domain = new HashSet<T>();
-            Stack<SortNode> open = new Stack<SortNode>();
+            List<SortNode> open = new List<SortNode>();
 
-            open.Push(new SortNode() { Node = start });
+            open.Add(new SortNode() { Node = start, Level = 1 });
+            domain.Add(open[0].Node);
 
+            Profiler.BeginSample("GraphMethods.FloodFill");
             while (open.Count > 0) {
-                SortNode current = open.Peek();
-                domain.Add(current.Node);
+                open.Sort();
+                SortNode current = open[0];
+                open.RemoveAt(0);
+                //domain.Add(current.Node);
 
-                bool leafFound = true;
-                if (maxDepth == -1 || open.Count < maxDepth) {
+                if (maxDepth == -1 || current.Level < maxDepth) {
                     foreach (T neighbor in current.Node.GetNeighbors()) {
                         if (domain.Contains(neighbor)) {
                             continue;
@@ -41,19 +46,18 @@ namespace LostGen {
                         int tentativeGScore = current.GScore + current.Node.GetEdgeCost(neighbor);
 
                         if (maxCost == -1 || tentativeGScore < maxCost) {
-                            open.Push(new SortNode() {
+                            domain.Add(neighbor);
+                            open.Add(new SortNode() {
                                 Node = neighbor,
-                                GScore = tentativeGScore
+                                GScore = tentativeGScore,
+                                FScore = tentativeGScore,
+                                Level = current.Level + 1
                             });
-                            leafFound = false;
                         }
                     }
                 }
-
-                if (leafFound) {
-                    open.Pop();
-                }
             }
+            Profiler.EndSample();
 
             return domain;
         }

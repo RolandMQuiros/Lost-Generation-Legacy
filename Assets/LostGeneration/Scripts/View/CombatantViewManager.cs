@@ -7,12 +7,15 @@ public class CombatantViewManager : MonoBehaviour {
     public GameObject CombatantViewPrefab;
     public ICharacterFactory Characters { get; set; }
 
+    public event Action StepBegun;
+
     private const string _PAWN_CHILD_NAME = "_pawnChild";
     private Dictionary<Combatant, CombatantView> _combatantViews = new Dictionary<Combatant, CombatantView>();
     private MessageBuffer _buffer = new MessageBuffer();
 
     private BoardView _boardView;
     private BoardGridField _boardGridField;
+    private BoardCursor _cursor;
     private Transform _pawnChild;
     private ObjectRecycler _recycler;
 
@@ -27,6 +30,7 @@ public class CombatantViewManager : MonoBehaviour {
 
     public void Start() {
         _pawnChild = transform.FindChild(_PAWN_CHILD_NAME);
+        _cursor = GetComponentInChildren<BoardCursor>();
 
         if (CombatantViewPrefab == null) {
             throw new NullReferenceException("CombatantViewPrefab was not set");
@@ -42,6 +46,10 @@ public class CombatantViewManager : MonoBehaviour {
         while (pawnIter.MoveNext()) {
             OnPawnAdded(pawnIter.Current);
         }
+    }
+
+    public void OnBeginStep() {
+        StepBegun();
     }
 
     /// <summary>
@@ -87,6 +95,9 @@ public class CombatantViewManager : MonoBehaviour {
 
             RangedSkillController rangedSkillController = combatantObj.GetComponent<RangedSkillController>();
             rangedSkillController.BoardGridField = _boardGridField;
+            rangedSkillController.Cursor = _cursor;
+
+            StepBegun += rangedSkillController.BeginStep;
 
             // TEST
             rangedSkillController.Skill = combatant.GetSkill<WalkSkill>();

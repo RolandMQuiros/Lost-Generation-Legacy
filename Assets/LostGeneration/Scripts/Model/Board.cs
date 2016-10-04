@@ -29,7 +29,7 @@ namespace LostGen {
             /// <summary>Reference to the Board</summary>
             protected Board _board;
             /// <summary>List of adjacent, non-Wall, in-bounds Points on the Board</summary>
-            protected List<Node> _neighbors = new List<Node>();
+            protected List<IGraphNode> _neighbors = null;
             /// <summary>Edge cost callback</summary>
             protected EdgeCostLookup _edgeCostLookup;
 
@@ -70,29 +70,32 @@ namespace LostGen {
             /// </summary>
             /// <returns>An IEnumerable that iterates through this Node's neighboring Points</returns>
             public IEnumerable<IGraphNode> GetNeighbors() {
-                for (int i = 0; i < Point.OctoNeighbors.Length; i++) {
-                    Point neighborPoint = _point + Point.OctoNeighbors[i];
+                if (_neighbors == null) {
+                    _neighbors = new List<IGraphNode>();
+                    for (int i = 0; i < Point.Neighbors.Length; i++) {
+                        Point neighborPoint = _point + Point.Neighbors[i];
 
-                    if (_board.InBounds(neighborPoint) && _board.GetTile(neighborPoint) != Board.WALL_TILE) {
-                        // Check if a Node already exists for the Point
-                        Node neighbor = _neighbors.Find(node => node.Point.Equals(neighborPoint)) as Node;
-                        if (neighbor == null) {
-                            // If no Node exists, create one
-                            neighbor = new Node(_board, neighborPoint, _edgeCostLookup);
+                        if (_board.InBounds(neighborPoint) && _board.GetTile(neighborPoint) != Board.WALL_TILE) {
+                            Node neighbor = new Node(_board, neighborPoint, _edgeCostLookup);
                             _neighbors.Add(neighbor);
-
-                            yield return neighbor;
-                        } else {
-                            // If a Node exists, return the stored one
-                            yield return neighbor;
                         }
                     }
                 }
+
+                return _neighbors;
             }
 
             public bool IsMatch(IGraphNode other) {
                 Node otherNode = (Node)other;
                 return Point.Equals(otherNode.Point);
+            }
+
+            public override int GetHashCode() {
+                return _point.GetHashCode();
+            }
+
+            public override bool Equals(object obj) {
+                return _point == ((Node)obj).Point;
             }
         }
 

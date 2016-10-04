@@ -17,18 +17,15 @@ public class BoardController : MonoBehaviour {
 
     private ObjectRecycler _recycler;
     private BoardView _boardView;
+    private BoardGridField _boardGridField;
     private CombatantViewManager _combatantManager;
-
     private ICharacterFactory _characters = new TestCharacterFactory();
-
-    private List<IPawnController> _pawnControllers = new List<IPawnController>();
-    private int _finishedControllers = 0;
-
     private bool _actionsLeft = false;
     private bool _readyToStep = true;
 
     public void Awake() {
         _boardView = GetComponent<BoardView>();
+        _boardGridField = GetComponent<BoardGridField>();
         _recycler = GetComponent<ObjectRecycler>();
         _combatantManager = GetComponent<CombatantViewManager>();
 
@@ -43,8 +40,14 @@ public class BoardController : MonoBehaviour {
     }
 
     public bool Step() {
+        if (!_actionsLeft) {
+            Board.BeginTurn();
+        }
+
         if (_readyToStep) {
+            _boardGridField.ClearPoints();
             _actionsLeft = Board.Step();
+            _combatantManager.OnBeginStep();
         }
 
         _readyToStep = true;

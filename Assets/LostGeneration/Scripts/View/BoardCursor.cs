@@ -1,5 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections;
+using UnityEngine;
 using LostGen;
 
 public class BoardCursor : MonoBehaviour {
@@ -14,6 +15,8 @@ public class BoardCursor : MonoBehaviour {
     public Plane Plane { get; private set; }
     public Point BoardPoint { get; private set; }
 
+    private bool _isWindowFocused = true;
+
     public void Awake() {
         Plane = new Plane(Vector3.up, transform.position.y);
         Camera = Camera ?? Camera.main;
@@ -21,20 +24,31 @@ public class BoardCursor : MonoBehaviour {
     }
 
     public void LateUpdate() {
-        ScreenPoint = Input.mousePosition;
+        if (!IsMouseOutsideWindow() && _isWindowFocused) {
+            ScreenPoint = Input.mousePosition;
 
-        Ray screenCast = Camera.ScreenPointToRay(ScreenPoint);
-        float enter;
-        Plane.Raycast(screenCast, out enter);
-        WorldPoint = screenCast.GetPoint(enter);
+            Ray screenCast = Camera.ScreenPointToRay(ScreenPoint);
+            float enter;
+            Plane.Raycast(screenCast, out enter);
+            WorldPoint = screenCast.GetPoint(enter);
 
-        Vector3 snapped = BoardView.Theme.Snap(WorldPoint);
-        snapped.y = transform.position.y;
-        transform.position = snapped;
+            Vector3 snapped = BoardView.Theme.Snap(WorldPoint);
+            snapped.y = transform.position.y;
+            transform.position = snapped;
 
-        BoardPoint = BoardView.Theme.Vector3ToPoint(snapped);
+            BoardPoint = BoardView.Theme.Vector3ToPoint(snapped);
 
-        TapDown = Input.GetMouseButtonDown(0);
-        TapUp = Input.GetMouseButtonUp(0);
+            TapDown = Input.GetMouseButtonDown(0);
+            TapUp = Input.GetMouseButtonUp(0);
+        }
+    }
+
+    public void OnApplicationFocus(bool hasFocus) {
+        _isWindowFocused = hasFocus;
+    }
+
+    private bool IsMouseOutsideWindow() {
+        return Input.mousePosition.x < 0 || Input.mousePosition.x >= Screen.width &&
+               Input.mousePosition.y < 0 || Input.mousePosition.y >= Screen.height;
     }
 }
