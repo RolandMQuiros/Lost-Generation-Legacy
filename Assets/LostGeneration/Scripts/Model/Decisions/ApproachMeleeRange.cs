@@ -76,7 +76,7 @@ namespace LostGen.Decision {
                 _direction = first.Key;
                 _destination = first.Value;
 
-                _walk.SetDestination(_destination);
+                _walk.Target = _destination;
             }
         }
     }

@@ -57,7 +57,7 @@ public class TestBoardController : MonoBehaviour {
 	// Update is called once per frame
     public void Update () {
         bool move = false;
-	    if (Input.GetKeyDown(KeyCode.UpArrow)) {
+	    /*if (Input.GetKeyDown(KeyCode.UpArrow)) {
             _walk.SetDestination(_combatant.Position + Point.Up);
             move = true;
         } else if (Input.GetKeyDown(KeyCode.RightArrow)) {
@@ -69,9 +69,9 @@ public class TestBoardController : MonoBehaviour {
         } else if (Input.GetKeyDown(KeyCode.LeftArrow)) {
             _walk.SetDestination(_combatant.Position + Point.Left);
             move = true;
-        }
+        }*/
 
-        if (move) {
+        if (Input.GetKeyDown(KeyCode.Space)) {
             _walk.Fire();
             if (!_controller.Step()) {
                 _enemyAI.BeginTurn();

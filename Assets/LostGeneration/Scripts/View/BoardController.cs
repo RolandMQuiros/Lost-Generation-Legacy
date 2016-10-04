@@ -37,6 +37,8 @@ public class BoardController : MonoBehaviour {
     public void Start() {
         _boardView.AttachBoard(Board);
         _combatantManager.Initialize(_characters);
+
+        _combatantManager.OnBeginStep();
     }
 
     public bool Step() {

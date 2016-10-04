@@ -11,23 +11,17 @@ public class RangedSkillController : MonoBehaviour {
     public Sprite AreaOfEffectSprite;
     public bool IsTargeting;
 
-    private bool _isRangeAssigned = false;
-
-    public void BeginStep() {
-        BoardGridField.AddPoints(Skill.GetRange(), RangeSprite);
-    }
-
     public void Update() {
-        /*if (IsTargeting) {
-            if (Skill.Target != Cursor.BoardPoint && Skill.InRange(Cursor.BoardPoint)) {
+        if (IsTargeting) {
+            if (Skill.InRange(Cursor.BoardPoint) && Skill.Target != Cursor.BoardPoint) {
                 Skill.Target = Cursor.BoardPoint;
-                BoardGridField.RemovePoints(Skill.GetAreaOfEffect());
+                BoardGridField.AddPoints(Skill.GetRange(), RangeSprite);
                 BoardGridField.AddPoints(Skill.GetAreaOfEffect(), AreaOfEffectSprite);
 
                 if (Cursor.TapUp) {
                     IsTargeting = false;
                 }
             }
-        }*/
+        }
     }
 }

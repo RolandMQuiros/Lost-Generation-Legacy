@@ -49,7 +49,9 @@ public class CombatantViewManager : MonoBehaviour {
     }
 
     public void OnBeginStep() {
-        StepBegun();
+        if (StepBegun != null) {
+            StepBegun();
+        }
     }
 
     /// <summary>
@@ -96,8 +98,6 @@ public class CombatantViewManager : MonoBehaviour {
             RangedSkillController rangedSkillController = combatantObj.GetComponent<RangedSkillController>();
             rangedSkillController.BoardGridField = _boardGridField;
             rangedSkillController.Cursor = _cursor;
-
-            StepBegun += rangedSkillController.BeginStep;
 
             // TEST
             rangedSkillController.Skill = combatant.GetSkill<WalkSkill>();

@@ -59,14 +59,7 @@ public class BoardGridField : MonoBehaviour {
 
     public void AddPoints(IEnumerable<Point> points, Sprite sprite) {
         foreach (Point point in points) {
-            Sprite currentSprite;
-            _points.TryGetValue(point, out currentSprite);
-            if (currentSprite == null) {
-                _points.Add(point, sprite);
-            } else {
-                currentSprite = sprite;
-            }
-
+            _points[point] = sprite;
             _wasChanged = true;
         }
     }
