@@ -32,7 +32,7 @@ namespace Tests.Skills {
             Point end = new Point(10, 6);
             ArrangeBoard(BoardCommon.GRID_12X8, start, end, out board, out combatant);
 
-            WalkSkill walk = combatant.GetSkill("Walk") as WalkSkill;
+            WalkSkill walk = combatant.GetSkill<WalkSkill>();
 
             Assert.LessOrEqual(walk.ActionPoints, combatant.ActionPoints);
 
@@ -63,7 +63,7 @@ namespace Tests.Skills {
             Point end = new Point(10, 6);
             ArrangeBoard(grid, start, end, out board, out combatant);
 
-            WalkSkill walk = combatant.GetSkill("Walk") as WalkSkill;
+            WalkSkill walk = combatant.GetSkill<WalkSkill>();
 
             Assert.LessOrEqual(walk.ActionPoints, combatant.ActionPoints);
 
@@ -94,7 +94,7 @@ namespace Tests.Skills {
             Point end = new Point(10, 6);
             ArrangeBoard(grid, start, end, out board, out combatant);
 
-            WalkSkill walk = combatant.GetSkill("Walk") as WalkSkill;
+            WalkSkill walk = combatant.GetSkill<WalkSkill>();
 
             Assert.LessOrEqual(walk.ActionPoints, combatant.ActionPoints);
 

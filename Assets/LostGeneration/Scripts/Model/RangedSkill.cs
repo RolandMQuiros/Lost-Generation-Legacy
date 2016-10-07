@@ -13,5 +13,7 @@ namespace LostGen {
 
         public abstract IEnumerable<Point> GetRange();
         public abstract bool InRange(Point point);
+
+        public abstract IEnumerable<Point> GetPath();
     }
 }

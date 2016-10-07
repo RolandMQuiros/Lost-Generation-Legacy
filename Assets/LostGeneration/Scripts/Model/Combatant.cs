@@ -49,7 +49,6 @@ namespace LostGen {
 
         private List<Gear> _gear = new List<Gear>();
         private Dictionary<Type, ISkill> _skills = new Dictionary<Type, ISkill>();
-        private Dictionary<string, ISkill> _aliasedSkills = new Dictionary<string, ISkill>();
         private HashSet<Pawn> _visiblePawns = new HashSet<Pawn>();
         private HashSet<Pawn> _knownPawns = new HashSet<Pawn>();
 
@@ -57,26 +56,22 @@ namespace LostGen {
             : base(name, board, position, footprint, isCollidable, isSolid, isOpaque){
         }
 
-        public void AddSkill(ISkill skill, string alias = null) {
+        public void AddSkill(ISkill skill) {
             _skills.Add(skill.GetType(), skill);
-            if (alias != null) {
-                _aliasedSkills.Add(alias, skill);
-            } else {
-                _aliasedSkills.Add(skill.Name, skill);
-            }
-        }
-
-        public ISkill GetSkill(string alias) {
-            ISkill skill;
-            _aliasedSkills.TryGetValue(alias, out skill);
-
-            return skill;
         }
 
         public T GetSkill<T>() where T : ISkill {
             ISkill skill;
             _skills.TryGetValue(typeof(T), out skill);
             return (T)skill;
+        }
+
+        public IEnumerable<ISkill> GetSkills() {
+            return _skills.Values;
+        }
+
+        public bool HasSkill(ISkill skill) {
+            return _skills.ContainsValue(skill);
         }
 
         public IEnumerable<Pawn> GetKnownPawns() {

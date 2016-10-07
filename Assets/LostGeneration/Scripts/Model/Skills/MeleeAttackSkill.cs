@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace LostGen {
@@ -53,7 +54,7 @@ namespace LostGen {
         }
 
         public override IEnumerable<Point> GetAreaOfEffect(CardinalDirection direction) {
-            return _transforms[direction];
+            return _transforms[direction].Select(point => point + Owner.Position);
         }
 
         public override IEnumerable<Point> GetAreaOfEffect() {

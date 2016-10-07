@@ -7,8 +7,6 @@ public class CombatantViewManager : MonoBehaviour {
     public GameObject CombatantViewPrefab;
     public ICharacterFactory Characters { get; set; }
 
-    public event Action StepBegun;
-
     private const string _PAWN_CHILD_NAME = "_pawnChild";
     private Dictionary<Combatant, CombatantView> _combatantViews = new Dictionary<Combatant, CombatantView>();
     private MessageBuffer _buffer = new MessageBuffer();
@@ -45,12 +43,6 @@ public class CombatantViewManager : MonoBehaviour {
         IEnumerator<Pawn> pawnIter = _boardView.Board.GetPawnIterator();
         while (pawnIter.MoveNext()) {
             OnPawnAdded(pawnIter.Current);
-        }
-    }
-
-    public void OnBeginStep() {
-        if (StepBegun != null) {
-            StepBegun();
         }
     }
 
@@ -94,13 +86,6 @@ public class CombatantViewManager : MonoBehaviour {
             CombatantView combatantView = combatantObj.GetComponent<CombatantView>();
             combatantView.BoardTheme = _boardView.Theme;
             combatantView.Combatant = combatant;
-
-            RangedSkillController rangedSkillController = combatantObj.GetComponent<RangedSkillController>();
-            rangedSkillController.BoardGridField = _boardGridField;
-            rangedSkillController.Cursor = _cursor;
-
-            // TEST
-            rangedSkillController.Skill = combatant.GetSkill<WalkSkill>();
 
             combatant.Messages += _buffer.HandleMessage;
             _combatantViews.Add(combatant, combatantView);

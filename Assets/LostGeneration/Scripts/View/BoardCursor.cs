@@ -10,7 +10,12 @@ public class BoardCursor : MonoBehaviour {
     public Vector3 WorldPoint { get; private set; }
 
     public bool TapDown { get; private set; }
+    public bool TapHeld { get; private set; }
     public bool TapUp { get; private set; }
+
+    public bool DebugTapDown;
+    public bool DebugTapHeld;
+    public bool DebugTapUp;
 
     public Plane Plane { get; private set; }
     public Point BoardPoint { get; private set; }
@@ -39,8 +44,13 @@ public class BoardCursor : MonoBehaviour {
             BoardPoint = BoardView.Theme.Vector3ToPoint(snapped);
 
             TapDown = Input.GetMouseButtonDown(0);
+            TapHeld = Input.GetMouseButton(0);
             TapUp = Input.GetMouseButtonUp(0);
         }
+
+        DebugTapDown = TapDown;
+        DebugTapHeld = TapHeld;
+        DebugTapUp = TapUp;
     }
 
     public void OnApplicationFocus(bool hasFocus) {

@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace LostGen {
     /// <summary>
@@ -31,19 +30,7 @@ namespace LostGen {
             _board = Owner.Board;
         }
 
-        /// <summary>
-        /// Only use this for debugging
-        /// </summary>
-        /// <returns></returns>
-        public Queue<Point> GetPath() {
-            Queue<Point> pointPath = new Queue<Point>();
-            List<Board.Node> nodePath = FindPath();
-            for (int i = 0; i < nodePath.Count; i++) {
-                pointPath.Enqueue(nodePath[i].Point);
-            }
-
-            return pointPath;
-        }
+        #region PointCollections
 
         public override IEnumerable<Point> GetRange() {
             InitializeRange();
@@ -59,11 +46,27 @@ namespace LostGen {
             yield return Target;
         }
 
+        public override IEnumerable<Point> GetPath() {
+            List<Board.Node> nodePath = FindPath();
+            List<Point> path = new List<Point>();
+
+            if (nodePath != null) {
+                for (int i = 0; i < nodePath.Count; i++) {
+                    path.Add(nodePath[i].Point);
+                }
+            }
+
+            return path;
+        }
+
+        #endregion
+
         public override void Fire() {
             MoveAction move = null;
             List<Board.Node> path = FindPath();
 
             if (path != null) {
+                Debug.Log("Repathed");
                 for (int i = 0; i < path.Count; i++) {
                     move = new MoveAction(Owner, path[i].Point, true);
                     Owner.PushAction(move);

@@ -12,34 +12,17 @@ public class BoardController : MonoBehaviour {
         get { return _characters; }
     }
 
+    public event Action<Board> BoardInitialized;
+
     private const string _PAWN_CHILD_NAME = "_pawnChild";
     private const string _GRID_PREFAB_NAME = "BoardGridField";
 
-    private ObjectRecycler _recycler;
     private BoardView _boardView;
     private BoardGridField _boardGridField;
     private CombatantViewManager _combatantManager;
     private ICharacterFactory _characters = new TestCharacterFactory();
     private bool _actionsLeft = false;
     private bool _readyToStep = true;
-
-    public void Awake() {
-        _boardView = GetComponent<BoardView>();
-        _boardGridField = GetComponent<BoardGridField>();
-        _recycler = GetComponent<ObjectRecycler>();
-        _combatantManager = GetComponent<CombatantViewManager>();
-
-        if (!_recycler.IsRegistered(_GRID_PREFAB_NAME)) {
-            throw new ObjectRecycler.NotRegisteredException(_GRID_PREFAB_NAME);
-        }
-    }
-
-    public void Start() {
-        _boardView.AttachBoard(Board);
-        _combatantManager.Initialize(_characters);
-
-        _combatantManager.OnBeginStep();
-    }
 
     public bool Step() {
         if (!_actionsLeft) {
@@ -49,7 +32,6 @@ public class BoardController : MonoBehaviour {
         if (_readyToStep) {
             _boardGridField.ClearPoints();
             _actionsLeft = Board.Step();
-            _combatantManager.OnBeginStep();
         }
 
         _readyToStep = true;
@@ -58,8 +40,27 @@ public class BoardController : MonoBehaviour {
         return _actionsLeft;
     }
 
-    public GameObject GetBoardFieldObject() {
-        return _recycler.Spawn(_GRID_PREFAB_NAME);
+    #region MonoBehaviour
+
+    private void Awake() {
+        _boardView = GetComponent<BoardView>();
+        _boardGridField = GetComponent<BoardGridField>();
+        _combatantManager = GetComponent<CombatantViewManager>();
     }
+
+    private void Start() {
+        _boardView.AttachBoard(Board);
+        _combatantManager.Initialize(_characters);
+
+        // Construction based on BoardTheme here
+
+        if (BoardInitialized != null) {
+            BoardInitialized(Board);
+        }
+
+        Board.BeginTurn();
+    }
+
+    #endregion
 }
 

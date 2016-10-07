@@ -2,12 +2,15 @@
 using System.Collections;
 using LostGen;
 
+public class TestBoardInitializer : MonoBehaviour {
+    public PlayerController PlayerController;
 
-public class TestBoardController : MonoBehaviour {
     private Board _board;
     private BoardController _controller;
     private Combatant _combatant;
     private WalkSkill _walk;
+
+    private CombatantViewManager _combatantViews;
 
     private LostGen.CharacterController _enemyAI;
 
@@ -52,30 +55,7 @@ public class TestBoardController : MonoBehaviour {
 
         _board.AddPawn(_combatant);
         _board.AddPawn(enemy);
-    }
-	
-	// Update is called once per frame
-    public void Update () {
-        bool move = false;
-	    /*if (Input.GetKeyDown(KeyCode.UpArrow)) {
-            _walk.SetDestination(_combatant.Position + Point.Up);
-            move = true;
-        } else if (Input.GetKeyDown(KeyCode.RightArrow)) {
-            _walk.SetDestination(_combatant.Position + Point.Right);
-            move = true;
-        } else if (Input.GetKeyDown(KeyCode.DownArrow)) {
-            _walk.SetDestination(_combatant.Position + Point.Down);
-            move = true;
-        } else if (Input.GetKeyDown(KeyCode.LeftArrow)) {
-            _walk.SetDestination(_combatant.Position + Point.Left);
-            move = true;
-        }*/
 
-        if (Input.GetKeyDown(KeyCode.Space)) {
-            _walk.Fire();
-            if (!_controller.Step()) {
-                _enemyAI.BeginTurn();
-            }
-        }
+        PlayerController.AddCombatant(_combatant);
     }
 }
