@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using LostGen;
 
-[RequireComponent(typeof(TrashMan))]
 public class PlayerSkillTray : MonoBehaviour {
     public SkillButton SkillButtonPrefab;
     public float ButtonSpacing = 32f;
@@ -43,6 +42,8 @@ public class PlayerSkillTray : MonoBehaviour {
             SkillButton skillButton = buttonObj.GetComponent<SkillButton>();
             skillButton.PlayerController = PlayerController;
             skillButton.Skill = skill;
+            
+
             if (skill is RangedSkill) {
                 skillButton.SkillController = RangedSkillController;
             } else if (skill is DirectionalSkill) {

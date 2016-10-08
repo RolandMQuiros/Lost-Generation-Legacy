@@ -3,23 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 using LostGen;
 
-[RequireComponent(typeof(ObjectRecycler))]
 [RequireComponent(typeof(BoardView))]
 [RequireComponent(typeof(CombatantViewManager))]
 public class BoardController : MonoBehaviour {
+    #region UnityFields
+    public BoardGridField BoardGridFieldPrefab;
+    #endregion UnityFields
+
+    #region PublicProperties
     public Board Board { get; set; }
     public ICharacterFactory Characters {
         get { return _characters; }
     }
-
     public event Action<Board> BoardInitialized;
+    #endregion PublicProperties
 
-    private const string _PAWN_CHILD_NAME = "_pawnChild";
-    private const string _GRID_PREFAB_NAME = "BoardGridField";
-
+    #region Components
     private BoardView _boardView;
-    private BoardGridField _boardGridField;
     private CombatantViewManager _combatantManager;
+    #endregion
+
     private ICharacterFactory _characters = new TestCharacterFactory();
     private bool _actionsLeft = false;
     private bool _readyToStep = true;
@@ -30,7 +33,6 @@ public class BoardController : MonoBehaviour {
         }
 
         if (_readyToStep) {
-            _boardGridField.ClearPoints();
             _actionsLeft = Board.Step();
         }
 
@@ -44,7 +46,6 @@ public class BoardController : MonoBehaviour {
 
     private void Awake() {
         _boardView = GetComponent<BoardView>();
-        _boardGridField = GetComponent<BoardGridField>();
         _combatantManager = GetComponent<CombatantViewManager>();
     }
 

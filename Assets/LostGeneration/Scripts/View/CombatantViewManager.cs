@@ -15,18 +15,14 @@ public class CombatantViewManager : MonoBehaviour {
     private BoardGridField _boardGridField;
     private BoardCursor _cursor;
     private Transform _pawnChild;
-    private ObjectRecycler _recycler;
 
-    public void Awake() {
+    #region MonoBehaviour
+    private void Awake() {
         _boardView = GetComponent<BoardView>();
         _boardGridField = GetComponent<BoardGridField>();
-        _recycler = GetComponent<ObjectRecycler>();
-        if (!_recycler.IsRegistered("BoardGridField")) {
-            throw new ObjectRecycler.NotRegisteredException("BoardGridField");
-        }
     }
 
-    public void Start() {
+    private void Start() {
         _pawnChild = transform.FindChild(_PAWN_CHILD_NAME);
         _cursor = GetComponentInChildren<BoardCursor>();
 
@@ -34,6 +30,7 @@ public class CombatantViewManager : MonoBehaviour {
             throw new NullReferenceException("CombatantViewPrefab was not set");
         }
     }
+    #endregion
 
     public void Initialize(ICharacterFactory characters) {
         _boardView.Board.PawnAdded += OnPawnAdded;
@@ -86,6 +83,9 @@ public class CombatantViewManager : MonoBehaviour {
             CombatantView combatantView = combatantObj.GetComponent<CombatantView>();
             combatantView.BoardTheme = _boardView.Theme;
             combatantView.Combatant = combatant;
+
+            BoardGridField gridField = combatantObj.GetComponent<BoardGridField>();
+            gridField.Theme = _boardView.Theme;
 
             combatant.Messages += _buffer.HandleMessage;
             _combatantViews.Add(combatant, combatantView);

@@ -64,7 +64,7 @@ public partial class TrashMan : MonoBehaviour
 		if( cullExcessObjectsInterval > 0 )
 			StartCoroutine( cullExcessObjects() );
 	}
-
+#if UNITY_5_4
     private void OnEnable() {
         SceneManager.sceneLoaded += OnSceneLoad;
     }
@@ -72,16 +72,17 @@ public partial class TrashMan : MonoBehaviour
     private void OnDisable() {
         SceneManager.sceneLoaded -= OnSceneLoad;
     }
-
-    private void OnSceneLoad(Scene scene, LoadSceneMode mode)
-    {
-		for( var i = recycleBinCollection.Count - 1; i >= 0; i-- )
-		{
-			if( !recycleBinCollection[i].persistBetweenScenes )
-				removeRecycleBin( recycleBinCollection[i] );
-		}
-	}
-
+#else
+    private void OnLevelWasLoaded() {
+        OnSceneLoad(SceneManager.GetActiveScene(), LoadSceneMode.Single);
+    }
+#endif
+    private void OnSceneLoad(Scene scene, LoadSceneMode mode) {
+        for (var i = recycleBinCollection.Count - 1; i >= 0; i--) {
+            if (!recycleBinCollection[i].persistBetweenScenes)
+                removeRecycleBin(recycleBinCollection[i]);
+        }
+    }
 
 	private void OnApplicationQuit()
 	{
@@ -145,7 +146,7 @@ public partial class TrashMan : MonoBehaviour
 			{
 				var newTransform = newGo.transform;
 
-#if UNITY_4_6 || UNITY_5_0
+#if UNITY_4_6 || UNITY_5_0 || UNITY_5_3
                 if (newTransform as RectTransform)
                     newTransform.SetParent(null, false);
                 else

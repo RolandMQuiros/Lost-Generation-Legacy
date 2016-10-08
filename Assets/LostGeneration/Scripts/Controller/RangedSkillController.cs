@@ -12,11 +12,6 @@ public class RangedSkillController : MonoBehaviour, ISkillController {
     }
 
     public BoardCursor Cursor;
-    public BoardGridField BoardGridField;
-    public Sprite RangeSprite;
-    public Sprite AreaOfEffectSprite;
-    public Sprite PathSprite;
-
     public bool DebugIsTargeting;
 
     private RangedSkill _skill;
@@ -26,11 +21,13 @@ public class RangedSkillController : MonoBehaviour, ISkillController {
     public void StartTargeting() {
         _isTargeting = true;
         _initialTargeting = true;
+        _skill.IsReadyToFire = false;
     }
 
     public void CancelTargeting() {
         _isTargeting = false;
         _initialTargeting = false;
+        _skill.IsReadyToFire = false;
     }
 
     private void Update() {
@@ -39,20 +36,11 @@ public class RangedSkillController : MonoBehaviour, ISkillController {
                 if (Cursor.TapDown) {
                     _isTargeting = false;
                     _initialTargeting = false;
-                    BoardGridField.ClearPoints();
+                    _skill.IsReadyToFire = true;
                 }
 
                 if (_initialTargeting || _skill.Target != Cursor.BoardPoint) {
                     _skill.Target = Cursor.BoardPoint;
-                    IEnumerable<Point> range = _skill.GetRange();
-                    IEnumerable<Point> areaOfEffect = _skill.GetAreaOfEffect();
-                    IEnumerable<Point> path = _skill.GetPath();
-
-                    BoardGridField.ClearPoints();
-                    BoardGridField.AddPoints(range, RangeSprite);
-                    BoardGridField.AddPoints(areaOfEffect, AreaOfEffectSprite);
-                    BoardGridField.AddPoints(path, PathSprite);
-
                     _initialTargeting = false;
                 }
             }

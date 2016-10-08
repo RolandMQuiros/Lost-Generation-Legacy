@@ -43,6 +43,14 @@ namespace LostGen {
             return X == other.X && Y == other.Y;
         }
 
+        public override bool Equals(object obj) {
+            return Equals((Point)obj);
+        }
+
+        public override int GetHashCode() {
+            return base.GetHashCode();
+        }
+
         public static double Distance(Point start, Point end) {
             Point offset = end - start;
 

@@ -4,53 +4,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using LostGen;
 
-[RequireComponent(typeof(BoardView))]
 [RequireComponent(typeof(MeshFilter))]
 public class BoardGridField : MonoBehaviour {
     public float Offset = 0.1f;
+    public BoardTheme Theme;
 
-    private BoardView _boardView;
     private MeshFilter _meshFilter;
     private Dictionary<Point, Sprite> _points = new Dictionary<Point, Sprite>();
     private bool _wasChanged = true;
 
-    public void Awake() {
-        _boardView = GetComponent<BoardView>();
+    #region MonoBehaviour
+    private void Awake() {
         _meshFilter = GetComponent<MeshFilter>();
     }
 
-    public void Start() {
-        _boardView = _boardView ?? GetComponentInParent<BoardView>();
-    }
-
-    public void LateUpdate() {
+    private void LateUpdate() {
         if (_wasChanged) {
             RebuildMesh();
             _wasChanged = false;
             //DebugPrint();
         }
 	}
-
-    private void DebugPrint() {
-        string boardPrint = string.Empty;
-        for (int y = 0; y < _boardView.Board.Height; y++) {
-            string line = string.Empty;
-            for (int x = 0; x < _boardView.Board.Width; x++) {
-                Point p = new Point(x, y);
-                if (_points.ContainsKey(p)) {
-                    line += '╬';
-                } else {
-                    switch (_boardView.Board.GetTile(p)) {
-                        case Board.WALL_TILE: line += '█'; break;
-                        case Board.FLOOR_TILE: line += '░'; break;
-                    }
-                }
-            }
-            boardPrint += line + '\n';
-        }
-
-        Debug.Log(boardPrint);
-    }
+    #endregion MonoBehaviour
 
     public void AddPoint(Point point, Sprite sprite) {
         _points.Add(point, sprite);
@@ -86,16 +61,16 @@ public class BoardGridField : MonoBehaviour {
 
         int triangleOffset = 0;
 
-        float halfWidth = _boardView.Theme.TileWidth / 2f;
-        float halfHeight = _boardView.Theme.TileHeight / 2f;
+        float halfWidth = Theme.TileWidth / 2f;
+        float halfHeight = Theme.TileHeight / 2f;
 
-        Vector3 up = _boardView.Theme.PointToVector3(Point.Up) * halfHeight + (Vector3.up * Offset);
-        Vector3 left = _boardView.Theme.PointToVector3(Point.Left) * halfWidth + (Vector3.up * Offset);
-        Vector3 down = _boardView.Theme.PointToVector3(Point.Down) * halfHeight + (Vector3.up * Offset);
-        Vector3 right = _boardView.Theme.PointToVector3(Point.Right) * halfWidth + (Vector3.up * Offset);
+        Vector3 up = Theme.PointToVector3(Point.Up) * halfHeight + (Vector3.up * Offset);
+        Vector3 left = Theme.PointToVector3(Point.Left) * halfWidth + (Vector3.up * Offset);
+        Vector3 down = Theme.PointToVector3(Point.Down) * halfHeight + (Vector3.up * Offset);
+        Vector3 right = Theme.PointToVector3(Point.Right) * halfWidth + (Vector3.up * Offset);
 
         foreach (KeyValuePair<Point, Sprite> pointSprite in _points) {
-            Vector3 center = _boardView.Theme.PointToVector3(pointSprite.Key);
+            Vector3 center = Theme.PointToVector3(pointSprite.Key);
             Vector3 upperLeft = center + up + left;
             Vector3 bottomLeft = center + down + left;
             Vector3 bottomRight = center + down + right;

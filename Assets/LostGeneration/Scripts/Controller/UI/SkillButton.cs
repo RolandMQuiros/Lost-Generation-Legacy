@@ -17,6 +17,6 @@ public class SkillButton : MonoBehaviour {
     public void OnOtherClick() {
         SkillController.Skill = null;
         SkillController.CancelTargeting();
-        PlayerController.ClearActiveSkill(Skill.Owner);
+        PlayerController.ClearActiveSkill((Combatant)Skill.Owner);
     }
 }

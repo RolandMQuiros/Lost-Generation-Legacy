@@ -3,14 +3,12 @@ using System;
 using System.Collections.Generic;
 using LostGen;
 
-[RequireComponent(typeof(ObjectRecycler))]
 public class BoardView : MonoBehaviour {
     public BoardTheme Theme;
     public Board Board { get; private set; }
     public Plane Plane { get; private set; }
 
-    private const string _TILE_CHILD_NAME = "_tileChild";
-    private const string _GRID_PREFAB_NAME = "BoardGridField";
+    private const string _TILE_CHILD_NAME = "_tiles";
     private GameObject _tileChild;
 
     public void Start() {

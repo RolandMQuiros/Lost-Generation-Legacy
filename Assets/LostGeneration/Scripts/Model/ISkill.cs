@@ -19,6 +19,9 @@ namespace LostGen {
         Combatant Owner { get; }
         /// <summary>The number of Action Points this Skill will consume when fired</summary>
         int ActionPoints { get; }
+        /// <summary>If this Skill is ready to Fire</summary>
+        bool IsReadyToFire { get; }
+        bool IsActiveSkill { get; }
 
         /// <summary>
         /// Generates this Skill's Actions and pushes them onto the owning Combatant's Action queue,

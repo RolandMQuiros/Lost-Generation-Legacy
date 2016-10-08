@@ -9,6 +9,12 @@ namespace LostGen {
         public string Name { get; private set; }
         public string Description { get; private set; }
         public virtual int ActionPoints { get; set; }
+        public bool IsReadyToFire { get; set; }
+        public bool IsActiveSkill {
+            get {
+                return Owner.ActiveSkill == this;
+            }
+        }
 
         public AreaOfEffectSkill(Combatant owner, string name, string description) {
             Owner = owner;

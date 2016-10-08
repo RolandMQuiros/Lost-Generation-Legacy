@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using LostGen;
 
+[RequireComponent(typeof(RangedSkillController))]
+[RequireComponent(typeof(DirectionalSkillController))]
 public class PlayerController : MonoBehaviour, IPawnController {
     public BoardController BoardController;
     public PlayerSkillTray SkillTray;
@@ -13,7 +15,6 @@ public class PlayerController : MonoBehaviour, IPawnController {
 
     private List<Combatant> _units = new List<Combatant>();
     private int _activeUnit;
-    private Dictionary<Combatant, ISkill> _activeSkills = new Dictionary<Combatant, ISkill>();
 
     private RangedSkillController _rangedSkillController;
     private DirectionalSkillController _directionalSkillController;
@@ -42,8 +43,8 @@ public class PlayerController : MonoBehaviour, IPawnController {
     #endregion
 
     public void BeginTurn() {
-        foreach (ISkill skill in _activeSkills.Values) {
-            skill.Fire();
+        for (int i = 0; i < _units.Count; i++) {
+            _units[i].ActiveSkill.Fire();
         }
     }
 
@@ -60,16 +61,17 @@ public class PlayerController : MonoBehaviour, IPawnController {
     }
 
     public void SetActiveSkill(ISkill skill) {
-        _activeSkills[skill.Owner] = skill;
+        skill.Owner.ActiveSkill = skill;
 
         IsReady = true;
         for (int i = 0; i < _units.Count; i++) {
-            IsReady &= (_activeSkills.ContainsKey(_units[i]));
+            ISkill activeSkill = _units[i].ActiveSkill;
+            IsReady &= activeSkill != null && activeSkill.IsReadyToFire;
         }
     }
 
     public void ClearActiveSkill(Combatant combatant) {
-        _activeSkills.Remove(combatant);
+        combatant.ActiveSkill = null;
         IsReady = false;
     }
 }

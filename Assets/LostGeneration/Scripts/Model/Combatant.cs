@@ -37,6 +37,17 @@ namespace LostGen {
             }
         }
 
+        public ISkill ActiveSkill {
+            get { return _activeSkill; }
+            set {
+                if (value == null || _skills.ContainsValue(value)) {
+                    _activeSkill = value;
+                } else {
+                    throw new KeyNotFoundException("Skill " + value + " was not assigned to this Combatant");
+                }
+            }
+        }
+
         public int ActionPoints { get { return _actionPoints; } }
 
         public Team Team;
@@ -51,6 +62,7 @@ namespace LostGen {
         private Dictionary<Type, ISkill> _skills = new Dictionary<Type, ISkill>();
         private HashSet<Pawn> _visiblePawns = new HashSet<Pawn>();
         private HashSet<Pawn> _knownPawns = new HashSet<Pawn>();
+        private ISkill _activeSkill;
 
         public Combatant(string name, Board board, Point position, bool isOpaque = true, IEnumerable<Point> footprint = null, bool isCollidable = true, bool isSolid = true)
             : base(name, board, position, footprint, isCollidable, isSolid, isOpaque){
@@ -58,6 +70,17 @@ namespace LostGen {
 
         public void AddSkill(ISkill skill) {
             _skills.Add(skill.GetType(), skill);
+        }
+
+        public void SetActiveSkill<T>() where T : ISkill {
+            ISkill skill;
+            _skills.TryGetValue(typeof(T), out skill);
+
+            if (skill == null) {
+                throw new KeyNotFoundException("Combatant " + ToString() + " does not have a Skill of type " + typeof(T));
+            }
+
+            _activeSkill = skill;
         }
 
         public T GetSkill<T>() where T : ISkill {

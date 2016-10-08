@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LostGen;
 
+[RequireComponent(typeof(BoardGridField))]
 public class CombatantView : MonoBehaviour {
     public bool AreMessagesFinished {
         get { return _messages.Count > 0; }
@@ -10,8 +11,6 @@ public class CombatantView : MonoBehaviour {
     public Combatant Combatant;
     public BoardTheme BoardTheme;
 
-    private Animator _animator;
-    private MeshFilter _meshFilter;
     private Queue<MessageArgs> _messages = new Queue<MessageArgs>();
     private MessageArgs _currentMessage;
 
@@ -22,14 +21,8 @@ public class CombatantView : MonoBehaviour {
     private Vector3 _moveStart, _moveEnd;
     private float _hurtTimer = 0f;
 
-    // Use this for initialization
-    public void Awake () {
-        _animator = GetComponent<Animator>();
-        _meshFilter = GetComponent<MeshFilter>();
-	}
-	
-	// Update is called once per frame
-	public void Update () {
+    #region MonoBehaviour
+    private void Update () {
         CheckState();
         switch (_state) {
             case State.Moving:
@@ -40,6 +33,7 @@ public class CombatantView : MonoBehaviour {
                 break;
         }
 	}
+    #endregion MonoBehaviour
 
     public void OnMessage(MessageArgs message) {
         if (message.Source == Combatant || message.Target == Combatant) {
