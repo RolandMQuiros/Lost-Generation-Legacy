@@ -155,21 +155,23 @@ namespace LostGen {
             Point difference = p2 - p1;
 
             CardinalDirection direction = CardinalDirection.South;
+            int scalarY = Math.Abs(difference.Y);
+
             if (difference.Y >= 0) {
-                if (difference.X > difference.Y) {
+                if (difference.X > scalarY) {
                     direction = CardinalDirection.West;
-                } else if (difference.X <= difference.Y && difference.X >= -difference.Y) {
+                } else if (difference.X <= scalarY && difference.X >= -scalarY) {
                     direction = CardinalDirection.South;
-                } else if (difference.X < -difference.Y) {
+                } else if (difference.X < -scalarY) {
                     direction = CardinalDirection.East;
                 }
             } else {
-                if (difference.X > -difference.Y) {
-                    direction = CardinalDirection.West;
-                } else if (difference.X <= -difference.Y && difference.X >= difference.Y) {
-                    direction = CardinalDirection.North;
-                } else if (difference.X < difference.Y) {
+                if (difference.X > scalarY) {
                     direction = CardinalDirection.East;
+                } else if (difference.X <= scalarY && difference.X >= -scalarY) {
+                    direction = CardinalDirection.North;
+                } else if (difference.X < -scalarY) {
+                    direction = CardinalDirection.West;
                 }
             }
 

@@ -36,7 +36,7 @@ public class PlayerSkillTray : MonoBehaviour {
         foreach (ISkill skill in Combatant.GetSkills()) {
             GameObject buttonObj = TrashMan.spawn(SkillButtonPrefab.gameObject);
 
-            buttonObj.transform.parent = transform;
+            buttonObj.transform.SetParent(transform);
             buttonObj.transform.localPosition = new Vector3(ButtonSpacing * buttonCount++, 0f, 0f);
 
             SkillButton skillButton = buttonObj.GetComponent<SkillButton>();

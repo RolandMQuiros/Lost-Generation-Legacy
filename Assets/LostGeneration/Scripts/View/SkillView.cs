@@ -3,16 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using LostGen;
 
-[RequireComponent(typeof(BoardGridField))]
 public class SkillView : MonoBehaviour {
-    public ISkill Skill {
-        get { return _skill; }
-        set {
-            _skill = value;
-            _oldTarget = null;
-            _oldDirection = null;
-        }
-    }
+    public Combatant Combatant;
 
     #region EditorFields
     public Sprite RangeSprite;
@@ -20,49 +12,60 @@ public class SkillView : MonoBehaviour {
     public Sprite PathSprite;
     #endregion EditorFields
 
-    #region Components
+    #region References
     private BoardGridField _gridField;
-    #endregion Components
+    #endregion References
 
-    private ISkill _skill;
-    private Point? _oldTarget;
-    private CardinalDirection? _oldDirection;
-
-    #region MonoBehaviour
-    private void Awake() {
-        _gridField = GetComponent<BoardGridField>();
+    private Point? _oldTarget = null;
+    private CardinalDirection? _oldDirection = null;
+    private bool _wasReadyToFire = false;
+      
+    public void Initialize(BoardGridField gridField) {
+        _gridField = gridField;
     }
-
-    private void LateUpdate() {
-        if (Skill.IsActiveSkill) {
-
-        }
-    }
-    #endregion MonoBehaviour
-
+    
     public void BuildGridField() {
-        RangedSkill ranged;
-        DirectionalSkill directional;
-        if ((ranged = _skill as RangedSkill) != null) {
-            if (_oldTarget == null || _oldTarget.Value != ranged.Target) {
-                _gridField.ClearPoints();
+        if (Combatant != null) {
+            RangedSkill ranged;
+            DirectionalSkill directional;
+            if ((ranged = Combatant.ActiveSkill as RangedSkill) != null) {
+                if (!_oldTarget.HasValue || _oldTarget.Value != ranged.Target || _wasReadyToFire) {
+                    _gridField.ClearPoints();
 
-                if (!ranged.IsReadyToFire) {
-                    _gridField.AddPoints(ranged.GetRange(), RangeSprite);
+                    if (!ranged.IsReadyToFire) {
+                        _gridField.AddPoints(ranged.GetRange(), RangeSprite);
+                    }
+
+                    _gridField.AddPoints(ranged.GetPath(), PathSprite);
+                    _gridField.AddPoints(ranged.GetAreaOfEffect(), AreaOfEffectSprite);
+                    _gridField.RebuildMesh();
+
+                    _wasReadyToFire = ranged.IsReadyToFire;
+                    _oldTarget = ranged.Target;
                 }
+            } else if ((directional = Combatant.ActiveSkill as DirectionalSkill) != null) {
+                if (!_oldDirection.HasValue || _oldDirection.Value != directional.Direction) {
+                    _gridField.ClearPoints();
+                    _gridField.AddPoints(directional.GetAreaOfEffect(directional.Direction), AreaOfEffectSprite);
+                    _gridField.RebuildMesh();
 
-                _gridField.AddPoints(ranged.GetAreaOfEffect(), AreaOfEffectSprite);
-                _gridField.AddPoints(ranged.GetPath(), PathSprite);
+                    _oldDirection = directional.Direction;
+                }
             }
-        } else if ((directional = _skill as DirectionalSkill) != null) {
-            if (_oldDirection == null || _oldDirection.Value != directional.Direction) {
-                _gridField.ClearPoints();
-                _gridField.AddPoints(directional.GetAreaOfEffect(), AreaOfEffectSprite);
-            }
+        } else {
+            throw new NullReferenceException("No Combatant was assigned to this SkillView");
         }
     }
 
     public void Clear() {
         _gridField.ClearPoints();
     }
+
+    #region MonoBehaviour
+    private void LateUpdate() {
+        if (Combatant.ActiveSkill != null) {
+            BuildGridField();
+        }
+    }
+    #endregion MonoBehaviour
 }

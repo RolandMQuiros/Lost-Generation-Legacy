@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using LostGen;
 
-[RequireComponent(typeof(BoardGridField))]
 public class CombatantView : MonoBehaviour {
     public bool AreMessagesFinished {
         get { return _messages.Count > 0; }
     }
-    public Combatant Combatant;
-    public BoardTheme BoardTheme;
+    
+    private Combatant _combatant;
+    private BoardTheme _boardTheme;
 
     private Queue<MessageArgs> _messages = new Queue<MessageArgs>();
     private MessageArgs _currentMessage;
@@ -20,9 +20,20 @@ public class CombatantView : MonoBehaviour {
     private State _state;
     private Vector3 _moveStart, _moveEnd;
     private float _hurtTimer = 0f;
+    
+    public void Initialize(Combatant combatant, BoardTheme theme) {
+        _combatant = combatant;
+        _boardTheme = theme;
+    }
+
+    public void OnMessage(MessageArgs message) {
+        if (message.Source == _combatant || message.Target == _combatant) {
+            _messages.Enqueue(message);
+        }
+    }
 
     #region MonoBehaviour
-    private void Update () {
+    private void Update() {
         CheckState();
         switch (_state) {
             case State.Moving:
@@ -32,15 +43,10 @@ public class CombatantView : MonoBehaviour {
                 HurtUpdate();
                 break;
         }
-	}
+    }
     #endregion MonoBehaviour
 
-    public void OnMessage(MessageArgs message) {
-        if (message.Source == Combatant || message.Target == Combatant) {
-            _messages.Enqueue(message);
-        }
-    }
-
+    #region PrivateMethods
     private bool CheckState() {
         bool stateChanged = false;
         if (_currentMessage == null && _messages.Count > 0) {
@@ -48,7 +54,7 @@ public class CombatantView : MonoBehaviour {
             _currentMessage = _messages.Dequeue();
             _state = State.Idle;
 
-            if (_currentMessage.Source == Combatant) {
+            if (_currentMessage.Source == _combatant) {
                 MoveAction.Message move = _currentMessage as MoveAction.Message;
                 DamageMessage damage = _currentMessage as DamageMessage;
                 if (move != null) {
@@ -66,8 +72,8 @@ public class CombatantView : MonoBehaviour {
 
     private void OnMove(MoveAction.Message move) {
         _state = State.Moving;
-        _moveStart = BoardTheme.PointToVector3(move.From);
-        _moveEnd = BoardTheme.PointToVector3(move.To);
+        _moveStart = _boardTheme.PointToVector3(move.From);
+        _moveEnd = _boardTheme.PointToVector3(move.To);
 
         transform.position = _moveStart;
     }
@@ -90,4 +96,5 @@ public class CombatantView : MonoBehaviour {
             _currentMessage = null;
         }
     }
+    #endregion PrivateMethods
 }

@@ -64,7 +64,7 @@ public partial class TrashMan : MonoBehaviour
 		if( cullExcessObjectsInterval > 0 )
 			StartCoroutine( cullExcessObjects() );
 	}
-#if UNITY_5_4
+#if UNITY_5
     private void OnEnable() {
         SceneManager.sceneLoaded += OnSceneLoad;
     }
@@ -136,7 +136,7 @@ public partial class TrashMan : MonoBehaviour
 	/// internal method that actually does the work of grabbing the item from the bin and returning it
 	/// </summary>
 	/// <param name="gameObjectInstanceId">Game object instance identifier.</param>
-	private static GameObject spawn( int gameObjectInstanceId, Vector3 position, Quaternion rotation )
+	private static GameObject spawn( int gameObjectInstanceId, Vector3 position, Quaternion rotation, Transform parent )
 	{
 		if( instance._instanceIdToRecycleBin.ContainsKey( gameObjectInstanceId ) )
 		{
@@ -145,13 +145,7 @@ public partial class TrashMan : MonoBehaviour
 			if( newGo != null )
 			{
 				var newTransform = newGo.transform;
-
-#if UNITY_4_6 || UNITY_5_0 || UNITY_5_3
-                if (newTransform as RectTransform)
-                    newTransform.SetParent(null, false);
-                else
-#endif
-				    newTransform.parent = null;
+                newTransform.SetParent(parent, false);
 
 				newTransform.position = position;
 				newTransform.rotation = rotation;
@@ -227,23 +221,17 @@ public partial class TrashMan : MonoBehaviour
 	/// pulls an object out of the recycle bin
 	/// </summary>
 	/// <param name="go">Go.</param>
-	public static GameObject spawn( GameObject go, Vector3 position = default( Vector3 ), Quaternion rotation = default( Quaternion ) )
+	public static GameObject spawn( GameObject go, Vector3 position = default( Vector3 ), Quaternion rotation = default( Quaternion ), Transform parent = null)
 	{
 		if( instance._instanceIdToRecycleBin.ContainsKey( go.GetInstanceID() ) )
 		{
-			return spawn( go.GetInstanceID(), position, rotation );
+			return spawn( go.GetInstanceID(), position, rotation, parent );
 		}
 		else
 		{
-			Debug.LogWarning( "attempted to spawn go (" + go.name + ") but there is no recycle bin setup for it. Falling back to Instantiate" );
+			Debug.Log( "attempted to spawn go (" + go.name + ") but there is no recycle bin setup for it. Falling back to Instantiate" );
 			var newGo = GameObject.Instantiate( go, position, rotation ) as GameObject;
-
-#if UNITY_4_6 || UNITY_5_0
-            if (newGo.transform as RectTransform != null)
-                newGo.transform.SetParent(null, false);
-            else
-#endif
-			    newGo.transform.parent = null;
+            newGo.transform.SetParent(parent, false);
 
 			return newGo;
 		}
@@ -253,12 +241,12 @@ public partial class TrashMan : MonoBehaviour
 	/// <summary>
 	/// pulls an object out of the recycle bin using the bin's name
 	/// </summary>
-	public static GameObject spawn( string gameObjectName, Vector3 position = default( Vector3 ), Quaternion rotation = default( Quaternion ) )
+	public static GameObject spawn( string gameObjectName, Vector3 position = default( Vector3 ), Quaternion rotation = default( Quaternion ), Transform parent = null )
 	{
 		int instanceId = -1;
 		if( instance._poolNameToInstanceId.TryGetValue( gameObjectName, out instanceId ) )
 		{
-			return spawn( instanceId, position, rotation );
+			return spawn( instanceId, position, rotation, parent );
 		}
 		else
 		{
@@ -285,13 +273,7 @@ public partial class TrashMan : MonoBehaviour
 		else
 		{
 			instance._instanceIdToRecycleBin[instance._poolNameToInstanceId[goName]].despawn( go );
-
-#if UNITY_4_6 || UNITY_5_0
-            if (go.transform as RectTransform != null)
-                go.transform.SetParent(instance.transform, false);
-            else
-#endif
-                go.transform.parent = instance.transform;
+            go.transform.SetParent(instance.transform, false);
 		}
 	}
 

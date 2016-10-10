@@ -6,12 +6,10 @@ using LostGen;
 
 [RequireComponent(typeof(RangedSkillController))]
 [RequireComponent(typeof(DirectionalSkillController))]
-public class PlayerController : MonoBehaviour, IPawnController {
-    public BoardController BoardController;
+public class PlayerController : MonoBehaviour {
     public PlayerSkillTray SkillTray;
 
     public bool IsReady = false;
-    public event Action<IPawnController> Ready;
 
     private List<Combatant> _units = new List<Combatant>();
     private int _activeUnit;

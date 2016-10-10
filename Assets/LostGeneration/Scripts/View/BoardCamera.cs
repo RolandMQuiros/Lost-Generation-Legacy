@@ -4,8 +4,10 @@ using UnityEngine;
 using LostGen;
 
 public class BoardCamera : MonoBehaviour {
+    #region UnityFields
     public Camera Camera;
-    public BoardView BoardView;
+    public float PlaneOffset;
+    #endregion
 
     #region MotionDefs
     private abstract class Motion {
@@ -29,7 +31,7 @@ public class BoardCamera : MonoBehaviour {
     private class PanMotion : Motion {
         private Vector3 _target;
 
-        public PanMotion(Transform pivot, Plane boardPlane, Vector3 target, float duration)
+        public PanMotion(Transform pivot, Vector3 target, float duration)
             : base(null, pivot, duration) {
             _target = target;
         }
@@ -84,6 +86,8 @@ public class BoardCamera : MonoBehaviour {
     }
     #endregion
 
+    private BoardTheme _theme;
+
     private Queue<Motion> _motions = new Queue<Motion>();
     private Motion _currentMotion;
 
@@ -93,17 +97,17 @@ public class BoardCamera : MonoBehaviour {
     private float _timer;
     private float _zoom = 1f;
 
-    public void Awake() {
-        Camera = Camera ?? GetComponentInChildren<Camera>() ?? Camera.main;
+    public void Initialize(BoardTheme theme) {
+        _theme = theme;
     }
 
-    public void Start() {
-        BoardView = BoardView ?? GetComponentInParent<BoardView>();
+    #region MonoBehaviour
+    private void Start() {
         _originalOffset = Camera.transform.localPosition;
         _directionToCamera = _originalOffset.normalized;
     }
 
-    public void Update() {
+    private void Update() {
         if (_currentMotion != null) {
             if (_currentMotion.Update(Time.deltaTime)) {
                 _currentMotion.End();
@@ -113,20 +117,28 @@ public class BoardCamera : MonoBehaviour {
             }
         }
     }
+    #endregion MonoBehaviour
+
+    #region MotionMethods
+    public void CancelPan() {
+        if (_currentMotion != null && _currentMotion is PanMotion) {
+            _currentMotion = null;
+        }
+    }
 
     public void Pan(Point point, float duration) {
-        Vector3 end = BoardView.Theme.PointToVector3(point);
+        Vector3 end = _theme.PointToVector3(point);
 
         if (_currentMotion != null && !(_currentMotion is PanMotion)) {
             _currentMotion.End();
         }
-        _currentMotion = new PanMotion(transform, BoardView.Plane, end, duration);
+        _currentMotion = new PanMotion(transform, end, duration);
         _motions.Clear();
     }
 
     public void AddPan(Point point, float duration) {
-        Vector3 end = BoardView.Theme.PointToVector3(point);
-        _motions.Enqueue(new PanMotion(transform, BoardView.Plane, end, duration));
+        Vector3 end = _theme.PointToVector3(point);
+        _motions.Enqueue(new PanMotion(transform, end, duration));
     }
 
     public void Zoom(float scale, float duration) {
@@ -153,4 +165,6 @@ public class BoardCamera : MonoBehaviour {
     public void AddRotate(float angle, float duration) {
         _motions.Enqueue(new RotateMotion(transform, angle, duration));
     }
+
+    #endregion MotionMethods
 }

@@ -4,13 +4,6 @@ using UnityEngine;
 using LostGen;
 
 public class RangedSkillController : MonoBehaviour, ISkillController {
-    public ISkill Skill {
-        get { return _skill; }
-        set {
-            _skill = (RangedSkill)value;
-        }
-    }
-
     public BoardCursor Cursor;
     public bool DebugIsTargeting;
 
@@ -18,7 +11,8 @@ public class RangedSkillController : MonoBehaviour, ISkillController {
     private bool _isTargeting = false;
     private bool _initialTargeting = false;
 
-    public void StartTargeting() {
+    public void StartTargeting(ISkill skill) {
+        _skill = (RangedSkill)skill;
         _isTargeting = true;
         _initialTargeting = true;
         _skill.IsReadyToFire = false;
@@ -27,11 +21,16 @@ public class RangedSkillController : MonoBehaviour, ISkillController {
     public void CancelTargeting() {
         _isTargeting = false;
         _initialTargeting = false;
-        _skill.IsReadyToFire = false;
+
+        if (_skill != null) {
+            _skill.IsReadyToFire = false;
+        }
+
+        _skill = null;
     }
 
     private void Update() {
-        if (_isTargeting) {
+        if (_skill != null && _isTargeting) {
             if (_skill.InRange(Cursor.BoardPoint)) {
                 if (Cursor.TapDown) {
                     _isTargeting = false;

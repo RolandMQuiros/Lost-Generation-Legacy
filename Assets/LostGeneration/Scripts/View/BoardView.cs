@@ -1,22 +1,19 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
 using LostGen;
 
 public class BoardView : MonoBehaviour {
-    public BoardTheme Theme;
-    public Board Board { get; private set; }
-    public Plane Plane { get; private set; }
-
     private const string _TILE_CHILD_NAME = "_tiles";
     private GameObject _tileChild;
 
-    public void Start() {
-        Plane = new Plane(Vector3.up, transform.position.y);
-    }
+    private Board _board;
+    private BoardTheme _theme;
 
-    public void AttachBoard(Board board) {
-        Board = board;
+    public void Initialize(Board board, BoardTheme theme) {
+        _board = board;
+        _theme = theme;
         RebuildBoard();
     }
 
@@ -28,18 +25,18 @@ public class BoardView : MonoBehaviour {
         _tileChild = new GameObject(_TILE_CHILD_NAME);
         _tileChild.transform.SetParent(transform);
 
-        for (int y = 0; y < Board.Height; y++) {
-            for (int x = 0; x < Board.Width; x++) {
+        for (int y = 0; y < _board.Height; y++) {
+            for (int x = 0; x < _board.Width; x++) {
                 GameObject newTile;
-                Vector3 position = Theme.PointToVector3(new Point(x, y));
-                switch (Board.GetTile(x, y)) {
+                Vector3 position = _theme.PointToVector3(new Point(x, y));
+                switch (_board.GetTile(x, y)) {
                     case Board.FLOOR_TILE:
-                        newTile = GameObject.Instantiate(Theme.FloorTile);
+                        newTile = GameObject.Instantiate(_theme.FloorTile);
                         newTile.transform.SetParent(_tileChild.transform);
                         newTile.transform.position = position;
                         break;
                     case Board.WALL_TILE:
-                        newTile = GetBoardTile(Theme.WallTile, new Point(x, y), Board.WALL_TILE);
+                        newTile = GetBoardTile(_theme.WallTile, new Point(x, y), Board.WALL_TILE);
                         newTile.transform.SetParent(_tileChild.transform);
                         newTile.transform.position = position;
                         break;
@@ -47,13 +44,13 @@ public class BoardView : MonoBehaviour {
             }
         }
     }
-
+    
     private GameObject GetBoardTile(AutoTile autoTile, Point point, int tile) {
         return autoTile.GetTile(
-            !Board.InBounds(point + Point.Right) || Board.GetTile(point + Point.Right) == tile,
-            !Board.InBounds(point + Point.Down) || Board.GetTile(point + Point.Down) == tile,
-            !Board.InBounds(point + Point.Left) || Board.GetTile(point + Point.Left) == tile,
-            !Board.InBounds(point + Point.Up) || Board.GetTile(point + Point.Up) == tile
+            !_board.InBounds(point + Point.Right) || _board.GetTile(point + Point.Right) == tile,
+            !_board.InBounds(point + Point.Down) || _board.GetTile(point + Point.Down) == tile,
+            !_board.InBounds(point + Point.Left) || _board.GetTile(point + Point.Left) == tile,
+            !_board.InBounds(point + Point.Up) || _board.GetTile(point + Point.Up) == tile
         );
     }
 }

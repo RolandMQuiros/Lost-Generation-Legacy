@@ -4,40 +4,41 @@ using UnityEngine;
 using LostGen;
 
 public class CombatantViewManager : MonoBehaviour {
-    public GameObject CombatantViewPrefab;
-    public ICharacterFactory Characters { get; set; }
-
-    private const string _PAWN_CHILD_NAME = "_pawnChild";
-    private Dictionary<Combatant, CombatantView> _combatantViews = new Dictionary<Combatant, CombatantView>();
-    private MessageBuffer _buffer = new MessageBuffer();
-
-    private BoardView _boardView;
-    private BoardGridField _boardGridField;
-    private BoardCursor _cursor;
-    private Transform _pawnChild;
-
-    #region MonoBehaviour
-    private void Awake() {
-        _boardView = GetComponent<BoardView>();
-        _boardGridField = GetComponent<BoardGridField>();
-    }
-
-    private void Start() {
-        _pawnChild = transform.FindChild(_PAWN_CHILD_NAME);
-        _cursor = GetComponentInChildren<BoardCursor>();
-
-        if (CombatantViewPrefab == null) {
-            throw new NullReferenceException("CombatantViewPrefab was not set");
-        }
-    }
+    #region UnityFields
+    public CombatantView CombatantViewPrefab;
+    public BoardGridField BoardGridFieldPrefab;
+    public BoardCursor Cursor;
     #endregion
 
-    public void Initialize(ICharacterFactory characters) {
-        _boardView.Board.PawnAdded += OnPawnAdded;
-        _boardView.Board.PawnRemoved += OnPawnRemoved;
-        Characters = characters;
+    #region Components
+    private BoardView _boardView;
+    private BoardGridField _boardGridField;
+    private TrashMan _pool;
+    #endregion
 
-        IEnumerator<Pawn> pawnIter = _boardView.Board.GetPawnIterator();
+    #region References
+    private Transform _pawnChild;
+    #endregion
+
+    private const string _PAWN_CHILD_NAME = "_pawnChild";
+    private const string _GRID_FIELD_CHILD = "_grids";
+    private Dictionary<Combatant, CombatantView> _combatantViews = new Dictionary<Combatant, CombatantView>();
+    private MessageBuffer _buffer = new MessageBuffer();
+    private Transform _gridFieldChild;
+
+    private ICharacterFactory _characters;
+    private Board _board;
+    private BoardTheme _theme;
+
+    public void Initialize(ICharacterFactory characters, Board board, BoardTheme theme) {
+        _characters = characters;
+        _board = board;
+        _theme = theme;
+
+        _board.PawnAdded += OnPawnAdded;
+        _board.PawnRemoved += OnPawnRemoved;
+        
+        IEnumerator<Pawn> pawnIter = _board.GetPawnIterator();
         while (pawnIter.MoveNext()) {
             OnPawnAdded(pawnIter.Current);
         }
@@ -62,11 +63,31 @@ public class CombatantViewManager : MonoBehaviour {
         return !_buffer.IsStepFinished;
     }
 
+    #region MonoBehaviour
+    private void Awake() {
+        _boardView = GetComponent<BoardView>();
+        _boardGridField = GetComponent<BoardGridField>();
+        _pool = GetComponent<TrashMan>();
+    }
+
+    private void Start() {
+        _pawnChild = transform.FindChild(_PAWN_CHILD_NAME);
+        _gridFieldChild = transform.FindChild(_GRID_FIELD_CHILD);
+
+        Cursor = GetComponentInChildren<BoardCursor>();
+
+        if (CombatantViewPrefab == null) {
+            throw new NullReferenceException("CombatantViewPrefab was not set");
+        }
+    }
+    #endregion
+
+    #region PrivateMethods
     private void OnPawnAdded(Pawn pawn) {
         Combatant combatant = pawn as Combatant;
         if (combatant != null) {
-            Character character = Characters.GetCharacter(combatant.CharacterID);
-            Vector3 position = _boardView.Theme.PointToVector3(pawn.Position);
+            Character character = _characters.GetCharacter(combatant.CharacterID);
+            Vector3 position = _theme.PointToVector3(pawn.Position);
 
             if (_pawnChild == null) {
                 GameObject pawnChildObj = new GameObject(_PAWN_CHILD_NAME);
@@ -74,18 +95,30 @@ public class CombatantViewManager : MonoBehaviour {
                 _pawnChild.transform.SetParent(transform);
             }
 
+            if (_gridFieldChild == null) {
+                GameObject gridObj = new GameObject(_GRID_FIELD_CHILD);
+                _gridFieldChild = gridObj.transform;
+                _gridFieldChild.SetParent(transform);
+            }
+
             Transform parentTransform = transform;
-            GameObject combatantObj = GameObject.Instantiate<GameObject>(CombatantViewPrefab);            
+            GameObject combatantObj = GameObject.Instantiate<GameObject>(CombatantViewPrefab.gameObject);            
             combatantObj.transform.SetParent(_pawnChild.transform);
             combatantObj.transform.position = ViewCommon.PointToVector3(combatant.Position);
             combatantObj.name = combatant.Name;
 
             CombatantView combatantView = combatantObj.GetComponent<CombatantView>();
-            combatantView.BoardTheme = _boardView.Theme;
-            combatantView.Combatant = combatant;
+            combatantView.Initialize(combatant, _theme);
 
-            BoardGridField gridField = combatantObj.GetComponent<BoardGridField>();
-            gridField.Theme = _boardView.Theme;
+            SkillView skillView = combatantObj.GetComponent<SkillView>();
+
+            GameObject gridFieldObj = TrashMan.spawn(BoardGridFieldPrefab.gameObject, Vector3.zero, Quaternion.identity, _gridFieldChild);
+
+            BoardGridField gridField = gridFieldObj.GetComponent<BoardGridField>();
+            gridField.Initialize(_theme);
+
+            skillView.Initialize(gridField);
+            skillView.Combatant = combatant;
 
             combatant.Messages += _buffer.HandleMessage;
             _combatantViews.Add(combatant, combatantView);
@@ -105,7 +138,5 @@ public class CombatantViewManager : MonoBehaviour {
             }
         }
     }
+    #endregion PrivateMethods
 }
-
-
-

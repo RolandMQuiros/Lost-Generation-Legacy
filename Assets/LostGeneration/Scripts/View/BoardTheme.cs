@@ -20,6 +20,6 @@ public class BoardTheme : ScriptableObject {
     }
 
     public Point Vector3ToPoint(Vector3 vector) {
-        return new Point(Mathf.FloorToInt(-vector.x / TileWidth), Mathf.FloorToInt(vector.z / TileHeight));
+        return new Point(Mathf.RoundToInt(-vector.x / TileWidth), Mathf.RoundToInt(vector.z / TileHeight));
     }
 }

@@ -14,7 +14,7 @@ public class TestCameraMover : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (Input.GetMouseButtonDown(1)) {
+        if (_cursor.TapDown) {
             Camera.Pan(_cursor.BoardPoint, 1f);
         }
 

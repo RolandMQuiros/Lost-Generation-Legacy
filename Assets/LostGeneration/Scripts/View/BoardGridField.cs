@@ -7,25 +7,16 @@ using LostGen;
 [RequireComponent(typeof(MeshFilter))]
 public class BoardGridField : MonoBehaviour {
     public float Offset = 0.1f;
-    public BoardTheme Theme;
+
+    private BoardTheme _theme;
 
     private MeshFilter _meshFilter;
     private Dictionary<Point, Sprite> _points = new Dictionary<Point, Sprite>();
     private bool _wasChanged = true;
 
-    #region MonoBehaviour
-    private void Awake() {
-        _meshFilter = GetComponent<MeshFilter>();
+    public void Initialize(BoardTheme theme) {
+        _theme = theme;
     }
-
-    private void LateUpdate() {
-        if (_wasChanged) {
-            RebuildMesh();
-            _wasChanged = false;
-            //DebugPrint();
-        }
-	}
-    #endregion MonoBehaviour
 
     public void AddPoint(Point point, Sprite sprite) {
         _points.Add(point, sprite);
@@ -54,27 +45,27 @@ public class BoardGridField : MonoBehaviour {
         _wasChanged = true;
     }
 
-    private void RebuildMesh() {
+    public void RebuildMesh() {
         List<Vector3> vertices = new List<Vector3>();
         List<Vector2> uvs = new List<Vector2>();
         List<int> triangles = new List<int>();
 
         int triangleOffset = 0;
 
-        float halfWidth = Theme.TileWidth / 2f;
-        float halfHeight = Theme.TileHeight / 2f;
+        float halfWidth = _theme.TileWidth / 2f;
+        float halfHeight = _theme.TileHeight / 2f;
 
-        Vector3 up = Theme.PointToVector3(Point.Up) * halfHeight + (Vector3.up * Offset);
-        Vector3 left = Theme.PointToVector3(Point.Left) * halfWidth + (Vector3.up * Offset);
-        Vector3 down = Theme.PointToVector3(Point.Down) * halfHeight + (Vector3.up * Offset);
-        Vector3 right = Theme.PointToVector3(Point.Right) * halfWidth + (Vector3.up * Offset);
+        Vector3 up = _theme.PointToVector3(Point.Up) * halfHeight;
+        Vector3 left = _theme.PointToVector3(Point.Left) * halfWidth;
+        Vector3 down = _theme.PointToVector3(Point.Down) * halfHeight;
+        Vector3 right = _theme.PointToVector3(Point.Right) * halfWidth;
 
         foreach (KeyValuePair<Point, Sprite> pointSprite in _points) {
-            Vector3 center = Theme.PointToVector3(pointSprite.Key);
-            Vector3 upperLeft = center + up + left;
-            Vector3 bottomLeft = center + down + left;
-            Vector3 bottomRight = center + down + right;
-            Vector3 upperRight = center + up + right;
+            Vector3 center = _theme.PointToVector3(pointSprite.Key);
+            Vector3 upperLeft = center + up + left + (Vector3.up * Offset);
+            Vector3 bottomLeft = center + down + left + (Vector3.up * Offset);
+            Vector3 bottomRight = center + down + right + (Vector3.up * Offset);
+            Vector3 upperRight = center + up + right + (Vector3.up * Offset);
 
             vertices.Add(bottomLeft);
             vertices.Add(bottomRight);
@@ -107,4 +98,10 @@ public class BoardGridField : MonoBehaviour {
         mesh.RecalculateBounds();
         mesh.RecalculateNormals();
     }
+
+    #region MonoBehaviour
+    private void Awake() {
+        _meshFilter = GetComponent<MeshFilter>();
+    }
+    #endregion MonoBehaviour
 }

@@ -4,13 +4,6 @@ using UnityEngine;
 using LostGen;
 
 public class DirectionalSkillController : MonoBehaviour, ISkillController {
-    public ISkill Skill {
-        get { return _skill; }
-        set {
-            _skill = (DirectionalSkill)value;
-        }
-    }
-
     public BoardCursor Cursor;
 
     public string DebugDirection;
@@ -22,7 +15,7 @@ public class DirectionalSkillController : MonoBehaviour, ISkillController {
 
     #region MonoBehaviour
     private void Update() {
-        if (_isTargeting && Cursor.BoardPoint != _skill.Owner.Position) {
+        if (_skill != null && _isTargeting && Cursor.BoardPoint != _skill.Owner.Position) {
             CardinalDirection direction = Point.DirectionBetweenPoints(Cursor.BoardPoint, _skill.Owner.Position);
 
             if (direction != _skill.Direction || _initialTargeting) {
@@ -43,16 +36,22 @@ public class DirectionalSkillController : MonoBehaviour, ISkillController {
     }
     #endregion MonoBehaviour
 
-    public void StartTargeting() {
+    public void StartTargeting(ISkill skill) {
+        _skill = (DirectionalSkill)skill;
         _skill.IsReadyToFire = false;
         _isTargeting = true;
         _initialTargeting = true;
     }
 
     public void CancelTargeting() {
-        _skill.IsReadyToFire = false;
         _isTargeting = false;
         _initialTargeting = false;
+
+        if (_skill != null) {
+            _skill.IsReadyToFire = false;
+        }
+
+        _skill = null;
     }
 }
 
