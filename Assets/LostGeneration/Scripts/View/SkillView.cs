@@ -4,11 +4,6 @@ using UnityEngine;
 using LostGen;
 
 public class SkillView : MonoBehaviour {
-    public ISkill Skill {
-        get { return _skill; }
-        set { _skill = value; }
-    }
-
     #region EditorFields
     public Sprite RangeSprite;
     public Sprite AreaOfEffectSprite;
@@ -16,67 +11,65 @@ public class SkillView : MonoBehaviour {
     #endregion EditorFields
 
     #region References
+    private Combatant _combatant;
+    private RangedSkill _ranged;
+    private DirectionalSkill _directional;
     private BoardGridField _gridField;
-    private ISkill _skill;
     #endregion References
 
-    private Point? _oldTarget = null;
-    private CardinalDirection? _oldDirection = null;
-    private bool _wasReadyToFire = false;
-      
-    public void Initialize(BoardGridField gridField) {
+    public void Initialize(Combatant combatant, BoardGridField gridField) {
+        _combatant = combatant;
+        _combatant.SkillActivated += OnSkillActivated;
+
         _gridField = gridField;
-    }
-
-    // Wire this to SkillButton.Activated somehow
-    public void SetSkill(ISkill skill) {
-        _skill = skill;
-    }
-    
-    public void BuildGridField() {
-        if (_skill != null) {
-            RangedSkill ranged;
-            DirectionalSkill directional;
-            if ((ranged = _skill as RangedSkill) != null) {
-                if (!_oldTarget.HasValue || _oldTarget.Value != ranged.Target || _wasReadyToFire) {
-                    _gridField.ClearPoints();
-
-                    if (!ranged.IsReadyToFire) {
-                        _gridField.AddPoints(ranged.GetRange(), RangeSprite);
-                    }
-
-                    _gridField.AddPoints(ranged.GetPath(), PathSprite);
-                    _gridField.AddPoints(ranged.GetAreaOfEffect(), AreaOfEffectSprite);
-                    _gridField.RebuildMesh();
-
-                    _wasReadyToFire = ranged.IsReadyToFire;
-                    _oldTarget = ranged.Target;
-                }
-            } else if ((directional = _skill as DirectionalSkill) != null) {
-                if (!_oldDirection.HasValue || _oldDirection.Value != directional.Direction) {
-                    _gridField.ClearPoints();
-                    _gridField.AddPoints(directional.GetAreaOfEffect(directional.Direction), AreaOfEffectSprite);
-                    _gridField.RebuildMesh();
-
-                    _oldDirection = directional.Direction;
-                }
-            }
-        } else {
-            throw new NullReferenceException("No Combatant was assigned to this SkillView");
-        }
     }
 
     public void Clear() {
         _gridField.ClearPoints();
     }
 
-    #region MonoBehaviour
-    private void LateUpdate() {
-        if (_skill != null) {
-            BuildGridField();
-        } else if (!_gridField.IsEmpty) {
+    public void OnTargetingEnd() {
+        if (_ranged != null) {
             _gridField.ClearPoints();
+            _gridField.AddPoints(_ranged.GetPath(), PathSprite);
+            _gridField.AddPoints(_ranged.GetAreaOfEffect(), AreaOfEffectSprite);
+            _gridField.RebuildMesh();
         }
     }
-    #endregion MonoBehaviour
+
+    private void OnTargetChanged(Point point) {
+        _gridField.ClearPoints();
+        _gridField.AddPoints(_ranged.GetRange(), RangeSprite);
+        _gridField.AddPoints(_ranged.GetPath(), PathSprite);
+        _gridField.AddPoints(_ranged.GetAreaOfEffect(), AreaOfEffectSprite);
+        _gridField.RebuildMesh();
+    }
+
+    private void OnDirectionChanged(CardinalDirection direction) {
+        _gridField.ClearPoints();
+        _gridField.AddPoints(_directional.GetAreaOfEffect(_directional.Direction), AreaOfEffectSprite);
+        _gridField.RebuildMesh();
+    }
+
+    private void OnSkillActivated(Combatant combatant, ISkill skill) {
+        // Unbind delegates from old skill
+        if (_ranged != null) {
+            _ranged.TargetChanged -= OnTargetChanged;
+        } else if (_directional != null) {
+            _directional.DirectionChanged -= OnDirectionChanged;
+        }
+
+        // Figure out what kind of skill it is
+        _ranged = skill as RangedSkill;
+        _directional = skill as DirectionalSkill;
+
+        // Bind delegates to new skill
+        if (_ranged != null) {
+            _ranged.TargetChanged += OnTargetChanged;
+            OnTargetChanged(_ranged.Target);
+        } else if (_directional != null) {
+            _directional.DirectionChanged += OnDirectionChanged;
+            OnDirectionChanged(_directional.Direction);
+        }
+    }
 }

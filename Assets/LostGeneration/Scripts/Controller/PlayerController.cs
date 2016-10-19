@@ -53,15 +53,6 @@ public class PlayerController : MonoBehaviour {
     #endregion MonoBehaviour
 
     #region PublicMethods
-    public void Go() {
-        for (int i = 0; i < _units.Count; i++) {
-            _units[i].ActiveSkill.Fire();
-            ClearActiveSkill(_units[i]);
-        }
-
-        Stepped.Invoke();
-    }
-
     public void AddCombatant(Combatant combatant) {
         _units.Add(combatant);
         SkillTray.AddCombatant(combatant);
@@ -87,13 +78,8 @@ public class PlayerController : MonoBehaviour {
 
     private bool AreCombatantsReady() {
         bool isReady = true;
-        for (int i = 0; i < _units.Count; i++) {
-            int actionPoints = _units.ActionPoints;
-            foreach (CombatantAction action in _units[i].Actions) {
-                actionPoints -= action.ActionPoints;
-            }
-            
-            isReady &= actionPoints == 0;
+        for (int i = 0; i < _units.Count; i++) {            
+            isReady &= _units[i].ActionQueueCost == _units[i].ActionPoints;
         }
 
         return isReady;

@@ -34,21 +34,46 @@ namespace LostGen {
             }
         }
         public int ActionPoints { get { return _actionPoints; } }
-        public int QueueCost { get {return _queueCost; } }
+        public int ActionQueueCost { get { return _queueCost; } }
+
+        public ISkill ActiveSkill {
+            get { return _activeSkill;  }
+            set {
+                if (_skills.ContainsValue(value)) {
+                    if (_activeSkill != value) {
+                        _activeSkill = value;
+                        if (SkillActivated != null) {
+                            SkillActivated(this, _activeSkill);
+                        }
+                    }
+                } else {
+                    throw new ArgumentException("No Skill " + value + " is assigned to this Combatant " + ToString());
+                }
+            }
+        }
+
         public Team Team;
         #endregion Stats
 
         #region CollectionProperties
         public IEnumerable<ISkill> Skills { get { return _skills.Values; } }
+        public int SkillCount { get { return _skills.Count; } }
+
         public IEnumerable<Pawn> KnownPawns { get { return _knownPawns; } }
+        public int KnownPawnsCount { get { return _knownPawns.Count; } }
+
         public IEnumerable<Pawn> PawnsInView { get { return _visiblePawns; } }
+        public int PawnsInViewCount { get { return _visiblePawns.Count; } }
+
         public IEnumerable<Gear> Gear { get { return _gear; } }
+        public int GearCount { get { return _gear.Count; } }
         #endregion CollectionProperties
 
         #region Events
         public event Action<Combatant, ISkill> SkillAdded;
         public event Action<Combatant, ISkill> SkillRemoved;
         public event Action<Combatant, ISkill> SkillFired;
+        public event Action<Combatant, ISkill> SkillActivated;
         public event Action<Combatant, IEnumerable<CombatantAction>> ActionsAdded;
         public event Action<Combatant, Gear> GearEquipped;
         public event Action<Combatant, Gear> GearRemoved;
@@ -61,6 +86,7 @@ namespace LostGen {
         private int _health;
         private int _actionPoints;
         private int _queueCost;
+        private ISkill _activeSkill;
 
         private List<Gear> _gear = new List<Gear>();
         private Dictionary<Type, ISkill> _skills = new Dictionary<Type, ISkill>();
@@ -84,6 +110,14 @@ namespace LostGen {
 
         public bool HasSkill(ISkill skill) {
             return _skills.ContainsValue(skill);
+        }
+
+        public void SetActiveSkill<T>() where T : ISkill {
+            ISkill skill = GetSkill<T>();
+            if (skill == null) {
+                throw new NullReferenceException("No Skill of type " + typeof(T) + " is assigned to this Combatant " + ToString());
+            }
+            _activeSkill = skill;
         }
 
         public IEnumerable<Pawn> GetKnownPawns() {
@@ -119,6 +153,33 @@ namespace LostGen {
             }
         }
 
+        #region PawnOverrides
+
+        public override void PushAction(IPawnAction action) {
+            base.PushAction(action);
+
+            CombatantAction combatantAction;
+            if ((combatantAction = action as CombatantAction) != null)  {
+                _queueCost += combatantAction.ActionPoints;
+            }
+        }
+
+        public override void PushActions(IEnumerable<IPawnAction> actions) {
+            base.PushActions(actions);
+
+            foreach (IPawnAction action in actions) {
+                CombatantAction combatantAction;
+                if ((combatantAction = action as CombatantAction) != null) {
+                    _queueCost += combatantAction.ActionPoints;
+                }
+            }
+        }
+
+        public override void ClearActions() {
+            base.ClearActions();
+            _queueCost = 0;
+        }
+
         public override void BeginTurn() {
             _actionPoints = EffectiveStats.Stamina;
         }
@@ -129,5 +190,7 @@ namespace LostGen {
                 _actionPoints -= combatantAction.ActionPoints;
             }
         }
+
+        #endregion PawnOverrides
     }
 }

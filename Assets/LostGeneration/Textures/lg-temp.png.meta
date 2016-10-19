@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: c118794b946de074e99f7c97f9f84258
-timeCreated: 1475828077
+timeCreated: 1476855945
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -15,6 +15,8 @@ TextureImporter:
     21300016: Sprite_Dither
     21300018: Sprite_DitherRed
     21300020: Sprite_DitherGreen
+    21300022: Sprite_Path
+    21300024: Sprite_AreaOfEffect
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -198,6 +200,32 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 33
+        y: 31
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Sprite_Path
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 31
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Sprite_AreaOfEffect
+      rect:
+        serializedVersion: 2
+        x: 49
         y: 31
         width: 8
         height: 8

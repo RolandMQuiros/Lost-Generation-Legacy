@@ -3,7 +3,21 @@ using System.Collections.Generic;
 
 namespace LostGen {
     public abstract class RangedSkill : AreaOfEffectSkill {
-        public virtual Point Target { get; set; }
+        public virtual Point Target {
+            get { return _target; }
+            set {
+                if (_target != value) {
+                    _target = value;
+                    if (TargetChanged != null) {
+                        TargetChanged(_target);
+                    }
+                }
+            }
+        }
+
+        public event Action<Point> TargetChanged;
+
+        private Point _target;
 
         public RangedSkill(Combatant owner, string name, string description)
             : base(owner, name, description) {

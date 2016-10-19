@@ -4,6 +4,7 @@ using UnityEngine;
 using LostGen;
 
 public class SkillButton : MonoBehaviour {
+    public ISkill Skill { get { return _skill; } }
     public event Action<ISkill> Activated;
     private ISkill _skill;
 
@@ -12,6 +13,7 @@ public class SkillButton : MonoBehaviour {
     }
 
     public void Activate() {
+        _skill.Owner.ActiveSkill = _skill;
         Activated.Invoke(_skill);
     }
 }

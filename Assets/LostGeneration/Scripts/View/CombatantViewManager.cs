@@ -123,8 +123,7 @@ public class CombatantViewManager : MonoBehaviour {
             BoardGridField gridField = gridFieldObj.GetComponent<BoardGridField>();
             gridField.Initialize(_theme);
 
-            skillView.Initialize(gridField);
-            skillView.Combatant = combatant;
+            skillView.Initialize(combatant, gridField);
 
             combatant.Messages += _buffer.HandleMessage;
             _combatantViews.Add(combatant, combatantView);
