@@ -159,11 +159,11 @@ namespace LostGen {
 
             if (difference.Y >= 0) {
                 if (difference.X > scalarY) {
-                    direction = CardinalDirection.West;
+                    direction = CardinalDirection.East;
                 } else if (difference.X <= scalarY && difference.X >= -scalarY) {
                     direction = CardinalDirection.South;
                 } else if (difference.X < -scalarY) {
-                    direction = CardinalDirection.East;
+                    direction = CardinalDirection.West;
                 }
             } else {
                 if (difference.X > scalarY) {

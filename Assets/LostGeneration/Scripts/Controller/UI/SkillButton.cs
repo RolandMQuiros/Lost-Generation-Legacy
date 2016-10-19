@@ -4,16 +4,14 @@ using UnityEngine;
 using LostGen;
 
 public class SkillButton : MonoBehaviour {
-    public ISkill Skill;
-    public ISkillController SkillController;
-    public PlayerController PlayerController;
+    public event Action<ISkill> Activated;
+    private ISkill _skill;
 
-    public void OnClick() {
-        SkillController.StartTargeting(Skill);
-        PlayerController.SetActiveSkill(Skill);
+    public void Initialize(ISkill skill) {
+    	_skill = skill;
     }
 
-    public void OnOtherClick() {
-        SkillController.CancelTargeting();
+    public void Activate() {
+        Activated.Invoke(_skill);
     }
 }

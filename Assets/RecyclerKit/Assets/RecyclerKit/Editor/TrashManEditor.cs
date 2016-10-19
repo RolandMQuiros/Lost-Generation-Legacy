@@ -277,6 +277,15 @@ public class TrashManEditor : Editor
 				GUILayout.Space( 10f );
 				EditorGUILayout.BeginVertical();
 
+                // PArent
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Label(new GUIContent("Parent", "Transform of parent object for all spawned instances"), EditorStyles.label, GUILayout.Width(115f));
+                Transform parent = EditorGUILayout.ObjectField(prefabPool.parent, typeof(Transform), true) as Transform;
+                if (parent.gameObject.scene != null) {
+                    prefabPool.parent = parent;
+                }
+                EditorGUILayout.EndHorizontal();
+
 				// PreAlloc
 				EditorGUILayout.BeginHorizontal();
 				GUILayout.Label( new GUIContent( "Preallocate Count", "Total items to create at scene start" ), EditorStyles.label, GUILayout.Width( 115f ) );

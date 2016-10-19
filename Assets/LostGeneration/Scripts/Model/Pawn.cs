@@ -23,9 +23,7 @@ namespace LostGen {
             set { Board.SetPawnPosition(this, value); }
         }
 
-        public int ActionCount {
-            get { return _actions.Count; }
-        }
+        public IEnumerable<IPawnAction> Actions { get { return _actions; } }
 
         /// <summary>
         /// Sorting priority. Determines what order the Board executes the Pawn steps.
@@ -126,7 +124,7 @@ namespace LostGen {
             }
         }
 
-        public void PushActions(IEnumerable<IPawnAction> actions) {
+        public virtual void PushActions(IEnumerable<IPawnAction> actions) {
             foreach (IPawnAction action in actions) {
                 _actions.AddLast(action);
             }

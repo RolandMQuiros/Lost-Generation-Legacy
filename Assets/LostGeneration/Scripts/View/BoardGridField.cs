@@ -8,6 +8,10 @@ using LostGen;
 public class BoardGridField : MonoBehaviour {
     public float Offset = 0.1f;
 
+    public bool IsEmpty {
+        get { return _points.Count == 0; }
+    }
+
     private BoardTheme _theme;
 
     private MeshFilter _meshFilter;

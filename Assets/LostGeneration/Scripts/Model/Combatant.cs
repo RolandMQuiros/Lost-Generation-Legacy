@@ -3,15 +3,15 @@ using System.Collections.Generic;
 
 namespace LostGen {
     public class Combatant : Pawn {
-        public Stats BaseStats
-        {
+        #region Stats
+        public Stats BaseStats {
             get { return _baseStats; }
             set {
                 _baseStats = value;
                 _didStatsChange = true;
             }
         }
-        
+
         public Stats EffectiveStats {
             get {
                 if (_didStatsChange) {
@@ -27,42 +27,46 @@ namespace LostGen {
                 return _effectiveStats;
             }
         }
-
-        public int Health
-        {
+        public int Health {
             get { return _health; }
-            set
-            {
+            set {
                 _health = Math.Max(0, Math.Min(_effectiveStats.Health, value));
             }
         }
-
-        public ISkill ActiveSkill {
-            get { return _activeSkill; }
-            set {
-                if (value == null || _skills.ContainsValue(value)) {
-                    _activeSkill = value;
-                } else {
-                    throw new KeyNotFoundException("Skill " + value + " was not assigned to this Combatant");
-                }
-            }
-        }
-
         public int ActionPoints { get { return _actionPoints; } }
-
+        public int QueueCost { get {return _queueCost; } }
         public Team Team;
+        #endregion Stats
 
+        #region CollectionProperties
+        public IEnumerable<ISkill> Skills { get { return _skills.Values; } }
+        public IEnumerable<Pawn> KnownPawns { get { return _knownPawns; } }
+        public IEnumerable<Pawn> PawnsInView { get { return _visiblePawns; } }
+        public IEnumerable<Gear> Gear { get { return _gear; } }
+        #endregion CollectionProperties
+
+        #region Events
+        public event Action<Combatant, ISkill> SkillAdded;
+        public event Action<Combatant, ISkill> SkillRemoved;
+        public event Action<Combatant, ISkill> SkillFired;
+        public event Action<Combatant, IEnumerable<CombatantAction>> ActionsAdded;
+        public event Action<Combatant, Gear> GearEquipped;
+        public event Action<Combatant, Gear> GearRemoved;
+        #endregion Events
+
+        #region PrivateMembers
         private bool _didStatsChange;
         private Stats _baseStats;
         private Stats _effectiveStats;
         private int _health;
         private int _actionPoints;
+        private int _queueCost;
 
         private List<Gear> _gear = new List<Gear>();
         private Dictionary<Type, ISkill> _skills = new Dictionary<Type, ISkill>();
         private HashSet<Pawn> _visiblePawns = new HashSet<Pawn>();
         private HashSet<Pawn> _knownPawns = new HashSet<Pawn>();
-        private ISkill _activeSkill;
+        #endregion PrivateMembers
 
         public Combatant(string name, Board board, Point position, bool isOpaque = true, IEnumerable<Point> footprint = null, bool isCollidable = true, bool isSolid = true)
             : base(name, board, position, footprint, isCollidable, isSolid, isOpaque){
@@ -72,25 +76,10 @@ namespace LostGen {
             _skills.Add(skill.GetType(), skill);
         }
 
-        public void SetActiveSkill<T>() where T : ISkill {
-            ISkill skill;
-            _skills.TryGetValue(typeof(T), out skill);
-
-            if (skill == null) {
-                throw new KeyNotFoundException("Combatant " + ToString() + " does not have a Skill of type " + typeof(T));
-            }
-
-            _activeSkill = skill;
-        }
-
         public T GetSkill<T>() where T : ISkill {
             ISkill skill;
             _skills.TryGetValue(typeof(T), out skill);
             return (T)skill;
-        }
-
-        public IEnumerable<ISkill> GetSkills() {
-            return _skills.Values;
         }
 
         public bool HasSkill(ISkill skill) {
@@ -99,10 +88,6 @@ namespace LostGen {
 
         public IEnumerable<Pawn> GetKnownPawns() {
             return _knownPawns;
-        }
-
-        public IEnumerable<Pawn> GetPawnsInView() {
-            return _visiblePawns;
         }
 
         public bool AddPawnToView(Pawn pawn) {
@@ -118,16 +103,20 @@ namespace LostGen {
             return _visiblePawns.Contains(pawn);
         }
 
-        public IEnumerable<Gear> GetGear() {
-            return _gear;
-        }
-
         public void AddGear(Gear gear) {
             _gear.Add(gear);
+
+            if (GearEquipped != null) {
+                GearEquipped(this, gear);
+            }
         }
 
-        public void RemoteGear(Gear gear) {
+        public void RemoveGear(Gear gear) {
             _gear.Remove(gear);
+
+            if (GearRemoved != null) {
+                GearRemoved(this, gear);
+            }
         }
 
         public override void BeginTurn() {

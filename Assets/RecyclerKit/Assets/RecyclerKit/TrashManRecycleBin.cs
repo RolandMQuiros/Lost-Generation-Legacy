@@ -17,11 +17,15 @@ public sealed class TrashManRecycleBin
 	/// </summary>
 	public event Action<GameObject> onDespawnedEvent;
 
-
 	/// <summary>
 	/// The prefab or GameObject in the scene managed by this class.
 	/// </summary>
 	public GameObject prefab;
+    
+    /// <summary>
+    /// Parent of GameObjects spawned by this RecycleBin
+    /// </summary>
+    public Transform parent;
 
 	/// <summary>
 	/// total number of instances to create at start
@@ -103,10 +107,10 @@ public sealed class TrashManRecycleBin
 
             if(go.transform as RectTransform)
             {
-                go.transform.SetParent(TrashMan.instance.transform, false);
+                go.transform.SetParent(parent ?? TrashMan.instance.transform, false);
             }
             else
-			    go.transform.parent = TrashMan.instance.transform;
+			    go.transform.parent = parent ?? TrashMan.instance.transform;
 			go.SetActive( false );
 			_gameObjectPool.Push( go );
 		}

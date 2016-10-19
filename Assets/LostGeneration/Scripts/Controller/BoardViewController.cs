@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using LostGen;
@@ -6,11 +7,6 @@ using LostGen;
 public class BoardViewController : MonoBehaviour {
     #region UnityFields
     public BoardTheme BoardTheme;
-    public BoardView BoardView;
-    public BoardCursor BoardCursor;
-    public PlayerController PlayerController;
-    public BoardCamera BoardCamera;
-    public BoardCameraController BoardCameraController;
     public CombatantViewManager CombatantViewManager;
     #endregion UnityFields
 
@@ -25,7 +21,7 @@ public class BoardViewController : MonoBehaviour {
     private bool _actionsLeft = false;
     private bool _readyToStep = true;
 
-    public bool Step() {
+    public void Step() {
         if (!_actionsLeft) {
             Board.BeginTurn();
         }
@@ -36,23 +32,36 @@ public class BoardViewController : MonoBehaviour {
 
         _readyToStep = true;
         _readyToStep &= !CombatantViewManager.OnStep();
+    }
 
-        return _actionsLeft;
+    public void Turn() {
+        Board.BeginTurn();
+        Board.Turn();
+
+        while (CombatantViewManager.OnStep());
     }
 
     #region MonoBehaviour
 
     private void Awake() {
-        // Construction based on BoardTheme here
+        BoardTheme.Set(BoardTheme);
     }
 
     private void Start() {
+        List<BoardView> boardViews = new List<BoardView>(GetComponentsInChildren<BoardView>());
+        List<BoardClickCollider> clickColliders = new List<BoardClickCollider>(GetComponentsInChildren<BoardClickCollider>());
+        List<BoardCursor> cursors = new List<BoardCursor>(GetComponentsInChildren<BoardCursor>());
+        List<BoardCamera> cameras = new List<BoardCamera>(GetComponentsInChildren<BoardCamera>());
+        List<BoardCameraController> cameraControllers = new List<BoardCameraController>(GetComponentsInChildren<BoardCameraController>());
+        List<CombatantViewManager> combatantViewManagers = new List<CombatantViewManager>(GetComponentsInChildren<CombatantViewManager>());
+
         // Assign all Model-bound variables to View and Controller GameObjects
-        BoardView.Initialize(Board, BoardTheme);
-        BoardCursor.Initialize(BoardTheme);
-        BoardCamera.Initialize(BoardTheme);
-        BoardCameraController.Initialize(BoardTheme);
-        CombatantViewManager.Initialize(_characters, Board, BoardTheme);
+        boardViews.ForEach(x => x.Initialize(Board, BoardTheme));
+        clickColliders.ForEach(x => x.Initialize(BoardTheme, Board.Width, Board.Height));
+        cursors.ForEach(x => x.Initialize(BoardTheme));
+        cameras.ForEach(x => x.Initialize(BoardTheme));
+        cameraControllers.ForEach(x => x.Initialize(BoardTheme));
+        combatantViewManagers.ForEach(x => x.Initialize(_characters, Board, BoardTheme));
 
         Board.BeginTurn();
     }

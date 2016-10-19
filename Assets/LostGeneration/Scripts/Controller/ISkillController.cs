@@ -4,5 +4,4 @@ using LostGen;
 
 public interface ISkillController {
     void StartTargeting(ISkill skill);
-    void CancelTargeting();
 }

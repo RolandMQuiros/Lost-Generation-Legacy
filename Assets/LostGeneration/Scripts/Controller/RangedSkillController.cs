@@ -18,24 +18,14 @@ public class RangedSkillController : MonoBehaviour, ISkillController {
         _skill.IsReadyToFire = false;
     }
 
-    public void CancelTargeting() {
-        _isTargeting = false;
-        _initialTargeting = false;
-
-        if (_skill != null) {
-            _skill.IsReadyToFire = false;
-        }
-
-        _skill = null;
-    }
-
+    #region MonoBehaviour
     private void Update() {
         if (_skill != null && _isTargeting) {
             if (_skill.InRange(Cursor.BoardPoint)) {
                 if (Cursor.TapDown) {
                     _isTargeting = false;
                     _initialTargeting = false;
-                    _skill.IsReadyToFire = true;
+                    _skill.Fire();
                 }
 
                 if (_initialTargeting || _skill.Target != Cursor.BoardPoint) {
@@ -47,4 +37,5 @@ public class RangedSkillController : MonoBehaviour, ISkillController {
 
         DebugIsTargeting = _isTargeting;
     }
+    #endregion MonoBehaviour
 }

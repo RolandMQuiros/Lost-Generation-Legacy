@@ -83,6 +83,12 @@ public class CombatantViewManager : MonoBehaviour {
     #endregion
 
     #region PrivateMethods
+    /// <summary>
+    /// TODO
+    /// Why am I rebuilding every time the combatant changes
+    /// Just make a new tray for each combatant, jesus
+    /// </summary>
+    /// <param name="pawn"></param>
     private void OnPawnAdded(Pawn pawn) {
         Combatant combatant = pawn as Combatant;
         if (combatant != null) {

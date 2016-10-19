@@ -13,21 +13,25 @@ public class DirectionalSkillController : MonoBehaviour, ISkillController {
     private bool _isTargeting = false;
     private bool _initialTargeting = false;
 
+    public void StartTargeting(ISkill skill) {
+        _skill = (DirectionalSkill)skill;
+        _isTargeting = true;
+        _initialTargeting = true;
+    }
+    
     #region MonoBehaviour
     private void Update() {
         if (_skill != null && _isTargeting && Cursor.BoardPoint != _skill.Owner.Position) {
-            CardinalDirection direction = Point.DirectionBetweenPoints(Cursor.BoardPoint, _skill.Owner.Position);
+            CardinalDirection direction = Point.DirectionBetweenPoints(_skill.Owner.Position, Cursor.BoardPoint);
 
             if (direction != _skill.Direction || _initialTargeting) {
                 _skill.Direction = direction;
                 _initialTargeting = false;
-                _skill.IsReadyToFire = false;
             }
 
             if (Cursor.TapUp) {
                 _isTargeting = false;
                 _initialTargeting = false;
-                _skill.IsReadyToFire = true;
             }
         }
 
@@ -35,23 +39,5 @@ public class DirectionalSkillController : MonoBehaviour, ISkillController {
         DebugIsTargeting = _isTargeting;
     }
     #endregion MonoBehaviour
-
-    public void StartTargeting(ISkill skill) {
-        _skill = (DirectionalSkill)skill;
-        _skill.IsReadyToFire = false;
-        _isTargeting = true;
-        _initialTargeting = true;
-    }
-
-    public void CancelTargeting() {
-        _isTargeting = false;
-        _initialTargeting = false;
-
-        if (_skill != null) {
-            _skill.IsReadyToFire = false;
-        }
-
-        _skill = null;
-    }
 }
 

@@ -4,7 +4,10 @@ using UnityEngine;
 using LostGen;
 
 public class SkillView : MonoBehaviour {
-    public Combatant Combatant;
+    public ISkill Skill {
+        get { return _skill; }
+        set { _skill = value; }
+    }
 
     #region EditorFields
     public Sprite RangeSprite;
@@ -14,6 +17,7 @@ public class SkillView : MonoBehaviour {
 
     #region References
     private BoardGridField _gridField;
+    private ISkill _skill;
     #endregion References
 
     private Point? _oldTarget = null;
@@ -23,12 +27,17 @@ public class SkillView : MonoBehaviour {
     public void Initialize(BoardGridField gridField) {
         _gridField = gridField;
     }
+
+    // Wire this to SkillButton.Activated somehow
+    public void SetSkill(ISkill skill) {
+        _skill = skill;
+    }
     
     public void BuildGridField() {
-        if (Combatant != null) {
+        if (_skill != null) {
             RangedSkill ranged;
             DirectionalSkill directional;
-            if ((ranged = Combatant.ActiveSkill as RangedSkill) != null) {
+            if ((ranged = _skill as RangedSkill) != null) {
                 if (!_oldTarget.HasValue || _oldTarget.Value != ranged.Target || _wasReadyToFire) {
                     _gridField.ClearPoints();
 
@@ -43,7 +52,7 @@ public class SkillView : MonoBehaviour {
                     _wasReadyToFire = ranged.IsReadyToFire;
                     _oldTarget = ranged.Target;
                 }
-            } else if ((directional = Combatant.ActiveSkill as DirectionalSkill) != null) {
+            } else if ((directional = _skill as DirectionalSkill) != null) {
                 if (!_oldDirection.HasValue || _oldDirection.Value != directional.Direction) {
                     _gridField.ClearPoints();
                     _gridField.AddPoints(directional.GetAreaOfEffect(directional.Direction), AreaOfEffectSprite);
@@ -63,8 +72,10 @@ public class SkillView : MonoBehaviour {
 
     #region MonoBehaviour
     private void LateUpdate() {
-        if (Combatant.ActiveSkill != null) {
+        if (_skill != null) {
             BuildGridField();
+        } else if (!_gridField.IsEmpty) {
+            _gridField.ClearPoints();
         }
     }
     #endregion MonoBehaviour

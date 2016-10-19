@@ -23,6 +23,7 @@ namespace LostGen {
         protected Board _board;
         private int _actionPoints;
 
+        private Point _prevOrigin;
         private HashSet<Point> _range;
 
         public WalkSkill(Combatant owner)
@@ -32,18 +33,18 @@ namespace LostGen {
 
         #region PointCollections
 
-        public override IEnumerable<Point> GetRange() {
-            InitializeRange();
+        public override IEnumerable<Point> GetRange(Point origin) {
+            ReinitializeRange(origin);
             return _range;
         }
 
         public override bool InRange(Point point) {
-            InitializeRange();
+            ReinitializeRange(Owner.Position);
             return _range.Contains(point);
         }
 
-        public override IEnumerable<Point> GetAreaOfEffect() {
-            yield return Target;
+        public override IEnumerable<Point> GetAreaOfEffect(Point target) {
+            yield return target;
         }
 
         public override IEnumerable<Point> GetPath() {
@@ -110,10 +111,11 @@ namespace LostGen {
             return path;
         }
 
-        private void InitializeRange() {
-            if (_range == null) {
+        private void ReinitializeRange(Point origin) {
+            if (_range == null || _prevOrigin != origin) {
                 _range = new HashSet<Point>();
-                Board.Node startNode = Owner.Board.GetNode(Owner.Position, TileCost);
+                _prevOrigin = origin;
+                Board.Node startNode = Owner.Board.GetNode(origin, TileCost);
                 foreach (Board.Node node in GraphMethods<Board.Node>.FloodFill(startNode, Owner.ActionPoints)) {
                     _range.Add(node.Point);
                 }

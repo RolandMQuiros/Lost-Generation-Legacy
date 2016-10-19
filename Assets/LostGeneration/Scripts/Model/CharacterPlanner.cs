@@ -44,7 +44,7 @@ namespace LostGen {
         }
 
         private void FindTarget() {
-            foreach (Pawn pawn in _owner.GetPawnsInView()) {
+            foreach (Pawn pawn in _owner.PawnsInView) {
                 Combatant target = pawn as Combatant;
                 if (target != null && target.Team.IsHostile(_owner.Team)) {
                     _target = target;

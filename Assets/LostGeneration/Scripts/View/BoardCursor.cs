@@ -16,6 +16,10 @@ public class BoardCursor : MonoBehaviour {
     public bool TapHeld { get; private set; }
     public bool TapDown { get; private set; }
 
+    public bool DebugTapUp;
+    public bool DebugTapHeld;
+    public bool DebugTapDown;
+
     public Plane Plane { get; private set; }
     public Point BoardPoint { get; private set; }
 
@@ -26,10 +30,32 @@ public class BoardCursor : MonoBehaviour {
         _theme = theme;
     }
 
+    #region ClickHandlers
+
+    public void OnClickDown(PointerEventData data) {
+        TapDown = true;
+        TapHeld = true;
+        TapUp = false;
+    }
+
+    public void OnClickUp(PointerEventData data) {
+        TapDown = false;
+        TapHeld = false;
+        TapUp = true;
+    }
+
+    #endregion ClickHandlers
+
     #region MonoBehaviour
     private void Awake() {
         Plane = new Plane(Vector3.up, transform.position.y);
         Camera = Camera ?? Camera.main;
+    }
+
+    private void Update() {
+        DebugTapUp = TapUp;
+        DebugTapHeld = TapHeld;
+        DebugTapDown = TapDown;
     }
 
     private void LateUpdate() {
@@ -47,6 +73,9 @@ public class BoardCursor : MonoBehaviour {
 
             BoardPoint = _theme.Vector3ToPoint(snapped);
         }
+
+        TapDown = false;
+        TapUp = false;
     }
 
     private void OnApplicationFocus(bool hasFocus) {
@@ -58,4 +87,6 @@ public class BoardCursor : MonoBehaviour {
                Input.mousePosition.y < 0 || Input.mousePosition.y >= Screen.height;
     }
     #endregion MonoBehaviour
+
+    
 }

@@ -3,6 +3,7 @@ using System.Collections;
 using LostGen;
 
 public class TestBoardViewController : BoardViewController {
+    public PlayerController PlayerController;
     private LostGen.CharacterController _enemyAI;
     // Use this for initialization
     public void Awake () {
@@ -39,6 +40,8 @@ public class TestBoardViewController : BoardViewController {
         Board.AddPawn(playerCombatant);
         Board.AddPawn(enemy);
 
+        PlayerController = PlayerController ?? GetComponentInChildren<PlayerController>();
         PlayerController.AddCombatant(playerCombatant);
+        PlayerController.AddCombatant(enemy);
     }
 }

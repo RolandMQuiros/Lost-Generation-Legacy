@@ -64,7 +64,7 @@ public partial class TrashMan : MonoBehaviour
 		if( cullExcessObjectsInterval > 0 )
 			StartCoroutine( cullExcessObjects() );
 	}
-#if UNITY_5
+#if UNITY_5_4
     private void OnEnable() {
         SceneManager.sceneLoaded += OnSceneLoad;
     }
@@ -138,15 +138,18 @@ public partial class TrashMan : MonoBehaviour
 	/// <param name="gameObjectInstanceId">Game object instance identifier.</param>
 	private static GameObject spawn( int gameObjectInstanceId, Vector3 position, Quaternion rotation, Transform parent )
 	{
-		if( instance._instanceIdToRecycleBin.ContainsKey( gameObjectInstanceId ) )
+        TrashManRecycleBin recycleBin;
+        instance._instanceIdToRecycleBin.TryGetValue(gameObjectInstanceId, out recycleBin);
+
+        if ( recycleBin != null )
 		{
-			var newGo = instance._instanceIdToRecycleBin[gameObjectInstanceId].spawn();
+			var newGo = recycleBin.spawn();
 
 			if( newGo != null )
 			{
 				var newTransform = newGo.transform;
-                newTransform.SetParent(parent, false);
-
+                
+                newTransform.SetParent(recycleBin.parent ?? parent, false);
 				newTransform.position = position;
 				newTransform.rotation = rotation;
 
