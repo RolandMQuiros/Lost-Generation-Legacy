@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using LostGen;
 
 public class BoardCursor : MonoBehaviour {
     #region UnityFields
     public Camera Camera;
+    public PointEvent Moved;
+    public PointEvent Tapped;
     #endregion
 
+    #region Properties
     public Vector3 ScreenPoint { get; private set; }
     public Vector3 WorldPoint { get; private set; }
 
@@ -16,15 +20,21 @@ public class BoardCursor : MonoBehaviour {
     public bool TapHeld { get; private set; }
     public bool TapDown { get; private set; }
 
+    public Plane Plane { get; private set; }
+    public Point BoardPoint { get; private set; }
+    #endregion Properties
+
+    #region Debug
     public bool DebugTapUp;
     public bool DebugTapHeld;
     public bool DebugTapDown;
+    #endregion Debug
 
-    public Plane Plane { get; private set; }
-    public Point BoardPoint { get; private set; }
-
+    #region PrivateMembers
     private BoardTheme _theme;
     private bool _isWindowFocused = true;
+    private Point _oldPoint;
+    #endregion PrivateMembers
 
     public void Initialize(BoardTheme theme) {
         _theme = theme;
@@ -42,6 +52,8 @@ public class BoardCursor : MonoBehaviour {
         TapDown = false;
         TapHeld = false;
         TapUp = true;
+
+        Tapped.Invoke(BoardPoint);
     }
 
     #endregion ClickHandlers
@@ -72,6 +84,10 @@ public class BoardCursor : MonoBehaviour {
             transform.position = snapped;
 
             BoardPoint = _theme.Vector3ToPoint(snapped);
+            if (_oldPoint != BoardPoint) {
+                _oldPoint = BoardPoint;
+                Moved.Invoke(BoardPoint);
+            }
         }
 
         TapDown = false;

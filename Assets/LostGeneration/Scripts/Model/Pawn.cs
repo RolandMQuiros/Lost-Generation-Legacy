@@ -14,16 +14,35 @@ namespace LostGen {
         public int CharacterID { get; set; }
         /// <summary>Reference to the Board where this Pawn resides</summary>
         public Board Board { get; private set; }
-        /// <summary> Returns a read-only version of the footprint</summary>
+        /// <summary>Returns a read-only version of the footprint</summary>
         public ReadOnlyCollection<Point> Footprint { get { return _footprint.AsReadOnly(); } }
-
+        /// <summary>Returns the first PawnAction in the queue</summary>
+        public PawnAction FirstAction {
+            get {
+                PawnAction first = null;
+                if (_actions.First != null) {
+                    first = _actions.First.Value;
+                }
+                return first;
+            }
+        }
+        /// <summary>Returns the last PawnAction in the queue</summary>
+        public PawnAction LastAction {
+            get {
+                PawnAction last = null;
+                if (_actions.Last != null) {
+                    last = _actions.Last.Value;
+                }
+                return last;
+            }
+        }
         
         public Point Position {
             get { return _position; }
             set { Board.SetPawnPosition(this, value); }
         }
 
-        public IEnumerable<IPawnAction> Actions { get { return _actions; } }
+        public IEnumerable<PawnAction> Actions { get { return _actions; } }
         public int ActionCount { get { return _actions.Count; } }
 
         /// <summary>
@@ -54,7 +73,7 @@ namespace LostGen {
         public event CollisionDelegate CollisionStayed;
         public event CollisionDelegate CollisionExited;
 
-        protected LinkedList<IPawnAction> _actions = new LinkedList<IPawnAction>();
+        protected LinkedList<PawnAction> _actions = new LinkedList<PawnAction>();
         /// <summary>
         /// List of offsets that describe the space this Pawn takes up on the Board. For example, a very large door may take
         /// up four Points.
@@ -125,13 +144,13 @@ namespace LostGen {
             }
         }
 
-        public virtual void PushActions(IEnumerable<IPawnAction> actions) {
-            foreach (IPawnAction action in actions) {
+        public virtual void PushActions(IEnumerable<PawnAction> actions) {
+            foreach (PawnAction action in actions) {
                 _actions.AddLast(action);
             }
         }
 
-        public virtual void PushAction(IPawnAction action) {
+        public virtual void PushAction(PawnAction action) {
             _actions.AddLast(action);
         }
 
@@ -146,9 +165,12 @@ namespace LostGen {
 		///</summary>
 		public virtual bool Step() {
             if (_actions.Count > 0) {
-                IPawnAction stepAction = _actions.First.Value;
+                PawnAction stepAction = _actions.First.Value;
                 PreprocessAction(stepAction);
-                stepAction.Run();
+
+                stepAction.Do();
+                stepAction.React();
+
                 _actions.RemoveFirst();
             }
 
@@ -166,6 +188,6 @@ namespace LostGen {
             return compare;
         }
 
-        protected virtual void PreprocessAction(IPawnAction action) { }
+        protected virtual void PreprocessAction(PawnAction action) { }
     }
 }

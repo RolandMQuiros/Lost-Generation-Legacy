@@ -17,9 +17,12 @@ public class SkillView : MonoBehaviour {
     private BoardGridField _gridField;
     #endregion References
 
+    private Point _origin;
+
     public void Initialize(Combatant combatant, BoardGridField gridField) {
         _combatant = combatant;
         _combatant.SkillActivated += OnSkillActivated;
+        _combatant.SkillDeactivated += OnSkillDeactivated;
 
         _gridField = gridField;
     }
@@ -31,23 +34,23 @@ public class SkillView : MonoBehaviour {
     public void OnTargetingEnd() {
         if (_ranged != null) {
             _gridField.ClearPoints();
-            _gridField.AddPoints(_ranged.GetPath(), PathSprite);
-            _gridField.AddPoints(_ranged.GetAreaOfEffect(), AreaOfEffectSprite);
+            _gridField.AddPoints(_ranged.GetPath(_origin, _ranged.Target), PathSprite);
+            _gridField.AddPoints(_ranged.GetAreaOfEffect(_origin), AreaOfEffectSprite);
             _gridField.RebuildMesh();
         }
     }
 
     private void OnTargetChanged(Point point) {
         _gridField.ClearPoints();
-        _gridField.AddPoints(_ranged.GetRange(), RangeSprite);
-        _gridField.AddPoints(_ranged.GetPath(), PathSprite);
-        _gridField.AddPoints(_ranged.GetAreaOfEffect(), AreaOfEffectSprite);
+        _gridField.AddPoints(_ranged.GetRange(_origin), RangeSprite);
+        _gridField.AddPoints(_ranged.GetPath(_origin, point), PathSprite);
+        _gridField.AddPoints(_ranged.GetAreaOfEffect(point), AreaOfEffectSprite);
         _gridField.RebuildMesh();
     }
 
     private void OnDirectionChanged(CardinalDirection direction) {
         _gridField.ClearPoints();
-        _gridField.AddPoints(_directional.GetAreaOfEffect(_directional.Direction), AreaOfEffectSprite);
+        _gridField.AddPoints(_directional.GetAreaOfEffect(_origin, _directional.Direction), AreaOfEffectSprite);
         _gridField.RebuildMesh();
     }
 
@@ -58,6 +61,10 @@ public class SkillView : MonoBehaviour {
         } else if (_directional != null) {
             _directional.DirectionChanged -= OnDirectionChanged;
         }
+
+        // Figure out origin from ActionQueue
+        PawnAction lastAction = _combatant.LastAction;
+        _origin = (lastAction == null) ? _combatant.Position : lastAction.PostRunPosition;
 
         // Figure out what kind of skill it is
         _ranged = skill as RangedSkill;
@@ -71,5 +78,10 @@ public class SkillView : MonoBehaviour {
             _directional.DirectionChanged += OnDirectionChanged;
             OnDirectionChanged(_directional.Direction);
         }
+    }
+
+    private void OnSkillDeactivated(Combatant combatant, ISkill skill) {
+        _gridField.ClearPoints();
+        _gridField.RebuildMesh();
     }
 }

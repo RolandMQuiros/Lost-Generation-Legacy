@@ -1,7 +1,10 @@
 ﻿using System;
 
 namespace LostGen {
-    public class DamageAction : IPawnAction {
+    public class DamageAction : PawnAction {
+        public override Point PostRunPosition {
+            get { return Owner.Position; }
+        }
         public int Amount { get; private set; }
         public Combatant Target { get; private set; }
         public Combatant Source { get; private set; }
@@ -12,7 +15,7 @@ namespace LostGen {
             Source = source;
         }
 
-        public override void Run() {
+        public override void React() {
             if (Amount > 0) {
                 Target.Health -= Amount;
                 Target.EmitMessage(

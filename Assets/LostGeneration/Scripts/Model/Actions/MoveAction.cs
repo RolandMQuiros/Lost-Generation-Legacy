@@ -21,9 +21,14 @@ namespace LostGen {
         }
 
         public override int ActionPoints { get { return Point.TaxicabDistance(Owner.Position, _destination); } }
+        public override Point PostRunPosition {
+            get { return _destination; }
+        }
 
+        private Point _start;
         private Point _destination;
         private bool _isContinuous;
+        private bool _moveSuccess;
 
         public MoveAction(Combatant owner, Point destination, bool isContinuous) 
             : base(owner) {
@@ -31,12 +36,19 @@ namespace LostGen {
             _isContinuous = isContinuous;
         }
 
-        public override void Run() {
-            Point start = Owner.Position;
+        public override void Do() {
+            _start = Owner.Position;
+            _moveSuccess = Owner.SetPosition(_destination);
+        }
 
-            if (Owner.SetPosition(_destination)) {
+        public override void Undo() {
+            Owner.SetPositionInternal(_start);
+        }
+
+        public override void React() {
+            if (_moveSuccess) {
                 SendMessage(
-                    new Message(Owner, start, _destination, _isContinuous)
+                    new Message(Owner, _start, _destination, _isContinuous)
                 );
             }
         }

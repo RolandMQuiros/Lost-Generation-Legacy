@@ -51,8 +51,8 @@ namespace LostGen {
             }
         }
 
-        public override IEnumerable<Point> GetAreaOfEffect(CardinalDirection direction, Point target) {
-            return _transforms[direction].Select(point => point + target);
+        public override IEnumerable<Point> GetAreaOfEffect(Point origin, CardinalDirection direction) {
+            return _transforms[direction].Select(point => point + origin);
         }
 
         public bool InAreaOfEffect(CardinalDirection direction, Point target) {

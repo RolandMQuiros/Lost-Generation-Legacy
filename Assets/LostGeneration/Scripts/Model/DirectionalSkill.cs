@@ -22,15 +22,15 @@ namespace LostGen {
         private CardinalDirection _direction;
 
         public DirectionalSkill(Combatant owner, string name, string description) : base(owner, name, description) { }
-        public abstract IEnumerable<Point> GetAreaOfEffect(CardinalDirection direction, Point target);
-        public override IEnumerable<Point> GetAreaOfEffect(Point target) {
-            return GetAreaOfEffect(Direction, target);
+        public abstract IEnumerable<Point> GetAreaOfEffect(Point origin, CardinalDirection direction);
+        public override IEnumerable<Point> GetAreaOfEffect(Point origin) {
+            return GetAreaOfEffect(origin, Direction);
         }
         public virtual IEnumerable<Point> GetAreaOfEffect(CardinalDirection direction) {
-            return GetAreaOfEffect(direction, Owner.Position);
+            return GetAreaOfEffect(Owner.Position, direction);
         }
         public virtual IEnumerable<Point> GetAreaOfEffect() {
-            return GetAreaOfEffect(Direction, Owner.Position);
+            return GetAreaOfEffect(Owner.Position, Direction);
         }
     }
 }

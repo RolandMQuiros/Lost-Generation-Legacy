@@ -38,17 +38,17 @@ namespace LostGen {
             return _range;
         }
 
-        public override bool InRange(Point point) {
-            ReinitializeRange(Owner.Position);
+        public override bool InRange(Point origin, Point point) {
+            ReinitializeRange(origin);
             return _range.Contains(point);
         }
 
-        public override IEnumerable<Point> GetAreaOfEffect(Point target) {
-            yield return target;
+        public override IEnumerable<Point> GetAreaOfEffect(Point origin) {
+            yield return origin;
         }
 
-        public override IEnumerable<Point> GetPath() {
-            List<Board.Node> nodePath = FindPath();
+        public override IEnumerable<Point> GetPath(Point origin, Point target) {
+            List<Board.Node> nodePath = FindPath(origin, target);
             List<Point> path = new List<Point>();
 
             if (nodePath != null) {
@@ -64,7 +64,7 @@ namespace LostGen {
 
         public override void Fire() {
             MoveAction move = null;
-            List<Board.Node> path = FindPath();
+            List<Board.Node> path = FindPath(Owner.Position, Target);
 
             if (path != null) {
                 Debug.Log("Repathed");
@@ -78,24 +78,24 @@ namespace LostGen {
             }
         }
 
-        private List<Board.Node> FindPath() {
-            Board.Node end = _board.GetNode(Target, TileCost);
+        private List<Board.Node> FindPath(Point origin, Point target) {
+            Board.Node end = _board.GetNode(target, TileCost);
             List<Board.Node> path = null;
 
             if (end != null) {
-                Board.Node start = _board.GetNode(Owner.Position, TileCost);
+                Board.Node start = _board.GetNode(origin, TileCost);
 
                 if (start == null) {
                     throw new Exception("This Skill's owner is positioned outside the graph");
                 }
 
-                if (Point.TaxicabDistance(Owner.Position, Target) == 1) {
+                if (Point.TaxicabDistance(Owner.Position, target) == 1) {
                     path = new List<Board.Node>();
-                    path.Add(_board.GetNode(Target, TileCost));
+                    path.Add(_board.GetNode(target, TileCost));
                 } else {
                     path = new List<Board.Node>(
                         GraphMethods<Board.Node>.FindPath(
-                            new Board.Node(_board, Owner.Position, TileCost),
+                            new Board.Node(_board, origin, TileCost),
                             end,
                             Heuristic
                         )
@@ -113,11 +113,13 @@ namespace LostGen {
 
         private void ReinitializeRange(Point origin) {
             if (_range == null || _prevOrigin != origin) {
-                _range = new HashSet<Point>();
-                _prevOrigin = origin;
                 Board.Node startNode = Owner.Board.GetNode(origin, TileCost);
-                foreach (Board.Node node in GraphMethods<Board.Node>.FloodFill(startNode, Owner.ActionPoints)) {
-                    _range.Add(node.Point);
+                _prevOrigin = origin;
+                _range = new HashSet<Point>();
+                if (startNode != null) {
+                    foreach (Board.Node node in GraphMethods<Board.Node>.FloodFill(startNode, Owner.ActionPoints)) {
+                        _range.Add(node.Point);
+                    }
                 }
             }
         }

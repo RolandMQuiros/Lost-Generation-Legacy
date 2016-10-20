@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace LostGen {
-    public abstract class CombatantAction : IPawnAction {
+    public abstract class CombatantAction : PawnAction {
         public new Combatant Owner { get { return _combatantOwner; } }
         public abstract int ActionPoints { get; }
         private Combatant _combatantOwner;
@@ -12,7 +12,5 @@ namespace LostGen {
         public CombatantAction(Combatant owner) : base(owner) {
             _combatantOwner = owner;
         }
-
-        public abstract override void Run();
     }
 }

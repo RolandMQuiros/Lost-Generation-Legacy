@@ -4,38 +4,30 @@ using UnityEngine;
 using LostGen;
 
 public class RangedSkillController : MonoBehaviour, ISkillController {
-    public BoardCursor Cursor;
-    public bool DebugIsTargeting;
+    public Point Origin {
+        get { return _origin; }
+        set { _origin = value; }
+    }
 
     private RangedSkill _skill;
-    private bool _isTargeting = false;
-    private bool _initialTargeting = false;
+    private Point _origin;
 
-    public void StartTargeting(ISkill skill) {
+    public void StartTargeting(Point origin, ISkill skill) {
         _skill = (RangedSkill)skill;
-        _isTargeting = true;
-        _initialTargeting = true;
-        _skill.IsReadyToFire = false;
+        _origin = origin;
     }
 
-    #region MonoBehaviour
-    private void Update() {
-        if (_skill != null && _isTargeting) {
-            if (_skill.InRange(Cursor.BoardPoint)) {
-                if (Cursor.TapDown) {
-                    _isTargeting = false;
-                    _initialTargeting = false;
-                    _skill.Fire();
-                }
-
-                if (_initialTargeting || _skill.Target != Cursor.BoardPoint) {
-                    _skill.Target = Cursor.BoardPoint;
-                    _initialTargeting = false;
-                }
-            }
+    public void OnCursorMove(Point point) {
+        if (_skill != null && _skill.InRange(_origin, point)) {
+            _skill.Target = point;
         }
-
-        DebugIsTargeting = _isTargeting;
     }
-    #endregion MonoBehaviour
+
+    public void OnTap(Point point) {
+        if (_skill != null && _skill.InRange(_origin, point)) {
+            _skill.Fire();
+            _skill.Owner.ClearActiveSkill();
+            _skill = null;
+        }
+    }
 }

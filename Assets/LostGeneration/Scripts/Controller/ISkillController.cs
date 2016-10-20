@@ -3,5 +3,5 @@ using System.Collections.Generic;
 using LostGen;
 
 public interface ISkillController {
-    void StartTargeting(ISkill skill);
+    void StartTargeting(Point origin, ISkill skill);
 }

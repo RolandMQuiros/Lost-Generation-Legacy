@@ -14,9 +14,7 @@ namespace LostGen {
                 }
             }
         }
-
         public event Action<Point> TargetChanged;
-
         private Point _target;
 
         public RangedSkill(Combatant owner, string name, string description)
@@ -27,11 +25,18 @@ namespace LostGen {
         public virtual IEnumerable<Point> GetRange() {
             return GetRange(Owner.Position);
         }
-        public abstract bool InRange(Point point);
+        public abstract bool InRange(Point origin, Point point);
+        public virtual bool InRange(Point point) {
+            return InRange(Owner.Position, point);
+        }
+
         public virtual IEnumerable<Point> GetAreaOfEffect() {
             return GetAreaOfEffect(Target);
         }
 
-        public abstract IEnumerable<Point> GetPath();
+        public abstract IEnumerable<Point> GetPath(Point origin, Point target);
+        public virtual IEnumerable<Point> GetPath() {
+            return GetPath(Owner.Position, Target);
+        }
     }
 }

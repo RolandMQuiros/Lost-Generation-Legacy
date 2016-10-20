@@ -38,18 +38,6 @@ namespace LostGen {
 
         public ISkill ActiveSkill {
             get { return _activeSkill;  }
-            set {
-                if (_skills.ContainsValue(value)) {
-                    if (_activeSkill != value) {
-                        _activeSkill = value;
-                        if (SkillActivated != null) {
-                            SkillActivated(this, _activeSkill);
-                        }
-                    }
-                } else {
-                    throw new ArgumentException("No Skill " + value + " is assigned to this Combatant " + ToString());
-                }
-            }
         }
 
         public Team Team;
@@ -74,6 +62,7 @@ namespace LostGen {
         public event Action<Combatant, ISkill> SkillRemoved;
         public event Action<Combatant, ISkill> SkillFired;
         public event Action<Combatant, ISkill> SkillActivated;
+        public event Action<Combatant, ISkill> SkillDeactivated;
         public event Action<Combatant, IEnumerable<CombatantAction>> ActionsAdded;
         public event Action<Combatant, Gear> GearEquipped;
         public event Action<Combatant, Gear> GearRemoved;
@@ -112,12 +101,42 @@ namespace LostGen {
             return _skills.ContainsValue(skill);
         }
 
+        public void SetActiveSkill(ISkill skill) {
+            if (skill == null || _skills.ContainsValue(skill)) {
+                if (_activeSkill != skill) {
+                    ISkill oldSkill = _activeSkill;
+                    _activeSkill = skill;
+
+                    if (_activeSkill == null) {
+                        if (SkillDeactivated != null) {
+                            SkillDeactivated(this, oldSkill);
+                        }
+                    } else if (SkillActivated != null) {
+                        SkillActivated(this, _activeSkill);
+                    }
+                }
+            } else {
+                throw new ArgumentException("No Skill " + skill + " is assigned to this Combatant " + ToString());
+            }
+        }
+
         public void SetActiveSkill<T>() where T : ISkill {
             ISkill skill = GetSkill<T>();
             if (skill == null) {
                 throw new NullReferenceException("No Skill of type " + typeof(T) + " is assigned to this Combatant " + ToString());
             }
-            _activeSkill = skill;
+            SetActiveSkill(skill);
+        }
+
+        public void ClearActiveSkill() {
+            if (_activeSkill != null) {
+                ISkill oldSkill = _activeSkill;
+                _activeSkill = null;
+
+                if (SkillDeactivated != null) {
+                    SkillDeactivated(this, oldSkill);
+                }
+            }
         }
 
         public IEnumerable<Pawn> GetKnownPawns() {
@@ -155,7 +174,7 @@ namespace LostGen {
 
         #region PawnOverrides
 
-        public override void PushAction(IPawnAction action) {
+        public override void PushAction(PawnAction action) {
             base.PushAction(action);
 
             CombatantAction combatantAction;
@@ -164,10 +183,10 @@ namespace LostGen {
             }
         }
 
-        public override void PushActions(IEnumerable<IPawnAction> actions) {
+        public override void PushActions(IEnumerable<PawnAction> actions) {
             base.PushActions(actions);
 
-            foreach (IPawnAction action in actions) {
+            foreach (PawnAction action in actions) {
                 CombatantAction combatantAction;
                 if ((combatantAction = action as CombatantAction) != null) {
                     _queueCost += combatantAction.ActionPoints;
@@ -184,7 +203,7 @@ namespace LostGen {
             _actionPoints = EffectiveStats.Stamina;
         }
 
-        protected override void PreprocessAction(IPawnAction action) {
+        protected override void PreprocessAction(PawnAction action) {
             CombatantAction combatantAction = action as CombatantAction;
             if (combatantAction != null) {
                 _actionPoints -= combatantAction.ActionPoints;
