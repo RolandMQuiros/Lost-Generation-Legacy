@@ -33,22 +33,22 @@ namespace LostGen {
 
         #region PointCollections
 
-        public override IEnumerable<Point> GetRange(Point origin) {
-            ReinitializeRange(origin);
+        public override IEnumerable<Point> GetRange() {
+            ReinitializeRange(Owner.Position);
             return _range;
         }
 
-        public override bool InRange(Point origin, Point point) {
-            ReinitializeRange(origin);
+        public override bool InRange(Point point) {
+            ReinitializeRange(Owner.Position);
             return _range.Contains(point);
         }
 
-        public override IEnumerable<Point> GetAreaOfEffect(Point origin) {
-            yield return origin;
+        public override IEnumerable<Point> GetAreaOfEffect() {
+            yield return Target;
         }
 
-        public override IEnumerable<Point> GetPath(Point origin, Point target) {
-            List<Board.Node> nodePath = FindPath(origin, target);
+        public override IEnumerable<Point> GetPath() {
+            List<Board.Node> nodePath = FindPath(Owner.Position, Target);
             List<Point> path = new List<Point>();
 
             if (nodePath != null) {

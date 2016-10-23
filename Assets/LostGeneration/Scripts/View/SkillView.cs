@@ -34,23 +34,23 @@ public class SkillView : MonoBehaviour {
     public void OnTargetingEnd() {
         if (_ranged != null) {
             _gridField.ClearPoints();
-            _gridField.AddPoints(_ranged.GetPath(_origin, _ranged.Target), PathSprite);
-            _gridField.AddPoints(_ranged.GetAreaOfEffect(_origin), AreaOfEffectSprite);
+            _gridField.AddPoints(_ranged.GetPath(), PathSprite);
+            _gridField.AddPoints(_ranged.GetAreaOfEffect(), AreaOfEffectSprite);
             _gridField.RebuildMesh();
         }
     }
 
     private void OnTargetChanged(Point point) {
         _gridField.ClearPoints();
-        _gridField.AddPoints(_ranged.GetRange(_origin), RangeSprite);
-        _gridField.AddPoints(_ranged.GetPath(_origin, point), PathSprite);
-        _gridField.AddPoints(_ranged.GetAreaOfEffect(point), AreaOfEffectSprite);
+        _gridField.AddPoints(_ranged.GetRange(), RangeSprite);
+        _gridField.AddPoints(_ranged.GetPath(), PathSprite);
+        _gridField.AddPoints(_ranged.GetAreaOfEffect(), AreaOfEffectSprite);
         _gridField.RebuildMesh();
     }
 
     private void OnDirectionChanged(CardinalDirection direction) {
         _gridField.ClearPoints();
-        _gridField.AddPoints(_directional.GetAreaOfEffect(_origin, _directional.Direction), AreaOfEffectSprite);
+        _gridField.AddPoints(_directional.GetAreaOfEffect(), AreaOfEffectSprite);
         _gridField.RebuildMesh();
     }
 

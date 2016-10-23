@@ -55,8 +55,9 @@ namespace LostGen.Decision {
             List<KeyValuePair<CardinalDirection, Point>> possibleDestinations = new List<KeyValuePair<CardinalDirection, Point>>();
             for (int i = 0; i < (int)CardinalDirection.Count; i++) {
                 CardinalDirection direction = (CardinalDirection)i;
+                _melee.SetDirection(direction);
 
-                foreach (Point aoeOffset in _melee.GetAreaOfEffect(direction)) {
+                foreach (Point aoeOffset in _melee.GetAreaOfEffect()) {
                     // For each point in the area of effect, see where we would need to be
                     Point strikePosition = _target.Position - aoeOffset;
                     if (_source.Board.InBounds(strikePosition) && // Make sure new standing position is on the Board
@@ -76,7 +77,7 @@ namespace LostGen.Decision {
                 _direction = first.Key;
                 _destination = first.Value;
 
-                _walk.Target = _destination;
+                _walk.SetTarget(_destination);
             }
         }
     }

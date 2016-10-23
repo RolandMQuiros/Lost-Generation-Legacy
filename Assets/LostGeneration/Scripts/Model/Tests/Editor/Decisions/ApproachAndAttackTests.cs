@@ -20,9 +20,10 @@ namespace Tests.Decisions {
             };
 
             MeleeAttackSkill attack = new MeleeAttackSkill(attacker, new Point[] { Point.Right, 2 * Point.Right }) {
-                ActionPoints = 3,
-                Direction = CardinalDirection.East
+                ActionPoints = 3
             };
+            attack.SetDirection(CardinalDirection.East);
+
             attacker.AddSkill(attack);
             attack.Fire();
 

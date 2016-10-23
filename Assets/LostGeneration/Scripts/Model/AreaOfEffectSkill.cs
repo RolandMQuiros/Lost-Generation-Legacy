@@ -17,7 +17,7 @@ namespace LostGen {
             Description = description;
         }
 
-        public abstract IEnumerable<Point> GetAreaOfEffect(Point target);
+        public abstract IEnumerable<Point> GetAreaOfEffect();
         public abstract void Fire();
     }
 }

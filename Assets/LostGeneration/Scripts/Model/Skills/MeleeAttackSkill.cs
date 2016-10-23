@@ -51,16 +51,16 @@ namespace LostGen {
             }
         }
 
-        public override IEnumerable<Point> GetAreaOfEffect(Point origin, CardinalDirection direction) {
-            return _transforms[direction].Select(point => point + origin);
+        public override IEnumerable<Point> GetAreaOfEffect() {
+            return _transforms[Direction].Select(point => point + Owner.Position);
         }
 
-        public bool InAreaOfEffect(CardinalDirection direction, Point target) {
+        public bool InAreaOfEffect(Point target) {
             bool found = false;
 
             if (_fullAreaOfEffect.Contains(target - Owner.Position)) {
-                for (int i = 0; !found && i < _transforms[direction].Length; i++) {
-                    Point aoePoint = _transforms[direction][i];
+                for (int i = 0; !found && i < _transforms[Direction].Length; i++) {
+                    Point aoePoint = _transforms[Direction][i];
                     if (aoePoint.Equals(Owner.Position - target)) {
                         if (PierceWalls && PierceSolids) {
                             found = true;

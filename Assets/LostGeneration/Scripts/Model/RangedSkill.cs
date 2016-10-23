@@ -5,14 +5,6 @@ namespace LostGen {
     public abstract class RangedSkill : AreaOfEffectSkill {
         public virtual Point Target {
             get { return _target; }
-            set {
-                if (_target != value) {
-                    _target = value;
-                    if (TargetChanged != null) {
-                        TargetChanged(_target);
-                    }
-                }
-            }
         }
         public event Action<Point> TargetChanged;
         private Point _target;
@@ -21,22 +13,18 @@ namespace LostGen {
             : base(owner, name, description) {
         }
 
-        public abstract IEnumerable<Point> GetRange(Point origin);
-        public virtual IEnumerable<Point> GetRange() {
-            return GetRange(Owner.Position);
-        }
-        public abstract bool InRange(Point origin, Point point);
-        public virtual bool InRange(Point point) {
-            return InRange(Owner.Position, point);
-        }
+        public abstract IEnumerable<Point> GetRange();
+        public abstract bool InRange(Point point);
+        public abstract override IEnumerable<Point> GetAreaOfEffect();
+        public abstract IEnumerable<Point> GetPath();
 
-        public virtual IEnumerable<Point> GetAreaOfEffect() {
-            return GetAreaOfEffect(Target);
-        }
-
-        public abstract IEnumerable<Point> GetPath(Point origin, Point target);
-        public virtual IEnumerable<Point> GetPath() {
-            return GetPath(Owner.Position, Target);
+        public void SetTarget(Point target) {
+            if (_target != target) {
+                _target = target;
+                if (TargetChanged != null) {
+                    TargetChanged(_target);
+                }
+            }
         }
     }
 }

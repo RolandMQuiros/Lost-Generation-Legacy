@@ -39,10 +39,9 @@ namespace LostGen.Decision {
             CardinalDirection direction;
             bool directionFound = false;
             for (direction = CardinalDirection.East; !directionFound && direction < CardinalDirection.Count; direction++) {
-                directionFound = _melee.GetAreaOfEffect(direction).Contains(_target.Position);
+                _melee.SetDirection(direction); // TODO: undo this
+                directionFound = _melee.GetAreaOfEffect().Contains(_target.Position);
             }
-
-            _melee.Direction = direction;
             _melee.Fire();
         }
     }

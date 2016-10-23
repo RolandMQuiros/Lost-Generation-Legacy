@@ -19,7 +19,7 @@ namespace Tests.Skills {
             WalkSkill walk = new WalkSkill(pawn);
             pawn.AddSkill(walk);
 
-            walk.Target = end;
+            walk.SetTarget(end);
 
             board.BeginTurn();
         }

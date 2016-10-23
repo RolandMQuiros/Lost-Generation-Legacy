@@ -18,13 +18,13 @@ public class RangedSkillController : MonoBehaviour, ISkillController {
     }
 
     public void OnCursorMove(Point point) {
-        if (_skill != null && _skill.InRange(_origin, point)) {
-            _skill.Target = point;
+        if (_skill != null && _skill.InRange(point)) {
+            _skill.SetTarget(point);
         }
     }
 
     public void OnTap(Point point) {
-        if (_skill != null && _skill.InRange(_origin, point)) {
+        if (_skill != null && _skill.InRange(point)) {
             _skill.Fire();
             _skill.Owner.ClearActiveSkill();
             _skill = null;

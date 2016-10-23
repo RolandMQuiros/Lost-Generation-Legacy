@@ -32,7 +32,7 @@ public class DirectionalSkillController : MonoBehaviour, ISkillController {
             CardinalDirection direction = Point.DirectionBetweenPoints(_skill.Owner.Position, Cursor.BoardPoint);
 
             if (direction != _skill.Direction || _initialTargeting) {
-                _skill.Direction = direction;
+                _skill.SetDirection(direction);
                 _initialTargeting = false;
             }
 
