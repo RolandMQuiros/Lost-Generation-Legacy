@@ -6,6 +6,8 @@ namespace LostGen {
     public class Pawn : IComparable<Pawn> {
         /// <summary>Counter used to generate unique Pawn ID</summary>
         private static ulong _idCounter;
+
+        #region Properties
         /// <summary>Unique instance identifier number</summary>
         public ulong InstanceID { get; private set; }
         /// <summary>User-facing name. Can also be used to search for Pawns on a Board.</summary>
@@ -44,7 +46,9 @@ namespace LostGen {
 
         public IEnumerable<PawnAction> Actions { get { return _actions; } }
         public int ActionCount { get { return _actions.Count; } }
+        #endregion Properties
 
+        #region Fields
         /// <summary>
         /// Sorting priority. Determines what order the Board executes the Pawn steps.
         /// 
@@ -65,6 +69,9 @@ namespace LostGen {
         /// Whether or not this Pawn stops field of view or light sources
         /// </summary>
         public bool IsOpaque;
+        #endregion Fields
+
+        #region Events
 
         public event EventHandler<MessageArgs> Messages;
 
@@ -72,6 +79,13 @@ namespace LostGen {
         public event CollisionDelegate CollisionEntered;
         public event CollisionDelegate CollisionStayed;
         public event CollisionDelegate CollisionExited;
+
+        public event Action<Pawn, Point, Point> Moved;
+        public event Action<Pawn, PawnAction> ActionAdded;
+        public event Action<Pawn, IEnumerable<PawnAction>> ActionsAdded;
+        public event Action<Pawn> ActionsCleared;
+
+        #endregion Events
 
         protected LinkedList<PawnAction> _actions = new LinkedList<PawnAction>();
         /// <summary>
@@ -110,7 +124,11 @@ namespace LostGen {
 
         ///<summary>Used by internally by Board. Do not use.</summary>
         public void SetPositionInternal(Point newPosition) {
+            Point oldPosition = _position;
             _position = newPosition;
+            if (Moved != null) {
+                Moved(this, oldPosition, newPosition);
+            }
         }
 
         public bool SetPosition(Point destination) {
@@ -146,16 +164,19 @@ namespace LostGen {
 
         public virtual void PushActions(IEnumerable<PawnAction> actions) {
             foreach (PawnAction action in actions) {
-                _actions.AddLast(action);
+                PushAction(action);
             }
+            if (ActionsAdded != null) { ActionsAdded(this, actions); }
         }
 
         public virtual void PushAction(PawnAction action) {
             _actions.AddLast(action);
+            if (ActionAdded != null) { ActionAdded(this, action); }
         }
 
         public virtual void ClearActions() {
             _actions.Clear();
+            if (ActionsCleared != null) { ActionsCleared(this); }
         }
         
         public virtual void BeginTurn() { }

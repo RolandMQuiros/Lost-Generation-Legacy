@@ -121,4 +121,11 @@ public class PlayerSkillTray : MonoBehaviour {
         
         return newPage;
     }
+
+    public int DebugX;
+    public int DebugY;
+    private void Update() {
+        DebugX = Combatant.Position.X;
+        DebugY = Combatant.Position.Y;
+    }
 }

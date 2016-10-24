@@ -4,17 +4,11 @@ using UnityEngine;
 using LostGen;
 
 public class RangedSkillController : MonoBehaviour, ISkillController {
-    public Point Origin {
-        get { return _origin; }
-        set { _origin = value; }
-    }
-
     private RangedSkill _skill;
     private Point _origin;
 
-    public void StartTargeting(Point origin, ISkill skill) {
+    public void StartTargeting(ISkill skill) {
         _skill = (RangedSkill)skill;
-        _origin = origin;
     }
 
     public void OnCursorMove(Point point) {
@@ -25,8 +19,7 @@ public class RangedSkillController : MonoBehaviour, ISkillController {
 
     public void OnTap(Point point) {
         if (_skill != null && _skill.InRange(point)) {
-            _skill.Fire();
-            _skill.Owner.ClearActiveSkill();
+            _skill.Owner.FireActiveSkill();
             _skill = null;
         }
     }

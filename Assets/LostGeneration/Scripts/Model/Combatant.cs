@@ -63,7 +63,6 @@ namespace LostGen {
         public event Action<Combatant, ISkill> SkillFired;
         public event Action<Combatant, ISkill> SkillActivated;
         public event Action<Combatant, ISkill> SkillDeactivated;
-        public event Action<Combatant, IEnumerable<CombatantAction>> ActionsAdded;
         public event Action<Combatant, Gear> GearEquipped;
         public event Action<Combatant, Gear> GearRemoved;
         #endregion Events
@@ -136,6 +135,14 @@ namespace LostGen {
                 if (SkillDeactivated != null) {
                     SkillDeactivated(this, oldSkill);
                 }
+            }
+        }
+
+        public void FireActiveSkill() {
+            if (_activeSkill != null) {
+                _activeSkill.Fire();
+                if (SkillFired != null) { SkillFired(this, _activeSkill); }
+                ClearActiveSkill();
             }
         }
 

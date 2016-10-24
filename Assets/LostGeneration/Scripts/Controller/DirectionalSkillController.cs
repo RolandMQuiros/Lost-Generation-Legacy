@@ -6,11 +6,6 @@ using LostGen;
 public class DirectionalSkillController : MonoBehaviour, ISkillController {
     public BoardCursor Cursor;
 
-    public Point Origin {
-        get { return _origin; }
-        set { _origin = value; }
-    }
-
     public string DebugDirection;
     public bool DebugIsTargeting;
 
@@ -19,8 +14,7 @@ public class DirectionalSkillController : MonoBehaviour, ISkillController {
     private bool _isTargeting = false;
     private bool _initialTargeting = false;
 
-    public void StartTargeting(Point origin, ISkill skill) {
-        _origin = origin;
+    public void StartTargeting(ISkill skill) {
         _skill = (DirectionalSkill)skill;
         _isTargeting = true;
         _initialTargeting = true;

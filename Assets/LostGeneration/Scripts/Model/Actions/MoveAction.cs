@@ -20,25 +20,25 @@ namespace LostGen {
             }
         }
 
-        public override int ActionPoints { get { return Point.TaxicabDistance(Owner.Position, _destination); } }
+        public override int ActionPoints { get { return Point.TaxicabDistance(Owner.Position, _end); } }
         public override Point PostRunPosition {
-            get { return _destination; }
+            get { return _end; }
         }
 
         private Point _start;
-        private Point _destination;
+        private Point _end;
         private bool _isContinuous;
         private bool _moveSuccess;
 
-        public MoveAction(Combatant owner, Point destination, bool isContinuous) 
+        public MoveAction(Combatant owner, Point start, Point end, bool isContinuous) 
             : base(owner) {
-            _destination = destination;
+            _start = start;
+            _end = end;
             _isContinuous = isContinuous;
         }
 
         public override void Do() {
-            _start = Owner.Position;
-            _moveSuccess = Owner.SetPosition(_destination);
+            _moveSuccess = Owner.SetPosition(_end);
         }
 
         public override void Undo() {
@@ -48,9 +48,13 @@ namespace LostGen {
         public override void React() {
             if (_moveSuccess) {
                 SendMessage(
-                    new Message(Owner, _start, _destination, _isContinuous)
+                    new Message(Owner, _start, _end, _isContinuous)
                 );
             }
+        }
+
+        public override string ToString() {
+            return "Move Action: { start: " + _start + "; end: " + _end + " }";
         }
     }
 }

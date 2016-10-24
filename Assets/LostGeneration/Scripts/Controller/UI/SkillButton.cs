@@ -5,7 +5,7 @@ using LostGen;
 
 public class SkillButton : MonoBehaviour {
     public ISkill Skill { get { return _skill; } }
-    public event Action<Point, ISkill> Activated;
+    public event Action<ISkill> Activated;
     private ISkill _skill;
 
     public void Initialize(ISkill skill) {
@@ -24,6 +24,6 @@ public class SkillButton : MonoBehaviour {
             origin = _skill.Owner.Position;
         }
 
-        Activated.Invoke(origin, _skill);
+        Activated.Invoke(_skill);
     }
 }

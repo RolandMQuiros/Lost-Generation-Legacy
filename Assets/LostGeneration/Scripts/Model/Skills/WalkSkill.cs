@@ -52,7 +52,7 @@ namespace LostGen {
             List<Point> path = new List<Point>();
 
             if (nodePath != null) {
-                for (int i = 0; i < nodePath.Count; i++) {
+                for (int i = 1; i < nodePath.Count; i++) {
                     path.Add(nodePath[i].Point);
                 }
             }
@@ -68,8 +68,8 @@ namespace LostGen {
 
             if (path != null) {
                 Debug.Log("Repathed");
-                for (int i = 0; i < path.Count; i++) {
-                    move = new MoveAction(Owner, path[i].Point, true);
+                for (int i = 1; i < path.Count; i++) {
+                    move = new MoveAction(Owner, path[i - 1].Point, path[i].Point, true);
                     Owner.PushAction(move);
                 }
 
@@ -91,6 +91,7 @@ namespace LostGen {
 
                 if (Point.TaxicabDistance(Owner.Position, target) == 1) {
                     path = new List<Board.Node>();
+                    path.Add(_board.GetNode(origin, TileCost));
                     path.Add(_board.GetNode(target, TileCost));
                 } else {
                     path = new List<Board.Node>(

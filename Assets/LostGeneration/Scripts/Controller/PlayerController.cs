@@ -14,6 +14,9 @@ public class PlayerController : MonoBehaviour {
     public BoardCamera Camera;
     public PlayerSkillTray SkillTray;
     public Button GoButton;
+    public Timeline Timeline;
+
+    public DebugPanel DebugPanel;
     #endregion EditorFields
 
     #region Events
@@ -56,6 +59,7 @@ public class PlayerController : MonoBehaviour {
     public void AddCombatant(Combatant combatant) {
         _units.Add(combatant);
         SkillTray.AddCombatant(combatant);
+        Timeline.AddCombatant(combatant);
         if (_units.Count == 1) {
             _activeUnit = 0;
             SkillTray.Combatant = _units[0];
@@ -65,8 +69,15 @@ public class PlayerController : MonoBehaviour {
     public void RemoveCombatant(Combatant combatant) {
         _units.Remove(combatant);
         SkillTray.RemoveCombatant(combatant);
+        Timeline.RemoveCombatant(combatant);
     }
     #endregion PublicMethods
+
+    #region CombatantMethods
+    public void ClearActions() {
+        _units[_activeUnit].ClearActions();
+    }
+    #endregion CombatantMethods
 
     #region PrivateMethods
 
@@ -74,6 +85,8 @@ public class PlayerController : MonoBehaviour {
         _activeUnit = (_activeUnit + 1) % _units.Count;
         SkillTray.Combatant = _units[_activeUnit];
         Camera.Pan(_units[_activeUnit].Position, 0.5f);
+
+        DebugPanel.Combatant = _units[_activeUnit];
     }
 
     private bool AreCombatantsReady() {
