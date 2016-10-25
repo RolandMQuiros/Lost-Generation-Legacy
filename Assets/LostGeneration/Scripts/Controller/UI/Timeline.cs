@@ -51,7 +51,11 @@ public class Timeline : MonoBehaviour {
         return removed;
     }
 
-    public void ResetToPresent() {
+    public void ToBeginning() {
+        SetStep(0);
+    }
+
+    public void ToEnd() {
         SetStep(_maxSteps);
     }
 
@@ -90,7 +94,7 @@ public class Timeline : MonoBehaviour {
     }
 
     private void OnSkillActivated(Combatant combatant, ISkill skill) {
-        ResetToPresent();
+        ToEnd();
     }
 
     private void OnSkillFired(Combatant combatant, ISkill skill) {
@@ -102,7 +106,7 @@ public class Timeline : MonoBehaviour {
     }
 
     private void FindMaxSteps() {
-        ResetToPresent();
+        ToEnd();
         _maxSteps = 0;
         for (int i = 0; i < _combatants.Count; i++) {
             int count = _combatants[i].Actions.Count();
