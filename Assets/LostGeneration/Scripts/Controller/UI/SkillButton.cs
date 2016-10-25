@@ -14,16 +14,6 @@ public class SkillButton : MonoBehaviour {
 
     public void OnActivate() {
         _skill.Owner.SetActiveSkill(_skill);
-
-        PawnAction lastAction = _skill.Owner.LastAction;
-        Point origin;
-
-        if (lastAction != null) {
-            origin = lastAction.PostRunPosition;
-        } else {
-            origin = _skill.Owner.Position;
-        }
-
         Activated.Invoke(_skill);
     }
 }

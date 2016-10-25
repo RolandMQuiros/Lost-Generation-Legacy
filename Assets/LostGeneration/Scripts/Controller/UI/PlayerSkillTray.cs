@@ -70,6 +70,25 @@ public class PlayerSkillTray : MonoBehaviour {
         }
     }
 
+    public void EnableInteractions() {
+        foreach (List<SkillButton> buttons in _buttons.Values) {
+            for (int i = 0; i < buttons.Count; i++) {
+                Button button = buttons[i].GetComponent<Button>();
+                button.interactable = true;
+            }
+        }
+    }
+
+    public void DisableInteractions() {
+        foreach (List<SkillButton> buttons in _buttons.Values) {
+            for (int i = 0; i < buttons.Count; i++) {
+                Button button = buttons[i].GetComponent<Button>();
+                button.interactable = false;
+            }
+        }
+    }
+
+    #region PrivateMethods
     private void SetCombatant(Combatant combatant) {
         if (!_buttons.ContainsKey(combatant)) {
             throw new ArgumentException("Combatant " + combatant + " is not handled by this PlayerSkillTray. Add it by calling PlayerSkillTray.AddCombatant.", "combatant");
@@ -113,7 +132,8 @@ public class PlayerSkillTray : MonoBehaviour {
 
             List<SkillButton> buttons = _buttons[_combatant];
             for (int i = start; i < end; i++) {
-                buttons[i].transform.localPosition = new Vector3(offset * ButtonSpacing, 0f, 0f);
+                RectTransform transform = buttons[i].GetComponent<RectTransform>();
+                transform.anchoredPosition = new Vector2(offset * ButtonSpacing, 0f);
                 buttons[i].gameObject.SetActive(true);
                 offset++;
             }
@@ -121,11 +141,5 @@ public class PlayerSkillTray : MonoBehaviour {
         
         return newPage;
     }
-
-    public int DebugX;
-    public int DebugY;
-    private void Update() {
-        DebugX = Combatant.Position.X;
-        DebugY = Combatant.Position.Y;
-    }
+    #endregion PrivateMethods
 }

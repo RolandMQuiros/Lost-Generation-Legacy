@@ -41,6 +41,8 @@ public class PlayerController : MonoBehaviour {
     private void Start() {
         SkillTray.RangedSkillController = _rangedSkillController;
         SkillTray.DirectionalSkillController = _directionalSkillController;
+
+        Timeline.Rewinded.AddListener(ClearAllActiveSkills);
     }
 
     private void Update() {
@@ -76,6 +78,16 @@ public class PlayerController : MonoBehaviour {
     #region CombatantMethods
     public void ClearActions() {
         _units[_activeUnit].ClearActions();
+    }
+
+    public void ClearActiveSkill() {
+        _units[_activeUnit].ClearActiveSkill();
+    }
+
+    public void ClearAllActiveSkills() {
+        for (int i = 0; i < _units.Count; i++) {
+            _units[i].ClearActiveSkill();
+        }
     }
     #endregion CombatantMethods
 

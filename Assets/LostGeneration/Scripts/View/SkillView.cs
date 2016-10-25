@@ -41,17 +41,21 @@ public class SkillView : MonoBehaviour {
     }
 
     private void OnTargetChanged(Point point) {
-        _gridField.ClearPoints();
-        _gridField.AddPoints(_ranged.GetRange(), RangeSprite);
-        _gridField.AddPoints(_ranged.GetPath(), PathSprite);
-        _gridField.AddPoints(_ranged.GetAreaOfEffect(), AreaOfEffectSprite);
-        _gridField.RebuildMesh();
+        if (_ranged != null) {
+            _gridField.ClearPoints();
+            _gridField.AddPoints(_ranged.GetRange(), RangeSprite);
+            _gridField.AddPoints(_ranged.GetPath(), PathSprite);
+            _gridField.AddPoints(_ranged.GetAreaOfEffect(), AreaOfEffectSprite);
+            _gridField.RebuildMesh();
+        }
     }
 
     private void OnDirectionChanged(CardinalDirection direction) {
-        _gridField.ClearPoints();
-        _gridField.AddPoints(_directional.GetAreaOfEffect(), AreaOfEffectSprite);
-        _gridField.RebuildMesh();
+        if (_directional != null) {
+            _gridField.ClearPoints();
+            _gridField.AddPoints(_directional.GetAreaOfEffect(), AreaOfEffectSprite);
+            _gridField.RebuildMesh();
+        }
     }
 
     private void OnSkillActivated(Combatant combatant, ISkill skill) {
@@ -83,5 +87,7 @@ public class SkillView : MonoBehaviour {
     private void OnSkillDeactivated(Combatant combatant, ISkill skill) {
         _gridField.ClearPoints();
         _gridField.RebuildMesh();
+        _ranged = null;
+        _directional = null;
     }
 }

@@ -11,11 +11,13 @@ public class DebugPanel : MonoBehaviour {
         set {
             if (_combatant != null) {
                 _combatant.ActionAdded -= OnActionAdded;
+                _combatant.Moved -= OnMove;
             }
 
             if (_combatant != value) {
                 _combatant = value;
                 _combatant.ActionAdded += OnActionAdded;
+                _combatant.Moved += OnMove;
                 OnActionAdded(_combatant, null);
             }
         }
@@ -27,6 +29,20 @@ public class DebugPanel : MonoBehaviour {
         foreach (PawnAction acts in _combatant.Actions) {
             text += acts + "\n";
         }
+
+        text += _combatant.Position;
+
+        Text.text = text;
+    }
+
+    private void OnMove(Pawn pawn, Point from, Point to) {
+        string text = string.Empty;
+        foreach (PawnAction acts in _combatant.Actions) {
+            text += acts + "\n";
+        }
+
+        text += _combatant.Position;
+
         Text.text = text;
     }
 }

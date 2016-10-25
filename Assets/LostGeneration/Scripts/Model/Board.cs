@@ -318,7 +318,7 @@ namespace LostGen {
             		willMove = false;
             	} else {
 	                foreach (Pawn other in enterCollisions) {
-	                    if (other.IsSolid) {
+	                    if (other != pawn && other.IsSolid) {
 	                        willMove = false;
 	                        break;
 	                    }
