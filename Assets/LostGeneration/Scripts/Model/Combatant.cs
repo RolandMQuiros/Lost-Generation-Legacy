@@ -33,7 +33,10 @@ namespace LostGen {
                 _health = Math.Max(0, Math.Min(_effectiveStats.Health, value));
             }
         }
-        public int ActionPoints { get { return _actionPoints; } }
+        public int ActionPoints {
+            get { return _actionPoints; }
+            set { _actionPoints = value; }
+        }
         public int ActionQueueCost { get { return _queueCost; } }
 
         public ISkill ActiveSkill {
@@ -138,12 +141,16 @@ namespace LostGen {
             }
         }
 
-        public void FireActiveSkill() {
-            if (_activeSkill != null) {
+        public bool FireActiveSkill() {
+            bool fired = false;
+            if (_activeSkill != null && _actionPoints > _activeSkill.ActionPoints) {
                 _activeSkill.Fire();
                 if (SkillFired != null) { SkillFired(this, _activeSkill); }
                 ClearActiveSkill();
+                fired = true;
             }
+
+            return fired;
         }
 
         public IEnumerable<Pawn> GetKnownPawns() {

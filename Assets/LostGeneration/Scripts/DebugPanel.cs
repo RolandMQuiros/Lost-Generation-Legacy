@@ -31,6 +31,7 @@ public class DebugPanel : MonoBehaviour {
         }
 
         text += _combatant.Position;
+        text += "Action Points: " + _combatant.ActionPoints + "\n";
 
         Text.text = text;
     }
@@ -42,6 +43,7 @@ public class DebugPanel : MonoBehaviour {
         }
 
         text += _combatant.Position;
+        text += "Action Points: " + _combatant.ActionPoints + "\n";
 
         Text.text = text;
     }

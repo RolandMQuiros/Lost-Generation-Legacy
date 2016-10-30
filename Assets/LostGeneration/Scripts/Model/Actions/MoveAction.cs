@@ -20,7 +20,7 @@ namespace LostGen {
             }
         }
 
-        public override int ActionPoints { get { return Point.TaxicabDistance(Owner.Position, _end); } }
+        public override int ActionPoints { get { return Point.TaxicabDistance(_start, _end); } }
         public override Point PostRunPosition {
             get { return _end; }
         }
@@ -39,10 +39,12 @@ namespace LostGen {
 
         public override void Do() {
             _moveSuccess = Owner.SetPosition(_end);
+            Owner.ActionPoints -= ActionPoints;
         }
 
         public override void Undo() {
             Owner.SetPositionInternal(_start);
+            Owner.ActionPoints += ActionPoints;
         }
 
         public override void React() {

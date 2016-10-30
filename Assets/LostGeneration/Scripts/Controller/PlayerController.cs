@@ -41,8 +41,6 @@ public class PlayerController : MonoBehaviour {
     private void Start() {
         SkillTray.RangedSkillController = _rangedSkillController;
         SkillTray.DirectionalSkillController = _directionalSkillController;
-
-        Timeline.Rewinded.AddListener(ClearAllActiveSkills);
     }
 
     private void Update() {

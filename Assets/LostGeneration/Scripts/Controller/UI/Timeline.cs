@@ -6,12 +6,11 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using LostGen;
 
-[RequireComponent(typeof(Scrollbar))]
 public class Timeline : MonoBehaviour {
-    public UnityEvent Played;
-    public UnityEvent Rewinded;
+    public UnityEvent Ended;
+    public UnityEvent Rewound;
 
-    private Scrollbar _scrollbar;
+    private Slider _slider;
 
     private List<Combatant> _combatants = new List<Combatant>();
     private int _currentStep = 0;
@@ -60,13 +59,15 @@ public class Timeline : MonoBehaviour {
     }
 
     public void SetStep(int step) {
-        if (step >= 0 && step <= _maxSteps) {
+        if (step >= 0 && step <= _maxSteps && step != _currentStep) {
             if (step == _maxSteps) {
-                Played.Invoke();
+                Ended.Invoke();
+                Debug.Log("Timeline Ended");
             } else {
-                Rewinded.Invoke();
+                Rewound.Invoke();
+                Debug.Log("Timeline Rewound");
             }
-
+                
             int difference = step - _currentStep;
 
             if (difference > 0) {
@@ -74,22 +75,28 @@ public class Timeline : MonoBehaviour {
                     for (int j = 0; j < _combatants.Count; j++) {
                         PawnAction action = _combatants[j].Actions.ElementAtOrDefault(i);
                         if (action != null) { action.Do(); }
+                        Debug.Log("Action Done");
                     }
+                    Debug.Log("Actions Done");
                 }
             } else if (difference < 0) {
                 for (int i = _currentStep; i >= step; i--) {
                     for (int j = 0; j < _combatants.Count; j++) {
                         PawnAction action = _combatants[j].Actions.ElementAtOrDefault(i);
                         if (action != null) { action.Undo(); }
+                        Debug.Log("Action Undone");
                     }
+                    Debug.Log("Actions Undone");
                 }
             }
+
             _currentStep = step;
+            DebugStep = _currentStep;
         }
     }
 
-    private void OnValueChanged(float value) {
-        int newStep = Mathf.RoundToInt((1f - value) * _maxSteps);
+    public void OnValueChanged(float value) {
+        int newStep = Mathf.RoundToInt(value);
         SetStep(newStep);
     }
 
@@ -99,6 +106,7 @@ public class Timeline : MonoBehaviour {
 
     private void OnSkillFired(Combatant combatant, ISkill skill) {
         FindMaxSteps();
+        ToEnd();
     }
 
     private void OnActionsCleared(Pawn pawn) {
@@ -106,7 +114,6 @@ public class Timeline : MonoBehaviour {
     }
 
     private void FindMaxSteps() {
-        ToEnd();
         _maxSteps = 0;
         for (int i = 0; i < _combatants.Count; i++) {
             int count = _combatants[i].Actions.Count();
@@ -115,18 +122,15 @@ public class Timeline : MonoBehaviour {
             }
         }
 
-        if (_scrollbar != null) {
-            _scrollbar.numberOfSteps = (_maxSteps + 1);
-            _scrollbar.size = 1f / (_maxSteps + 1);
+        if (_slider != null) {
+            _slider.maxValue = (_maxSteps + 1);
         }
     }
 
     #region MonoBehaviour
 
     private void Awake() {
-        _scrollbar = GetComponent<Scrollbar>();
-        _scrollbar.onValueChanged.AddListener(OnValueChanged);
-
+        _slider = GetComponent<Slider>();
         FindMaxSteps();
     }
 

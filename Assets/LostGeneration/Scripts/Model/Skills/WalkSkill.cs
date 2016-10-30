@@ -21,7 +21,7 @@ namespace LostGen {
         public override int ActionPoints { get { return _actionPoints; } }
 
         protected Board _board;
-        private int _actionPoints;
+        private int _actionPoints = 0;
 
         private Point _prevOrigin;
         private HashSet<Point> _range;
@@ -104,7 +104,7 @@ namespace LostGen {
                 }
 
                 _actionPoints = 0;
-                for (int i = 0; i < path.Count; i++) {
+                for (int i = 1; i < path.Count; i++) {
                     _actionPoints += TileCost(path[i].Point);
                 }
             }
