@@ -33,7 +33,7 @@ public class Timeline : MonoBehaviour {
         }
     }
     
-    public bool RemoveCombatant(Combatant combatant) {
+    public void RemoveCombatant(Combatant combatant) {
         bool removed = _combatants.Remove(combatant);
 
         if (removed) {
@@ -46,26 +46,22 @@ public class Timeline : MonoBehaviour {
                 action.Undo();
             }
         }
-
-        return removed;
     }
 
     public void ToBeginning() {
-        SetStep(0);
+        _slider.value = 0;
     }
 
     public void ToEnd() {
-        SetStep(_maxSteps);
+        _slider.value = _maxSteps;
     }
 
     public void SetStep(int step) {
         if (step >= 0 && step <= _maxSteps && step != _currentStep) {
             if (step == _maxSteps) {
                 Ended.Invoke();
-                Debug.Log("Timeline Ended");
             } else {
                 Rewound.Invoke();
-                Debug.Log("Timeline Rewound");
             }
                 
             int difference = step - _currentStep;
@@ -74,19 +70,19 @@ public class Timeline : MonoBehaviour {
                 for (int i = _currentStep; i < step; i++) {
                     for (int j = 0; j < _combatants.Count; j++) {
                         PawnAction action = _combatants[j].Actions.ElementAtOrDefault(i);
-                        if (action != null) { action.Do(); }
-                        Debug.Log("Action Done");
+                        if (action != null) {
+                            action.Do();
+                        }
                     }
-                    Debug.Log("Actions Done");
-                }
+                } 
             } else if (difference < 0) {
-                for (int i = _currentStep; i >= step; i--) {
+                for (int i = _currentStep; i > step; i--) {
                     for (int j = 0; j < _combatants.Count; j++) {
-                        PawnAction action = _combatants[j].Actions.ElementAtOrDefault(i);
-                        if (action != null) { action.Undo(); }
-                        Debug.Log("Action Undone");
+                        PawnAction action = _combatants[j].Actions.ElementAtOrDefault(i - 1);
+                        if (action != null) {
+                            action.Undo();
+                        }
                     }
-                    Debug.Log("Actions Undone");
                 }
             }
 
@@ -123,7 +119,7 @@ public class Timeline : MonoBehaviour {
         }
 
         if (_slider != null) {
-            _slider.maxValue = (_maxSteps + 1);
+            _slider.maxValue = _maxSteps;
         }
     }
 

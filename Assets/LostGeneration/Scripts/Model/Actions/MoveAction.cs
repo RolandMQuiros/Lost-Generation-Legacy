@@ -38,13 +38,13 @@ namespace LostGen {
         }
 
         public override void Do() {
-            _moveSuccess = Owner.SetPosition(_end);
             Owner.ActionPoints -= ActionPoints;
+            _moveSuccess = Owner.SetPosition(_end);
         }
 
         public override void Undo() {
-            Owner.SetPositionInternal(_start);
             Owner.ActionPoints += ActionPoints;
+            Owner.SetPositionInternal(_start);
         }
 
         public override void React() {
@@ -56,7 +56,7 @@ namespace LostGen {
         }
 
         public override string ToString() {
-            return "Move Action: { start: " + _start + "; end: " + _end + " }";
+            return "Move Action: { start: " + _start + "; end: " + _end + "; cost: " + ActionPoints + " }";
         }
     }
 }

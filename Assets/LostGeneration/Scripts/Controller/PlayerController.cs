@@ -12,15 +12,15 @@ using LostGen;
 public class PlayerController : MonoBehaviour {
     #region EditorFields
     public BoardCamera Camera;
-    public PlayerSkillTray SkillTray;
     public Button GoButton;
-    public Timeline Timeline;
-
     public DebugPanel DebugPanel;
     #endregion EditorFields
 
     #region Events
     public UnityEvent Stepped;
+    public CombatantEvent CombatantAdded;
+    public CombatantEvent CombatantRemoved;
+    public CombatantEvent CombatantSwitched;
     #endregion Events
 
     public bool IsReady = false;
@@ -38,11 +38,6 @@ public class PlayerController : MonoBehaviour {
         _directionalSkillController = GetComponent<DirectionalSkillController>();
     }
 
-    private void Start() {
-        SkillTray.RangedSkillController = _rangedSkillController;
-        SkillTray.DirectionalSkillController = _directionalSkillController;
-    }
-
     private void Update() {
         if (Input.GetButtonDown("Tab")) {
             CycleCombatantsForward();
@@ -58,18 +53,12 @@ public class PlayerController : MonoBehaviour {
     #region PublicMethods
     public void AddCombatant(Combatant combatant) {
         _units.Add(combatant);
-        SkillTray.AddCombatant(combatant);
-        Timeline.AddCombatant(combatant);
-        if (_units.Count == 1) {
-            _activeUnit = 0;
-            SkillTray.Combatant = _units[0];
-        }
+        CombatantAdded.Invoke(combatant);
     }
 
     public void RemoveCombatant(Combatant combatant) {
         _units.Remove(combatant);
-        SkillTray.RemoveCombatant(combatant);
-        Timeline.RemoveCombatant(combatant);
+        CombatantRemoved.Invoke(combatant);
     }
     #endregion PublicMethods
 
@@ -93,9 +82,9 @@ public class PlayerController : MonoBehaviour {
 
     private void CycleCombatantsForward() {
         _activeUnit = (_activeUnit + 1) % _units.Count;
-        SkillTray.Combatant = _units[_activeUnit];
-        Camera.Pan(_units[_activeUnit].Position, 0.5f);
+        CombatantSwitched.Invoke(_units[_activeUnit]);
 
+        Camera.Pan(_units[_activeUnit].Position, 0.5f);
         DebugPanel.Combatant = _units[_activeUnit];
     }
 
