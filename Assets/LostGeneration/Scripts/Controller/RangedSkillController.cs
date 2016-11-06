@@ -5,7 +5,6 @@ using LostGen;
 
 public class RangedSkillController : MonoBehaviour, ISkillController {
     private RangedSkill _skill;
-    private Point _origin;
 
     public void StartTargeting(ISkill skill) {
         _skill = (RangedSkill)skill;

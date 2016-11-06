@@ -13,7 +13,11 @@ public class SkillButton : MonoBehaviour {
     }
 
     public void OnActivate() {
-        _skill.Owner.SetActiveSkill(_skill);
-        Activated.Invoke(_skill);
+        if (_skill.Owner.ActiveSkill == _skill) {
+            _skill.Owner.ClearActiveSkill();
+        } else {
+            _skill.Owner.SetActiveSkill(_skill);
+            Activated.Invoke(_skill);
+        }
     }
 }

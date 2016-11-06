@@ -83,7 +83,7 @@ namespace LostGen {
         public event Action<Pawn, Point, Point> Moved;
         public event Action<Pawn, PawnAction> ActionAdded;
         public event Action<Pawn, IEnumerable<PawnAction>> ActionsAdded;
-        public event Action<Pawn> ActionsCleared;
+        public event Action<Pawn, IEnumerable<PawnAction>> ActionsCleared;
 
         #endregion Events
 
@@ -175,8 +175,9 @@ namespace LostGen {
         }
 
         public virtual void ClearActions() {
-            _actions.Clear();
-            if (ActionsCleared != null) { ActionsCleared(this); }
+            LinkedList<PawnAction> oldActions = _actions;
+            _actions = new LinkedList<PawnAction>();
+            if (ActionsCleared != null) { ActionsCleared(this, oldActions); }
         }
         
         public virtual void BeginTurn() { }

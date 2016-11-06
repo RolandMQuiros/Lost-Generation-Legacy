@@ -143,7 +143,7 @@ namespace LostGen {
 
         public bool FireActiveSkill() {
             bool fired = false;
-            if (_activeSkill != null && _actionPoints > _activeSkill.ActionPoints) {
+            if (_activeSkill != null && _actionPoints >= _activeSkill.ActionPoints) {
                 _activeSkill.Fire();
                 if (SkillFired != null) { SkillFired(this, _activeSkill); }
                 ClearActiveSkill();

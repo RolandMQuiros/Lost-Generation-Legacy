@@ -60,7 +60,7 @@ namespace LostGen {
             return path;
         }
 
-        #endregion
+        #endregion PointCollections
 
         public override void Fire() {
             MoveAction move = null;
@@ -118,8 +118,13 @@ namespace LostGen {
                 _prevOrigin = origin;
                 _range = new HashSet<Point>();
                 if (startNode != null) {
-                    foreach (Board.Node node in GraphMethods<Board.Node>.FloodFill(startNode, Owner.ActionPoints)) {
-                        _range.Add(node.Point);
+                    bool firstSkipped = false;
+                    foreach (Board.Node node in GraphMethods<Board.Node>.FloodFill(startNode, Owner.ActionPoints + 1)) {
+                        if (firstSkipped) {
+                            _range.Add(node.Point);
+                        } else {
+                            firstSkipped = true;
+                        }
                     }
                 }
             }
