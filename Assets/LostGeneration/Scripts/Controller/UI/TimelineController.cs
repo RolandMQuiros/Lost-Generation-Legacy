@@ -20,6 +20,11 @@ public class TimelineController : MonoBehaviour {
 
     private List<Timeline> _timelines = new List<Timeline>();
 
+    /// <summary>
+    /// Adds a Combatant to this TimelineController, creating a new Timeline keyed to that Combatant, and binding
+    /// the relevant events.
+    /// </summary>
+    /// <param name="combatant">Combatant to add</param>
     public void AddCombatant(Combatant combatant) {
         if (_timelines.Find(t => t.Source == combatant) == null) {
             _timelines.Add(new Timeline(combatant));
@@ -55,11 +60,12 @@ public class TimelineController : MonoBehaviour {
 
             if (step == _maxSteps) {
                 _isRewound = false;
-                Debug.Log("Ended");
                 Ended.Invoke();
             } else if (!_isRewound) {
-                _isRewound = true;
-                Debug.Log("Rewound");
+                _isRewound = true;                
+                // Bug note 12 Dec 2016:
+                // I set PlayerController.ClearAllActiveSkills as a handler for this.  This nulled out the activeSkill before it could be fired
+                // so the SkillFired event would fire and the BoardGridField wouldn't clear.  
                 Rewound.Invoke();
             }
 
@@ -92,6 +98,7 @@ public class TimelineController : MonoBehaviour {
     }
 
     private void CalculateMaxSteps() {
+        // Find the Timeline with the largest number of Actions queued
         _maxSteps = 0;
         for (int i = 0; i < _timelines.Count; i++) {
             int count = _timelines[i].Source.Actions.Count();
@@ -100,7 +107,7 @@ public class TimelineController : MonoBehaviour {
                 _isRewound = _currentStep == _maxSteps;
             }
         }
-
+        
         if (_slider != null) {
             _slider.maxValue = _maxSteps;
         }

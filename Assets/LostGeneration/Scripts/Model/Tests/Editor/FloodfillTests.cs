@@ -22,7 +22,7 @@ namespace Tests {
             }
 
             public IEnumerable<IGraphNode> GetNeighbors() {
-                Profiler.BeginSample("TestGridNode.GetNeighbors");
+                //Profiler.BeginSample("TestGridNode.GetNeighbors");
                 if (_neighbors == null) {
                     _neighbors = new List<IGraphNode>();
                     for (int i = 0; i < Point.Neighbors.Length; i++) {
@@ -32,7 +32,7 @@ namespace Tests {
                         }
                     }
                 }
-                Profiler.EndSample();
+                //Profiler.EndSample();
                 return _neighbors;
             }
 

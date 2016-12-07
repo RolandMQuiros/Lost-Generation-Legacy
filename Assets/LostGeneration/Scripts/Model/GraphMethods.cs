@@ -30,7 +30,7 @@ namespace LostGen {
             open.Add(new SortNode() { Node = start, Level = 1 });
             domain.Add(open[0].Node);
 
-            Profiler.BeginSample("GraphMethods.FloodFill");
+            //Profiler.BeginSample("GraphMethods.FloodFill");
             while (open.Count > 0) {
                 open.Sort();
                 SortNode current = open[0];
@@ -57,7 +57,7 @@ namespace LostGen {
                     }
                 }
             }
-            Profiler.EndSample();
+            //Profiler.EndSample();
 
             return domain;
         }
