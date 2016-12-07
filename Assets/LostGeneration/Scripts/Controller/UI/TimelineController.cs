@@ -28,10 +28,6 @@ public class TimelineController : MonoBehaviour {
     public void AddCombatant(Combatant combatant) {
         if (_timelines.Find(t => t.Source == combatant) == null) {
             _timelines.Add(new Timeline(combatant));
-
-            combatant.SkillActivated += OnSkillActivated;
-            combatant.SkillFired += OnSkillFired;
-            combatant.ActionsCleared += OnActionsCleared;
         }
     }
     
@@ -39,10 +35,6 @@ public class TimelineController : MonoBehaviour {
         int index = _timelines.FindIndex(t => t.Source == combatant);
         if (index != -1) {
             _timelines.RemoveAt(index);
-
-            combatant.SkillActivated -= OnSkillActivated;
-            combatant.SkillFired -= OnSkillFired;
-            combatant.ActionsCleared -= OnActionsCleared;
         }
     }
 
@@ -83,16 +75,16 @@ public class TimelineController : MonoBehaviour {
         SetStep(newStep);
     }
 
-    private void OnSkillActivated(Combatant combatant, ISkill skill) {
+    public void OnSkillActivated(Combatant combatant, ISkill skill) {
         _slider.value = combatant.Actions.Count();
     }
 
-    private void OnSkillFired(Combatant combatant, ISkill skill) {
+    public void OnSkillFired(Combatant combatant, ISkill skill) {
         CalculateMaxSteps();
         _slider.value = combatant.Actions.Count();
     }
 
-    private void OnActionsCleared(Pawn pawn, IEnumerable<PawnAction> clearedActions) {
+    public void OnActionsCleared(Pawn pawn, IEnumerable<PawnAction> clearedActions) {
         CalculateMaxSteps();
         _slider.value = _maxSteps;
     }

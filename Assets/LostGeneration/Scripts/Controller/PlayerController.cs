@@ -21,6 +21,12 @@ public class PlayerController : MonoBehaviour {
     public CombatantEvent CombatantAdded;
     public CombatantEvent CombatantRemoved;
     public CombatantEvent CombatantSwitched;
+
+    /// <summary>Editor Wrapper for Combatant.SkillFired. Invoked after a Skill is fired.</summary>
+    public CombatantSkillEvent SkillFired;
+    public CombatantSkillEvent SkillActivated;
+    public CombatantSkillEvent SkillDeactivated;
+
     #endregion Events
 
     public bool IsReady = false;
@@ -40,7 +46,7 @@ public class PlayerController : MonoBehaviour {
 
     private void Update() {
         if (Input.GetButtonDown("Tab")) {
-            CycleCombatantsForward();
+            CycleCombatants(1);
         }
 
         if (AreCombatantsReady()) {
@@ -53,22 +59,39 @@ public class PlayerController : MonoBehaviour {
     #region PublicMethods
     public void AddCombatant(Combatant combatant) {
         _units.Add(combatant);
+
+        if (_units.Count == 1) {
+            BindSkillEvents(combatant);
+        }
+
         CombatantAdded.Invoke(combatant);
     }
 
     public void RemoveCombatant(Combatant combatant) {
-        _units.Remove(combatant);
+        int idx = _units.IndexOf(combatant);
+
+        if (idx != -1) {
+            if (idx == _activeUnit) {
+                CycleCombatants(-1);
+            }
+            _units.RemoveAt(idx);
+        }
+
         CombatantRemoved.Invoke(combatant);
     }
     #endregion PublicMethods
 
     #region CombatantMethods
     public void ClearActions() {
-        _units[_activeUnit].ClearActions();
+        if (_units.Count > 0) {
+            _units[_activeUnit].ClearActions();
+        }
     }
 
     public void ClearActiveSkill() {
-        _units[_activeUnit].ClearActiveSkill();
+        if (_units.Count > 0) {
+            _units[_activeUnit].ClearActiveSkill();
+        }
     }
 
     public void ClearAllActiveSkills() {
@@ -80,12 +103,20 @@ public class PlayerController : MonoBehaviour {
 
     #region PrivateMethods
 
-    private void CycleCombatantsForward() {
-        _activeUnit = (_activeUnit + 1) % _units.Count;
-        CombatantSwitched.Invoke(_units[_activeUnit]);
+    private void CycleCombatants(int offset) {
+        ClearActiveSkill();
 
-        Camera.Pan(_units[_activeUnit].Position, 0.5f);
-        DebugPanel.Combatant = _units[_activeUnit];
+        if (_units.Count > 0) {
+            // Cycle forward through list of units, unbinding and binding event listeners
+            UnbindSkillEvents(_units[_activeUnit]);
+            _activeUnit = (_activeUnit + offset) % _units.Count;
+            BindSkillEvents(_units[_activeUnit]);
+
+            CombatantSwitched.Invoke(_units[_activeUnit]);
+
+            Camera.Pan(_units[_activeUnit].Position, 0.5f);
+            DebugPanel.Combatant = _units[_activeUnit];
+        }
     }
 
     private bool AreCombatantsReady() {
@@ -96,6 +127,32 @@ public class PlayerController : MonoBehaviour {
 
         return isReady;
     }
+
+    #region SkillEvents
+    private void OnSkillFired(Combatant combatant, ISkill skill) {
+        SkillFired.Invoke(combatant, skill);
+    }
+
+    private void OnSkillActivated(Combatant combatant, ISkill skill) {
+        SkillActivated.Invoke(combatant, skill);
+    }
+    
+    private void OnSkillDeactivated(Combatant combatant, ISkill skill) {
+        SkillDeactivated.Invoke(combatant, skill);
+    }
+
+    private void BindSkillEvents(Combatant combatant) {
+        combatant.SkillFired += OnSkillFired;
+        combatant.SkillActivated += OnSkillActivated;
+        combatant.SkillDeactivated += OnSkillDeactivated;
+    }
+
+    private void UnbindSkillEvents(Combatant combatant) {
+        combatant.SkillFired -= OnSkillFired;
+        combatant.SkillActivated -= OnSkillActivated;
+        combatant.SkillDeactivated -= OnSkillDeactivated;
+    }
+    #endregion SkillEvents
 
     #endregion PrivateMethods
 }

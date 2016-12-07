@@ -6,6 +6,9 @@ using LostGen;
 public class CombatantEvent : UnityEvent<Combatant> { }
 
 [Serializable]
+public class CombatantSkillEvent : UnityEvent<Combatant, ISkill> { }
+
+[Serializable]
 public class PointEvent : UnityEvent<Point> { }
 
 [Serializable]
