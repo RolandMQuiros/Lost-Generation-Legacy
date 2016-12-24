@@ -21,19 +21,16 @@ public class PlayerController : MonoBehaviour {
     public CombatantEvent CombatantAdded;
     public CombatantEvent CombatantRemoved;
     public CombatantEvent CombatantSwitched;
-
-    /// <summary>Editor Wrapper for Combatant.SkillFired. Invoked after a Skill is fired.</summary>
-    public CombatantSkillEvent SkillFired;
-    public CombatantSkillEvent SkillActivated;
-    public CombatantSkillEvent SkillDeactivated;
-
+    public SkillEvent SkillActivated;
+    public SkillEvent SkillDeactivated;
     #endregion Events
 
     public bool IsReady = false;
 
     private List<Combatant> _units = new List<Combatant>();
     private int _activeUnit;
-
+    private bool _isSkillActive = true;
+    private ISkill _latestSkill = null;
     private RangedSkillController _rangedSkillController;
     private DirectionalSkillController _directionalSkillController;
 
@@ -58,18 +55,15 @@ public class PlayerController : MonoBehaviour {
 
     #region PublicMethods
     public void AddCombatant(Combatant combatant) {
+        DeactivateSkill();
         _units.Add(combatant);
-
-        if (_units.Count == 1) {
-            BindSkillEvents(combatant);
-        }
-
         CombatantAdded.Invoke(combatant);
     }
 
     public void RemoveCombatant(Combatant combatant) {
         int idx = _units.IndexOf(combatant);
-
+        DeactivateSkill();
+        
         if (idx != -1) {
             if (idx == _activeUnit) {
                 CycleCombatants(-1);
@@ -79,6 +73,27 @@ public class PlayerController : MonoBehaviour {
 
         CombatantRemoved.Invoke(combatant);
     }
+
+    public void ActivateSkill(ISkill skill) {
+        _latestSkill = skill;
+        SkillActivated.Invoke(skill);
+    }
+
+    public void DeactivateSkill() {
+        SkillDeactivated.Invoke(_latestSkill);
+        _latestSkill = null;
+    }
+    public void ToggleSkill(ISkill skill) {
+        if (_latestSkill == skill) {
+            DeactivateSkill();
+        } else if (skill is RangedSkill) {
+            _rangedSkillController.StartTargeting(skill);
+            ActivateSkill(skill);
+        } else if (skill is DirectionalSkill) {
+            _directionalSkillController.StartTargeting(skill);
+            ActivateSkill(skill);
+        }
+    }
     #endregion PublicMethods
 
     #region CombatantMethods
@@ -87,30 +102,13 @@ public class PlayerController : MonoBehaviour {
             _units[_activeUnit].ClearActions();
         }
     }
-
-    public void ClearActiveSkill() {
-        if (_units.Count > 0) {
-            _units[_activeUnit].ClearActiveSkill();
-        }
-    }
-
-    public void ClearAllActiveSkills() {
-        for (int i = 0; i < _units.Count; i++) {
-            _units[i].ClearActiveSkill();
-        }
-    }
     #endregion CombatantMethods
 
     #region PrivateMethods
 
     private void CycleCombatants(int offset) {
-        ClearActiveSkill();
-
         if (_units.Count > 0) {
-            // Cycle forward through list of units, unbinding and binding event listeners
-            UnbindSkillEvents(_units[_activeUnit]);
             _activeUnit = (_activeUnit + offset) % _units.Count;
-            BindSkillEvents(_units[_activeUnit]);
 
             CombatantSwitched.Invoke(_units[_activeUnit]);
 
@@ -127,32 +125,5 @@ public class PlayerController : MonoBehaviour {
 
         return isReady;
     }
-
-    #region SkillEvents
-    private void OnSkillFired(Combatant combatant, ISkill skill) {
-        SkillFired.Invoke(combatant, skill);
-    }
-
-    private void OnSkillActivated(Combatant combatant, ISkill skill) {
-        SkillActivated.Invoke(combatant, skill);
-    }
-    
-    private void OnSkillDeactivated(Combatant combatant, ISkill skill) {
-        SkillDeactivated.Invoke(combatant, skill);
-    }
-
-    private void BindSkillEvents(Combatant combatant) {
-        combatant.SkillFired += OnSkillFired;
-        combatant.SkillActivated += OnSkillActivated;
-        combatant.SkillDeactivated += OnSkillDeactivated;
-    }
-
-    private void UnbindSkillEvents(Combatant combatant) {
-        combatant.SkillFired -= OnSkillFired;
-        combatant.SkillActivated -= OnSkillActivated;
-        combatant.SkillDeactivated -= OnSkillDeactivated;
-    }
-    #endregion SkillEvents
-
     #endregion PrivateMethods
 }

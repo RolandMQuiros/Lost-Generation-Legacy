@@ -18,7 +18,7 @@ public class RangedSkillController : MonoBehaviour, ISkillController {
 
     public void OnTap(Point point) {
         if (_skill != null && _skill.InRange(point)) {
-            _skill.Owner.FireActiveSkill();
+            _skill.Fire();
             _skill = null;
         }
     }

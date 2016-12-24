@@ -10,10 +10,7 @@ public class PlayerSkillTray : MonoBehaviour {
     #region EditorFields
     public SkillButton SkillButtonPrefab;
     public float ButtonSpacing = 32f;
-
-    public PlayerController PlayerController;
-    public RangedSkillController RangedSkillController;
-    public DirectionalSkillController DirectionalSkillController;
+    public SkillEvent SkillToggled; 
     #endregion EditorFields
 
     public Combatant Combatant {
@@ -28,26 +25,25 @@ public class PlayerSkillTray : MonoBehaviour {
 
     private const int _SKILLS_PER_PAGE = 9;
     private int _page;
-
     private Combatant _combatant;
-    private Dictionary<Combatant, List<SkillButton>> _buttons = new Dictionary<Combatant, List<SkillButton>>();
+    private Dictionary<Combatant, List<Button>> _buttons = new Dictionary<Combatant, List<Button>>();
 
     public void AddCombatant(Combatant combatant) {
-        List<SkillButton> buttons;
+        List<Button> buttons;
         _buttons.TryGetValue(combatant, out buttons);
 
         if (buttons == null) {
-            buttons = new List<SkillButton>();
+            buttons = new List<Button>();
 
             foreach (ISkill skill in combatant.Skills) {
-                SkillButton newButton = CreateButton(skill);
+                Button newButton = CreateButton(skill);
                 buttons.Add(newButton);
             }
 
             _buttons[combatant] = buttons;
         } else {
             foreach (ISkill skill in combatant.Skills.Except(buttons.Select(b => b.Skill))) {
-                SkillButton newButton = CreateButton(skill);
+                Button newButton = CreateButton(skill);
                 buttons.Add(newButton);
             } 
         }
@@ -59,7 +55,7 @@ public class PlayerSkillTray : MonoBehaviour {
     }
 
     public void RemoveCombatant(Combatant combatant) {
-        List<SkillButton> buttons;
+        List<Button> buttons;
         _buttons.TryGetValue(combatant, out buttons);
 
         if (buttons != null) {
@@ -71,19 +67,17 @@ public class PlayerSkillTray : MonoBehaviour {
     }
 
     public void EnableInteractions() {
-        foreach (List<SkillButton> buttons in _buttons.Values) {
+        foreach (List<Button> buttons in _buttons.Values) {
             for (int i = 0; i < buttons.Count; i++) {
-                Button button = buttons[i].GetComponent<Button>();
-                button.interactable = true;
+                buttons[i].interactable = true;
             }
         }
     }
 
     public void DisableInteractions() {
-        foreach (List<SkillButton> buttons in _buttons.Values) {
+        foreach (List<Button> buttons in _buttons.Values) {
             for (int i = 0; i < buttons.Count; i++) {
-                Button button = buttons[i].GetComponent<Button>();
-                button.interactable = false;
+                buttons[i].interactable = false;
             }
         }
     }
@@ -98,20 +92,18 @@ public class PlayerSkillTray : MonoBehaviour {
         _page = SetPage(0);
     }
 
-    private SkillButton CreateButton(ISkill skill) {
+    private Button CreateButton(ISkill skill) {
         GameObject buttonObj = TrashMan.spawn(SkillButtonPrefab.gameObject);
         buttonObj.SetActive(false);
+        
+        Button button = buttonObj.GetComponent<Button>();
+        button.onClick.AddListener(delegate {
+            if (SkillToggled != null) {
+                SkillToggled.Invoke(skill);
+            }
+        });
 
-        SkillButton skillButton = buttonObj.GetComponent<SkillButton>();
-        skillButton.Initialize(skill);
-
-        if (skill is RangedSkill) {
-            skillButton.Activated += RangedSkillController.StartTargeting;
-        } else if (skill is DirectionalSkill) {
-            skillButton.Activated += DirectionalSkillController.StartTargeting;
-        }
-
-        return skillButton;
+        return button;
     }
 
     private int SetPage(int page) {
