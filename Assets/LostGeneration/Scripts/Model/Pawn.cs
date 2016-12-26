@@ -185,9 +185,10 @@ namespace LostGen {
         ///<summary>
 		///Pops and runs a single action in the queue
 		///</summary>
-		public virtual bool Step() {
+		public virtual PawnAction Step() {
+            PawnAction stepAction = null;
             if (_actions.Count > 0) {
-                PawnAction stepAction = _actions.First.Value;
+                stepAction = _actions.First.Value;
                 PreprocessAction(stepAction);
 
                 stepAction.Do();
@@ -196,7 +197,7 @@ namespace LostGen {
                 _actions.RemoveFirst();
             }
 
-            return _actions.Count > 0;
+            return stepAction;
         }
 
         public int CompareTo(Pawn other) {

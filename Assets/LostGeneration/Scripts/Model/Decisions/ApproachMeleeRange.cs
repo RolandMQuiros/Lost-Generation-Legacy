@@ -61,7 +61,7 @@ namespace LostGen.Decision {
                     // For each point in the area of effect, see where we would need to be
                     Point strikePosition = _target.Position - aoeOffset;
                     if (_source.Board.InBounds(strikePosition) && // Make sure new standing position is on the Board
-                        _source.Board.GetTile(strikePosition) != Board.WALL_TILE && // and that it's not inside a wall
+                        _source.Board.GetBlock(strikePosition).IsSolid && // and that it's not inside a wall
                         _source.Board.PawnsAt(strikePosition).FirstOrDefault(pawn => pawn.IsCollidable && pawn.IsSolid) == null && // and not inside another solid Pawn
                         _melee.CanAttackFrom(strikePosition, _target.Position)) { // and there's nothing in the way
 

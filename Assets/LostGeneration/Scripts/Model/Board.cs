@@ -4,108 +4,39 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace LostGen {
+    public struct BoardBlock {
+        public bool IsSolid {
+            get {
+                return _solidSides == _ALL_SIDES;
+            }
+            set {
+                if (value) {
+                    _solidSides = _ALL_SIDES;
+                } else {
+                    _solidSides = 0;
+                }
+            }
+        }
+
+        public bool IsOpaque;
+
+        #region SideValues
+        private const byte _FRONT_SIDE = 1;
+        private const byte _RIGHT_SIDE = 2;
+        private const byte _LEFT_SIDE = 4;
+        private const byte _TOP_SIDE = 8;
+        private const byte _BACK_SIDE = 16;
+        private const byte _BOTTOM_SIDE = 32;
+        private const byte _ALL_SIDES = 63;
+        private byte _solidSides;
+        #endregion SideValues
+    }
+
     public class Board {
-    	public const int WALL_TILE = 0;
-    	public const int FLOOR_TILE = 1;
+        private BoardBlock[,,] _blocks;
 
-        /// <summary>
-        /// Graph node representation of a Board coordinate. This connects Points on the Board with adjacent
-        /// Points, and sets edge values depending on at those points, or Tile types.
-        /// </summary>
-        public class Node : IGraphNode {
-            /// <summary>
-            /// A function that takes a Point on the Board, and evaluates the AP cost of moving to that Point, often
-            /// depending on the Tile type or what Pawns occupy that Point.
-            /// 
-            /// Having a delegate handle the cost evaluation lets different Pawns decide their movement strategy differently.
-            /// </summary>
-            /// <param name="point">Point to move to. Does not necessarily need to be adjacent to this Node.</param>
-            /// <returns>Cost of moving to point</returns>
-            public delegate int EdgeCostLookup(Point point);
-
-            /// <summary>Point on the Board</summary>
-            protected Point _point;
-            public Point Point { get { return _point; } }
-            /// <summary>Reference to the Board</summary>
-            protected Board _board;
-            /// <summary>List of adjacent, non-Wall, in-bounds Points on the Board</summary>
-            protected List<IGraphNode> _neighbors = null;
-            /// <summary>Edge cost callback</summary>
-            protected EdgeCostLookup _edgeCostLookup;
-
-            /// <summary>
-            /// Construct a new Node
-            /// </summary>
-            /// <param name="board"></param>
-            /// <param name="point"></param>
-            /// <param name="lookup"></param>
-            public Node(Board board, Point point, EdgeCostLookup lookup = null) {
-                if (board == null) { throw new ArgumentNullException("board"); }
-                if (lookup == null) { throw new ArgumentNullException("lookup"); }
-
-                _board = board;
-                _point = point;
-                _edgeCostLookup = lookup;
-            }
-
-            /// <summary>
-            /// Returns the cost of moving from the current Node to an adjacent Node
-            /// </summary>
-            /// <param name="neighbor">Another Node. Doesn't actually have to be adjacent to this.</param>
-            /// <returns></returns>
-            public int GetEdgeCost(IGraphNode neighbor) {
-                Node boardNode = (Node)neighbor;
-                int cost = 0;
-                
-                if (_edgeCostLookup != null) {
-                    cost = _edgeCostLookup(boardNode.Point);
-                }
-
-                return cost;
-            }
-
-            /// <summary>
-            /// Iterates through adjacent Points.  To avoid having to construct the entire Board as a graph,
-            /// this function acts as an iterator, and creates neighbor Nodes only as needed.
-            /// </summary>
-            /// <returns>An IEnumerable that iterates through this Node's neighboring Points</returns>
-            public IEnumerable<IGraphNode> GetNeighbors() {
-                if (_neighbors == null) {
-                    _neighbors = new List<IGraphNode>();
-                    for (int i = 0; i < Point.Neighbors.Length; i++) {
-                        Point neighborPoint = _point + Point.Neighbors[i];
-
-                        if (_board.InBounds(neighborPoint) && _board.GetTile(neighborPoint) != Board.WALL_TILE) {
-                            Node neighbor = new Node(_board, neighborPoint, _edgeCostLookup);
-                            _neighbors.Add(neighbor);
-                        }
-                    }
-                }
-
-                return _neighbors;
-            }
-
-            public bool IsMatch(IGraphNode other) {
-                Node otherNode = (Node)other;
-                return Point.Equals(otherNode.Point);
-            }
-
-            public override int GetHashCode() {
-                return _point.GetHashCode();
-            }
-
-            public override bool Equals(object obj) {
-                return _point == ((Node)obj).Point;
-            }
-        }
-
-        private int[,] _tiles;
-        public int Width {
-        	get { return _tiles.GetLength(1); }
-        }
-
-        public int Height {
-        	get { return _tiles.GetLength(0); }
+        public Point Size {
+            get { return new Point(_blocks.GetLength(1), _blocks.GetLength(0), _blocks.GetLength(2)); }
         }
 
         public event Action<Pawn> PawnAdded;
@@ -115,46 +46,54 @@ namespace LostGen {
         private List<Pawn> _pawnOrder = new List<Pawn>();
         private Dictionary<Point, HashSet<Pawn>> _pawnBuckets = new Dictionary<Point, HashSet<Pawn>>();
 
-        public Board(int[,] tiles, int buckets = 4) {
-            if (tiles == null || tiles.Length == 0) {
-                throw new ArgumentNullException("tiles", "Grid is null or empty");
+        public Board(int[,] blocks, int buckets = 4) {
+            if (blocks == null || blocks.Length == 0) {
+                throw new ArgumentNullException("blocks", "Grid is null or empty");
             }
 
-            _tiles = new int[tiles.GetLength(0), tiles.GetLength(1)];
-            Array.Copy(tiles, 0, _tiles, 0, tiles.Length);
+            _blocks = new BoardBlock[blocks.GetLength(0), blocks.GetLength(1), blocks.GetLength(2)];
+            Array.Copy(blocks, 0, _blocks, 0, blocks.Length);
             
         }
 
-        public int GetTile(int x, int y) {
-        	return _tiles[y, x];
+        public BoardBlock GetBlock(int x, int y, int z) {
+        	return _blocks[y, x, z];
         }
 
-        public int GetTile(Point point) {
-            return _tiles[point.Y, point.X];
+        public BoardBlock GetBlock(Point point) {
+            return _blocks[point.Y, point.X, point.Z];
         }
 
+        /// <summary>
+        /// Indicates whether or not a given Point is within the bounds of the Board.
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
         public bool InBounds(Point point) {
-            return point.X >= 0 && point.X < Width &&
-                   point.Y >= 0 && point.Y < Height;
+            Point size = Size;
+            return point.X >= 0 && point.X < size.X &&
+                   point.Y >= 0 && point.Y < size.Y &&
+                   point.Z >= 0 && point.Z < size.Z;
         }
 
-        public Node GetNode(Point point, Node.EdgeCostLookup lookup = null) {
-            Node node = null;
-            if (InBounds(point) && _tiles[point.Y, point.X] != WALL_TILE) {
-                node = new Node(this, point, lookup);
-            }
-            return node;
-        }
-
+        /// <summary>
+        /// Checks if vision can pass through a Point in the board.  A point is considered opaque if the BoardBlock or any Pawn at that point is opaque.
+        /// If the given point is outside the bounds of the Board, returns true.
+        /// <param name="point">Point on the board to check</param>
+        /// <returns>True if light cannot pass through this point on the Board.  False, otherwise or if point is outside the Board.</returns>
         public bool IsOpaque(Point point) {
-            bool isOpaque = GetTile(point) == WALL_TILE;
-            if (!isOpaque) {
-                HashSet<Pawn> pointBucket = GetBucket(point);
+            bool isOpaque = true;
+            if (InBounds(point)) {
+                BoardBlock block = GetBlock(point);
+                isOpaque = block.IsOpaque;
+                if (!isOpaque) {
+                    HashSet<Pawn> pointBucket = GetBucket(point);
 
-                foreach (Pawn pawn in pointBucket) {
-                    if (pawn.IsOpaque) {
-                        isOpaque = true;
-                        break;
+                    foreach (Pawn pawn in pointBucket) {
+                        if (pawn.IsOpaque) {
+                            isOpaque = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -163,13 +102,16 @@ namespace LostGen {
         }
 
         public bool IsSolid(Point point) {
-            bool isSolid = GetTile(point) == WALL_TILE;
-            if (!isSolid) {
-                HashSet<Pawn> pawns = PawnsAt(point);
-                foreach (Pawn pawn in pawns) {
-                    if (pawn.IsCollidable && pawn.IsSolid) {
-                        isSolid = true;
-                        break;
+            bool isSolid = true;
+            if (InBounds(point)) {
+                isSolid = GetBlock(point).IsSolid;
+                if (!isSolid) {
+                    HashSet<Pawn> pawns = PawnsAt(point);
+                    foreach (Pawn pawn in pawns) {
+                        if (pawn.IsCollidable && pawn.IsSolid) {
+                            isSolid = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -293,7 +235,7 @@ namespace LostGen {
 
                 // Check if there's a wall at the new point.  If so, early out.
                 if (pawn.IsSolid) {
-                    if (InBounds(newPoint) && GetTile(newPoint) == WALL_TILE) {
+                    if (InBounds(newPoint) && GetBlock(newPoint).IsSolid) {
                         return false;
                     }
                 }
@@ -386,18 +328,28 @@ namespace LostGen {
         /// Calls the Step() function of each Pawn on the Board.
         /// </summary>
         /// <returns>true if a Pawn still has actions to perform in this step, false otherwise</returns>
-        public bool Step() {
+        public Queue<PawnAction> Step() {
             _pawnOrder.Sort();
-            bool actionsLeft = false;
+            Queue<PawnAction> actions = new Queue<PawnAction>();
             for (int i = 0; i < _pawnOrder.Count; i++) {
-                actionsLeft |= _pawnOrder[i].Step();
+                PawnAction action = _pawnOrder[i].Step();
+                if (action != null) {
+                    actions.Enqueue(action);
+                }
             }
 
-            return actionsLeft;
+            return actions;
         }
 
-        public void Turn() {
-            while (Step());
+        public Queue<PawnAction> Turn() {
+            Queue<PawnAction> actions = new Queue<PawnAction>();
+            
+            Queue<PawnAction> step;
+            while ((step = Step()).Count != 0) {
+                actions.Union(step);
+            }
+
+            return actions;
         }
 
         #region SelectAlgs
@@ -408,7 +360,7 @@ namespace LostGen {
 
             foreach (Point point in line.OrderBy(p => Point.TaxicabDistance(start, p))) {
                 if (InBounds(point)) {
-                    if (!passThroughWalls && GetTile(point) == WALL_TILE) {
+                    if (!passThroughWalls && GetBlock(point).IsSolid) {
                         stopped = true;
                     } else {
                         HashSet<Pawn> pawnsAt = PawnsAt(point);

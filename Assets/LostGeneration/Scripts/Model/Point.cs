@@ -2,12 +2,14 @@
 
 namespace LostGen {
     public struct Point : IEquatable<Point> {
-        public static readonly Point Zero = new Point(0, 0);
-        public static readonly Point One = new Point(1, 1);
-        public static readonly Point Up = new Point(0, -1);
-        public static readonly Point Down = new Point(0, 1);
-        public static readonly Point Left = new Point(-1, 0);
-        public static readonly Point Right = new Point(1, 0);
+        public static readonly Point Zero = new Point(0, 0, 0);
+        public static readonly Point One = new Point(1, 1, 1);
+        public static readonly Point Up = new Point(0, -1, 0);
+        public static readonly Point Down = new Point(0, 1, 0);
+        public static readonly Point Left = new Point(-1, 0, 0);
+        public static readonly Point Right = new Point(1, 0, 0);
+        public static readonly Point Forward = new Point(0, 0, 1);
+        public static readonly Point Backward = new Point(0, 0, -1);
 
         public static readonly Point[] Neighbors = new Point[] {
             Point.Up,
@@ -29,18 +31,20 @@ namespace LostGen {
 
         public int X;
         public int Y;
+        public int Z;
 
-        public Point(int x = 0, int y = 0) {
+        public Point(int x = 0, int y = 0, int z = 0) {
             X = x;
             Y = y;
+            Z = z;
         }
 
         public override string ToString() {
-            return "{x:" + X + ",y:" + Y + "}";
+            return "{x:" + X + ",y:" + Y + ",z: " + Z + "}";
         }
 
         public bool Equals(Point other) {
-            return X == other.X && Y == other.Y;
+            return X == other.X && Y == other.Y && Z == other.Z;
         }
 
         public override bool Equals(object obj) {
@@ -54,7 +58,7 @@ namespace LostGen {
         public static double Distance(Point start, Point end) {
             Point offset = end - start;
 
-            return Math.Sqrt(offset.X * offset.X + offset.Y * offset.Y);
+            return Math.Sqrt(offset.X * offset.X + offset.Y * offset.Y + offset.Z * offset.Z);
         }
 
         public static float FDistance(Point start, Point end) {
@@ -64,27 +68,27 @@ namespace LostGen {
         public static int TaxicabDistance(Point start, Point end) {
             Point offset = end - start;
 
-            return Math.Abs(offset.X) + Math.Abs(offset.Y);
+            return Math.Abs(offset.X) + Math.Abs(offset.Y) + Math.Abs(offset.Z);
         }
 
         public static Point operator +(Point p1, Point p2) {
-            return new Point(p1.X + p2.X, p1.Y + p2.Y);
+            return new Point(p1.X + p2.X, p1.Y + p2.Y, p1.Z + p2.Z);
         }
 
         public static Point operator -(Point p1, Point p2) {
-            return new Point(p1.X - p2.X, p1.Y - p2.Y);
+            return new Point(p1.X - p2.X, p1.Y - p2.Y, p1.Z - p2.Z);
         }
 
         public static Point operator *(Point point, float scalar) {
-            return new Point((int)(point.X * scalar + 0.5f), (int)(point.Y * scalar + 0.5f));
+            return new Point((int)(point.X * scalar + 0.5f), (int)(point.Y * scalar + 0.5f), (int)(point.Z * scalar + 0.5f));
         }
 
         public static Point operator *(float scalar, Point point) {
-            return new Point((int)(point.X * scalar + 0.5f), (int)(point.Y * scalar + 0.5f));
+            return new Point((int)(point.X * scalar + 0.5f), (int)(point.Y * scalar + 0.5f), (int)(point.Z * scalar + 0.5f));
         }
 
         public static Point operator *(Point point, int scalar) {
-            return new Point(point.X * scalar, point.Y * scalar);
+            return new Point(point.X * scalar, point.Y * scalar, point.Z * scalar);
         }
 
         public static Point operator *(int scalar, Point point) {

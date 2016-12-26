@@ -48,7 +48,7 @@ namespace LostGen {
         }
 
         public override IEnumerable<Point> GetPath() {
-            List<Board.Node> nodePath = FindPath(Owner.Position, Target);
+            List<BoardNode> nodePath = FindPath(Owner.Position, Target);
             List<Point> path = new List<Point>();
 
             if (nodePath != null) {
@@ -64,7 +64,7 @@ namespace LostGen {
 
         public override void Fire() {
             MoveAction move = null;
-            List<Board.Node> path = FindPath(Owner.Position, Target);
+            List<BoardNode> path = FindPath(Owner.Position, Target);
 
             if (path != null) {
                 Debug.Log("Repathed");
@@ -78,7 +78,11 @@ namespace LostGen {
             }
         }
 
-        private List<Board.Node> FindPath(Point origin, Point target) {
+        public override string ToString() {
+            return "WalkSkill : { Owner: " + Owner + ", Range: " + _range.Count + "}";
+        }
+
+        private List<BoardNode> FindPath(Point origin, Point target) {
             Board.Node end = _board.GetNode(target, TileCost);
             List<Board.Node> path = null;
 
@@ -130,7 +134,7 @@ namespace LostGen {
             }
         }
 
-        protected virtual int Heuristic(Board.Node start, Board.Node end) {
+        protected virtual int Heuristic(BoardNode start, BoardNode end) {
             return Point.TaxicabDistance(start.Point, end.Point);
         }
 
