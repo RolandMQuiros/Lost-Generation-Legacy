@@ -15,7 +15,7 @@ namespace LostGen {
         public Stats EffectiveStats {
             get {
                 if (_didStatsChange) {
-                    Stats newStats = _baseStats;
+                    Stats newStats = _baseStats;    
                     for (int i = 0; i < _gear.Count; i++) {
                         newStats += _gear[i].Modifier;
                     }
@@ -63,9 +63,6 @@ namespace LostGen {
         #region Events
         public event Action<Combatant, ISkill> SkillAdded;
         public event Action<Combatant, ISkill> SkillRemoved;
-        public event Action<Combatant, ISkill> SkillFired;
-        public event Action<Combatant, ISkill> SkillActivated;
-        public event Action<Combatant, ISkill> SkillDeactivated;
         public event Action<Combatant, Gear> GearEquipped;
         public event Action<Combatant, Gear> GearRemoved;
         #endregion Events
@@ -101,56 +98,6 @@ namespace LostGen {
 
         public bool HasSkill(ISkill skill) {
             return _skills.ContainsValue(skill);
-        }
-
-        public void SetActiveSkill(ISkill skill) {
-            if (skill == null || _skills.ContainsValue(skill)) {
-                if (_activeSkill != skill) {
-                    ISkill oldSkill = _activeSkill;
-                    _activeSkill = skill;
-
-                    if (_activeSkill == null) {
-                        if (SkillDeactivated != null) {
-                            SkillDeactivated(this, oldSkill);
-                        }
-                    } else if (SkillActivated != null) {
-                        SkillActivated(this, _activeSkill);
-                    }
-                }
-            } else {
-                throw new ArgumentException("No Skill " + skill + " is assigned to this Combatant " + ToString());
-            }
-        }
-
-        public void SetActiveSkill<T>() where T : ISkill {
-            ISkill skill = GetSkill<T>();
-            if (skill == null) {
-                throw new NullReferenceException("No Skill of type " + typeof(T) + " is assigned to this Combatant " + ToString());
-            }
-            SetActiveSkill(skill);
-        }
-
-        public void ClearActiveSkill() {
-            if (_activeSkill != null) {
-                ISkill oldSkill = _activeSkill;
-                _activeSkill = null;
-
-                if (SkillDeactivated != null) {
-                    SkillDeactivated(this, oldSkill);
-                }
-            }
-        }
-
-        public bool FireActiveSkill() {
-            bool fired = false;
-            if (_activeSkill != null && _actionPoints >= _activeSkill.ActionPoints) {
-                _activeSkill.Fire();
-                if (SkillFired != null) { SkillFired(this, _activeSkill); }
-                ClearActiveSkill();
-                fired = true;
-            }
-
-            return fired;
         }
 
         public IEnumerable<Pawn> GetKnownPawns() {
