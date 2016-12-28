@@ -16,14 +16,14 @@ namespace Tests.Integration {
 
             Board board = new Board(grid);
 
-            Assert.AreEqual(board.Width, 4);
-            Assert.AreEqual(board.Height, 3);
+            Assert.AreEqual(board.Size.X, 4);
+            Assert.AreEqual(board.Size.Y, 3);
         }
 
         [Test]
         public void PawnMovedButNotInBoard() {
             Board board = new Board(BoardCommon.GRID_12X8);
-            Pawn pawn = new Pawn("Add", board, new Point(board.Width / 2, board.Height / 2));
+            Pawn pawn = new Pawn("Add", board, board.Size / 2);
 
             // Expect an ArgumentException because the pawn doesn't exist on the board yet
             Assert.Throws<ArgumentException>(delegate () {

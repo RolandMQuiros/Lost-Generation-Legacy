@@ -15,7 +15,7 @@ namespace LostGen {
             Source = source;
         }
 
-        public override void React() {
+        public override void Commit() {
             if (Amount > 0) {
                 Target.Health -= Amount;
                 Target.EmitMessage(

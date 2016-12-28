@@ -20,7 +20,7 @@ namespace LostGen {
             _areaOfEffect = new List<Point>(area);
         }
 
-        public override void React() {
+        public override void Commit() {
             for (int i = 0; i < _areaOfEffect.Count; i++) {
                 int damage = Owner.EffectiveStats.Attack;
 

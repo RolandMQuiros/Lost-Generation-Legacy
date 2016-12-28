@@ -83,24 +83,24 @@ namespace LostGen {
         }
 
         private List<BoardNode> FindPath(Point origin, Point target) {
-            Board.Node end = _board.GetNode(target, TileCost);
-            List<Board.Node> path = null;
+            BoardNode end = new BoardNode(_board, target, TileCost);//_board.GetNode(target, TileCost);
+            List<BoardNode> path = null;
 
             if (end != null) {
-                Board.Node start = _board.GetNode(origin, TileCost);
+                BoardNode start = new BoardNode(_board, target, TileCost);
 
                 if (start == null) {
                     throw new Exception("This Skill's owner is positioned outside the graph");
                 }
 
                 if (Point.TaxicabDistance(Owner.Position, target) == 1) {
-                    path = new List<Board.Node>();
-                    path.Add(_board.GetNode(origin, TileCost));
-                    path.Add(_board.GetNode(target, TileCost));
+                    path = new List<BoardNode>();
+                    path.Add(new BoardNode(_board, origin, TileCost));
+                    path.Add(new BoardNode(_board, target, TileCost));
                 } else {
-                    path = new List<Board.Node>(
-                        GraphMethods<Board.Node>.FindPath(
-                            new Board.Node(_board, origin, TileCost),
+                    path = new List<BoardNode>(
+                        GraphMethods<BoardNode>.FindPath(
+                            new BoardNode(_board, origin, TileCost),
                             end,
                             Heuristic
                         )
@@ -118,12 +118,12 @@ namespace LostGen {
 
         private void ReinitializeRange(Point origin) {
             if (_range == null || _prevOrigin != origin) {
-                Board.Node startNode = Owner.Board.GetNode(origin, TileCost);
+                BoardNode startNode = new BoardNode(Owner.Board, origin, TileCost);
                 _prevOrigin = origin;
                 _range = new HashSet<Point>();
                 if (startNode != null) {
                     bool firstSkipped = false;
-                    foreach (Board.Node node in GraphMethods<Board.Node>.FloodFill(startNode, Owner.ActionPoints + 1)) {
+                    foreach (BoardNode node in GraphMethods<BoardNode>.FloodFill(startNode, Owner.ActionPoints + 1)) {
                         if (firstSkipped) {
                             _range.Add(node.Point);
                         } else {

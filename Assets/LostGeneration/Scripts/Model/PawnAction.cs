@@ -25,6 +25,6 @@
         /// Performs effects this PawnAction has on other Pawns.  This is only called during the actual
         /// Turn execution, and not during the planning phase.
         /// </summary>
-        public virtual void React() { }
+        public virtual void Commit() { }
     }
 }

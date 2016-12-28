@@ -31,10 +31,10 @@ namespace Tests {
                         str += "┼";
                     } else {
                         switch (grid[j, i]) {
-                            case Board.WALL_TILE:
+                            case 0:
                                 str += "█";
                                 break;
-                            case Board.FLOOR_TILE:
+                            case 1:
                                 str += "░";
                                 break;
                         }

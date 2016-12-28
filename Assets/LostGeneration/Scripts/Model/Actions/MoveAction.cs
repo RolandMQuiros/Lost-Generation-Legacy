@@ -47,7 +47,7 @@ namespace LostGen {
             Owner.SetPositionInternal(_start);
         }
 
-        public override void React() {
+        public override void Commit() {
             if (_moveSuccess) {
                 SendMessage(
                     new Message(Owner, _start, _end, _isContinuous)

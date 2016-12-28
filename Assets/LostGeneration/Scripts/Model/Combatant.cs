@@ -60,13 +60,6 @@ namespace LostGen {
         public int GearCount { get { return _gear.Count; } }
         #endregion CollectionProperties
 
-        #region Events
-        public event Action<Combatant, ISkill> SkillAdded;
-        public event Action<Combatant, ISkill> SkillRemoved;
-        public event Action<Combatant, Gear> GearEquipped;
-        public event Action<Combatant, Gear> GearRemoved;
-        #endregion Events
-
         #region PrivateMembers
         private bool _didStatsChange;
         private Stats _baseStats;
@@ -119,18 +112,10 @@ namespace LostGen {
 
         public void AddGear(Gear gear) {
             _gear.Add(gear);
-
-            if (GearEquipped != null) {
-                GearEquipped(this, gear);
-            }
         }
 
         public void RemoveGear(Gear gear) {
             _gear.Remove(gear);
-
-            if (GearRemoved != null) {
-                GearRemoved(this, gear);
-            }
         }
 
         #region PawnOverrides

@@ -39,6 +39,12 @@ namespace LostGen {
             Z = z;
         }
 
+        public Point(Point other) {
+            X = other.X;
+            Y = other.Y;
+            Z = other.Z;
+        }
+
         public override string ToString() {
             return "{x:" + X + ",y:" + Y + ",z: " + Z + "}";
         }
@@ -92,7 +98,15 @@ namespace LostGen {
         }
 
         public static Point operator *(int scalar, Point point) {
-            return new Point(point.X * scalar, point.Y * scalar);
+            return new Point(point.X * scalar, point.Y * scalar, point.Z * scalar);
+        }
+
+        public static Point operator /(int scalar, Point point) {
+            return new Point(point.X / scalar, point.Y / scalar, point.Z / scalar);
+        }
+
+        public static Point operator /(Point point, int scalar) {
+            return new Point(point.X / scalar, point.Y / scalar, point.Z / scalar);
         }
 
         public static bool operator ==(Point p1, Point p2) {

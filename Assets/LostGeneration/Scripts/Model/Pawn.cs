@@ -72,19 +72,7 @@ namespace LostGen {
         #endregion Fields
 
         #region Events
-
         public event EventHandler<MessageArgs> Messages;
-
-        public delegate void CollisionDelegate(Pawn source, Pawn other);
-        public event CollisionDelegate CollisionEntered;
-        public event CollisionDelegate CollisionStayed;
-        public event CollisionDelegate CollisionExited;
-
-        public event Action<Pawn, Point, Point> Moved;
-        public event Action<Pawn, PawnAction> ActionAdded;
-        public event Action<Pawn, IEnumerable<PawnAction>> ActionsAdded;
-        public event Action<Pawn, IEnumerable<PawnAction>> ActionsCleared;
-
         #endregion Events
 
         protected LinkedList<PawnAction> _actions = new LinkedList<PawnAction>();
@@ -126,36 +114,17 @@ namespace LostGen {
         public void SetPositionInternal(Point newPosition) {
             Point oldPosition = _position;
             _position = newPosition;
-            if (Moved != null) {
-                Moved(this, oldPosition, newPosition);
-            }
         }
 
         public bool SetPosition(Point destination) {
             return Board.SetPawnPosition(this, destination);
         }
-
         public bool Offset(Point offset) {
             return SetPosition(Position + offset);
         }
-
-        public virtual void OnCollisionEnter(Pawn other) {
-            if (CollisionEntered != null) {
-                CollisionEntered(this, other);
-            }
-        }
-
-        public virtual void OnCollisionStay(Pawn other) {
-            if (CollisionStayed != null) {
-                CollisionStayed(this, other);
-            }
-        }
-        public virtual void OnCollisionExit(Pawn other) {
-            if (CollisionExited != null) {
-                CollisionExited(this, other);
-            }
-        }
-
+        public virtual void OnCollisionEnter(Pawn other) { }
+        public virtual void OnCollisionStay(Pawn other) { }
+        public virtual void OnCollisionExit(Pawn other) { }
         public void EmitMessage(MessageArgs message) {
             if (Messages != null) {
                 Messages(this, message);
@@ -166,18 +135,15 @@ namespace LostGen {
             foreach (PawnAction action in actions) {
                 PushAction(action);
             }
-            if (ActionsAdded != null) { ActionsAdded(this, actions); }
         }
 
         public virtual void PushAction(PawnAction action) {
             _actions.AddLast(action);
-            if (ActionAdded != null) { ActionAdded(this, action); }
         }
 
         public virtual void ClearActions() {
             LinkedList<PawnAction> oldActions = _actions;
             _actions = new LinkedList<PawnAction>();
-            if (ActionsCleared != null) { ActionsCleared(this, oldActions); }
         }
         
         public virtual void BeginTurn() { }
@@ -192,7 +158,7 @@ namespace LostGen {
                 PreprocessAction(stepAction);
 
                 stepAction.Do();
-                stepAction.React();
+                stepAction.Commit();
 
                 _actions.RemoveFirst();
             }

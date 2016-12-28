@@ -379,12 +379,6 @@ namespace LostGen {
             return stopped;
         }
 
-        public HashSet<Point> LineOfSight(Point position, int range) {
-            HashSet<Point> visible = ShadowCast.ComputeVisibility(this, position, (float)range);
-
-            return visible;
-        }
-
         // basic flood fill
         public HashSet<Point> AreaOfEffect(Point point, int range, bool ignoreSolid = false) {
             HashSet<Point> visited = new HashSet<Point>();
