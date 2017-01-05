@@ -15,18 +15,53 @@ namespace LostGen {
             Point.Up,
             Point.Right,
             Point.Down,
-            Point.Left
+            Point.Left,
+            Point.Forward,
+            Point.Backward
         };
 
-        public static readonly Point[] OctoNeighbors = new Point[] {
+        public static readonly Point[] FullNeighbors = new Point[] {
+            Point.Up + Point.Forward,
+            Point.Up + Point.Forward + Point.Left,
+            Point.Up + Point.Forward + Point.Right,
+            Point.Up + Point.Left, 
             Point.Up,
             Point.Up + Point.Right,
+            Point.Up + Point.Backward + Point.Left,
+            Point.Up + Point.Backward,
+            Point.Up + Point.Backward + Point.Right,
+
+            Point.Forward,
+            Point.Forward + Point.Left,
+            Point.Forward + Point.Right,
+            Point.Left, 
             Point.Right,
-            Point.Right + Point.Down,
+            Point.Backward + Point.Left,
+            Point.Backward,
+            Point.Backward + Point.Right,
+
+            Point.Down + Point.Forward,
+            Point.Down + Point.Forward + Point.Left,
+            Point.Down + Point.Forward + Point.Right,
+            Point.Down + Point.Left, 
             Point.Down,
-            Point.Down + Point.Left,
+            Point.Down + Point.Right,
+            Point.Down + Point.Backward + Point.Left,
+            Point.Down + Point.Backward,
+            Point.Down + Point.Backward + Point.Right,
+        };
+
+        public static readonly Point[] TransverseNeighbors = new Point[] {
+            Point.Forward + Point.Left,
+            Point.Forward,
+            Point.Forward + Point.Right,
+
             Point.Left,
-            Point.Left + Point.Up
+            Point.Right,
+            
+            Point.Backward + Point.Left,
+            Point.Backward,
+            Point.Backward + Point.Right
         };
 
         public int X;

@@ -48,7 +48,7 @@ namespace LostGen {
         }
 
         public override IEnumerable<Point> GetPath() {
-            List<BoardNode> nodePath = FindPath(Owner.Position, Target);
+            List<WalkNode> nodePath = FindPath(Owner.Position, Target);
             List<Point> path = new List<Point>();
 
             if (nodePath != null) {
@@ -64,7 +64,7 @@ namespace LostGen {
 
         public override void Fire() {
             MoveAction move = null;
-            List<BoardNode> path = FindPath(Owner.Position, Target);
+            List<WalkNode> path = FindPath(Owner.Position, Target);
 
             if (path != null) {
                 Debug.Log("Repathed");
@@ -82,25 +82,25 @@ namespace LostGen {
             return "WalkSkill : { Owner: " + Owner + ", Range: " + _range.Count + "}";
         }
 
-        private List<BoardNode> FindPath(Point origin, Point target) {
-            BoardNode end = new BoardNode(_board, target, TileCost);//_board.GetNode(target, TileCost);
-            List<BoardNode> path = null;
+        private List<WalkNode> FindPath(Point origin, Point target) {
+            WalkNode end = new WalkNode(_board, target);//_board.GetNode(target, TileCost);
+            List<WalkNode> path = null;
 
             if (end != null) {
-                BoardNode start = new BoardNode(_board, target, TileCost);
+                WalkNode start = new WalkNode(_board, target);
 
                 if (start == null) {
                     throw new Exception("This Skill's owner is positioned outside the graph");
                 }
 
                 if (Point.TaxicabDistance(Owner.Position, target) == 1) {
-                    path = new List<BoardNode>();
-                    path.Add(new BoardNode(_board, origin, TileCost));
-                    path.Add(new BoardNode(_board, target, TileCost));
+                    path = new List<WalkNode>();
+                    path.Add(new WalkNode(_board, origin));
+                    path.Add(new WalkNode(_board, target));
                 } else {
-                    path = new List<BoardNode>(
-                        GraphMethods<BoardNode>.FindPath(
-                            new BoardNode(_board, origin, TileCost),
+                    path = new List<WalkNode>(
+                        GraphMethods<WalkNode>.FindPath(
+                            new WalkNode(_board, origin),
                             end,
                             Heuristic
                         )
@@ -118,12 +118,12 @@ namespace LostGen {
 
         private void ReinitializeRange(Point origin) {
             if (_range == null || _prevOrigin != origin) {
-                BoardNode startNode = new BoardNode(Owner.Board, origin, TileCost);
+                WalkNode startNode = new WalkNode(Owner.Board, origin);
                 _prevOrigin = origin;
                 _range = new HashSet<Point>();
                 if (startNode != null) {
                     bool firstSkipped = false;
-                    foreach (BoardNode node in GraphMethods<BoardNode>.FloodFill(startNode, Owner.ActionPoints + 1)) {
+                    foreach (WalkNode node in GraphMethods<WalkNode>.FloodFill(startNode, Owner.ActionPoints + 1)) {
                         if (firstSkipped) {
                             _range.Add(node.Point);
                         } else {
@@ -134,13 +134,8 @@ namespace LostGen {
             }
         }
 
-        protected virtual int Heuristic(BoardNode start, BoardNode end) {
+        protected virtual int Heuristic(WalkNode start, WalkNode end) {
             return Point.TaxicabDistance(start.Point, end.Point);
-        }
-
-        protected virtual int TileCost(Point point) {
-            int cost = 1;
-            return cost;
         }
     }
 }

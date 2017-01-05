@@ -5,31 +5,8 @@ using System.Collections.ObjectModel;
 
 namespace LostGen {
     public struct BoardBlock {
-        public bool IsSolid {
-            get {
-                return _solidSides == _ALL_SIDES;
-            }
-            set {
-                if (value) {
-                    _solidSides = _ALL_SIDES;
-                } else {
-                    _solidSides = 0;
-                }
-            }
-        }
-
+        public bool IsSolid;
         public bool IsOpaque;
-
-        #region SideValues
-        private const byte _FRONT_SIDE = 1;
-        private const byte _RIGHT_SIDE = 2;
-        private const byte _LEFT_SIDE = 4;
-        private const byte _TOP_SIDE = 8;
-        private const byte _BACK_SIDE = 16;
-        private const byte _BOTTOM_SIDE = 32;
-        private const byte _ALL_SIDES = 63;
-        private byte _solidSides;
-        #endregion SideValues
     }
 
     public class Board {
