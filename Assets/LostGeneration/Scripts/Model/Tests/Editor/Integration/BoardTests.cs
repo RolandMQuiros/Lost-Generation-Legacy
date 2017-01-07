@@ -8,13 +8,13 @@ namespace Tests.Integration {
     public class BoardTests {
         [Test]
         public void GridWidthAndHeight() {
-            int[,] grid = {
+            int[,,] grid = {{
                 {0, 0, 0, 0 },
                 {0, 0, 0, 0 },
                 {0, 0, 0, 0 }
-            };
+            }};
 
-            Board board = new Board(grid);
+            Board board = BoardCommon.ArrayToBoard(grid);
 
             Assert.AreEqual(board.Size.X, 4);
             Assert.AreEqual(board.Size.Y, 3);
@@ -22,7 +22,7 @@ namespace Tests.Integration {
 
         [Test]
         public void PawnMovedButNotInBoard() {
-            Board board = new Board(BoardCommon.GRID_12X8);
+            Board board = BoardCommon.ArrayToBoard(BoardCommon.GRID_12X1X8);
             Pawn pawn = new Pawn("Add", board, board.Size / 2);
 
             // Expect an ArgumentException because the pawn doesn't exist on the board yet

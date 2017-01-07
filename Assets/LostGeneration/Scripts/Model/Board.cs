@@ -13,7 +13,7 @@ namespace LostGen {
         private BoardBlock[,,] _blocks;
 
         public Point Size {
-            get { return new Point(_blocks.GetLength(1), _blocks.GetLength(0), _blocks.GetLength(2)); }
+            get { return new Point(_blocks.GetLength(0), _blocks.GetLength(1), _blocks.GetLength(2)); }
         }
 
         public event Action<Pawn> PawnAdded;
@@ -23,22 +23,28 @@ namespace LostGen {
         private List<Pawn> _pawnOrder = new List<Pawn>();
         private Dictionary<Point, HashSet<Pawn>> _pawnBuckets = new Dictionary<Point, HashSet<Pawn>>();
 
-        public Board(int[,] blocks, int buckets = 4) {
-            if (blocks == null || blocks.Length == 0) {
-                throw new ArgumentNullException("blocks", "Grid is null or empty");
-            }
-
-            _blocks = new BoardBlock[blocks.GetLength(0), blocks.GetLength(1), blocks.GetLength(2)];
-            Array.Copy(blocks, 0, _blocks, 0, blocks.Length);
-            
+        public Board(Point size) {
+            _blocks = new BoardBlock[size.X, size.Y, size.Z];
         }
 
-        public BoardBlock GetBlock(int x, int y, int z) {
-        	return _blocks[y, x, z];
+        public Board(int width, int height, int depth) {
+            _blocks = new BoardBlock[width, height, depth];
+        }
+
+        public void SetBlock(BoardBlock block, Point point) {
+            if (InBounds(point)) {
+                _blocks[point.X, point.Y, point.Z] = block;
+            } else {
+                throw new ArgumentOutOfRangeException("Given Point " + point + " is outside the bounds of the Board " + Size, "point");
+            }
         }
 
         public BoardBlock GetBlock(Point point) {
-            return _blocks[point.Y, point.X, point.Z];
+            if (InBounds(point)) {
+                return _blocks[point.X, point.Y, point.Z];
+            } else {
+                throw new ArgumentOutOfRangeException("Given Point " + point + " is outside the bounds of the Board " + Size, "point");
+            }
         }
 
         /// <summary>

@@ -2,20 +2,20 @@ using System;
 using System.Collections.Generic;
 
 namespace LostGen {
-    public abstract class BoardNode : IGraphNode {
+    public abstract class BlockNode : IGraphNode {
         public Board Board { get; private set; }
         public Point Point { get; protected set; }
 
-        public BoardNode(Board board, Point point) {
+        public BlockNode(Board board, Point point) {
             Board = board;
             Point = point;
         }
 
-        public abstract int GetEdgeCost(BoardNode neighbor);
+        public abstract int GetEdgeCost(BlockNode neighbor);
         public abstract IEnumerable<IGraphNode> GetNeighbors();
 
         public int GetEdgeCost(IGraphNode neighbor) {
-            BoardNode boardNeighbor = neighbor as BoardNode;
+            BlockNode boardNeighbor = neighbor as BlockNode;
             
             if (boardNeighbor != null) {
                 return GetEdgeCost(boardNeighbor);    
@@ -25,7 +25,7 @@ namespace LostGen {
         }
         
         public bool IsMatch(IGraphNode other) {
-            BoardNode boardOther = other as BoardNode;
+            BlockNode boardOther = other as BlockNode;
             if (boardOther != null) {
                 return boardOther.Point == Point;    
             } else {

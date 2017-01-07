@@ -5,7 +5,7 @@ namespace Tests.Decisions {
     public class ApproachAndAttack {
         [Test]
         public void StationaryMelee() {
-            Board board = new Board(BoardCommon.GRID_12X8);
+            Board board = BoardCommon.ArrayToBoard(BoardCommon.GRID_12X1X8);
             Combatant attacker = new Combatant("Attacker", board, new Point(5, 4));
             Combatant defender = new Combatant("Defender", board, new Point(7, 4));
             board.AddPawn(attacker);
@@ -37,7 +37,7 @@ namespace Tests.Decisions {
 
         [Test]
         public void ApproachMeleeRange() {
-            Board board = new Board( new int[,] {
+            Board board = BoardCommon.ArrayToBoard( new int[,,] {{
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
                 { 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 },
                 { 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 },
@@ -47,7 +47,7 @@ namespace Tests.Decisions {
                 { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
                 { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
-            });
+            }});
             Combatant attacker = new Combatant("Attacker", board, new Point(1, 7));
             Combatant defender = new Combatant("Defender", board, new Point(10, 1));
             board.AddPawn(attacker);

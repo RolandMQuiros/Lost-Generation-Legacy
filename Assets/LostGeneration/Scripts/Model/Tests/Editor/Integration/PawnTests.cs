@@ -16,7 +16,7 @@ namespace Tests.Integration {
 
         [Test]
         public void MoveIntoWall() {
-            Board board = new Board(BoardCommon.GRID_12X8);
+            Board board = BoardCommon.ArrayToBoard(BoardCommon.GRID_12X1X8);
             Pawn pawn = new Pawn("Mover", board, Point.One, null, true, true);
 
             board.AddPawn(pawn);
@@ -38,7 +38,7 @@ namespace Tests.Integration {
 
         [Test]
         public void MoveSolidPawnIntoSolidPawn() {
-            Board board = new Board(BoardCommon.GRID_12X8);
+            Board board = BoardCommon.ArrayToBoard(BoardCommon.GRID_12X1X8);
 
             Point pos1 = new Point(6, 4);
             Point pos2 = new Point(8, 4);
@@ -66,7 +66,7 @@ namespace Tests.Integration {
 
         [Test]
         public void SolidPawnsMoveIntoEachOther() {
-            Board board = new Board(BoardCommon.GRID_12X8);
+            Board board = BoardCommon.ArrayToBoard(BoardCommon.GRID_12X1X8);
 
             Point pos1 = new Point(6, 4);
             Point pos2 = new Point(7, 4);
@@ -86,7 +86,7 @@ namespace Tests.Integration {
 
         [Test]
         public void SolidPawnsMoveIntoSharedCell() {
-            Board board = new Board(BoardCommon.GRID_12X8);
+            Board board = BoardCommon.ArrayToBoard(BoardCommon.GRID_12X1X8);
 
             Point pos1 = new Point(6, 4);
             Point pos2 = new Point(8, 4);
@@ -129,7 +129,7 @@ namespace Tests.Integration {
         [Test]
         public void CollisionTest() {
             // Arrange
-            Board board = new Board(BoardCommon.GRID_12X8);
+            Board board = BoardCommon.ArrayToBoard(BoardCommon.GRID_12X1X8);
 
             Point pos1 = board.Size / 2; // Center of board
             Point pos2 = pos1 + (3 * Point.Right); // Two tiles to the right of center

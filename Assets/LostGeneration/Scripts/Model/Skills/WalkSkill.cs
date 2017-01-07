@@ -109,7 +109,7 @@ namespace LostGen {
 
                 _actionPoints = 0;
                 for (int i = 1; i < path.Count; i++) {
-                    _actionPoints += TileCost(path[i].Point);
+                    _actionPoints += ActionCostBetweenNodes(path[i-1], path[i]);
                 }
             }
 
@@ -132,6 +132,18 @@ namespace LostGen {
                     }
                 }
             }
+        }
+
+        private int ActionCostBetweenNodes(BlockNode from, BlockNode to) {
+            int actionPoints = Math.Abs(to.Point.X - from.Point.Y);
+            int heightDifference = to.Point.Y - from.Point.Y;
+            
+            // Climbing costs 2 points per block. Dropping only costs the horizontal component.
+            if (heightDifference > 0) {
+                actionPoints += heightDifference * 2;
+            }
+
+            return actionPoints;
         }
 
         protected virtual int Heuristic(WalkNode start, WalkNode end) {
