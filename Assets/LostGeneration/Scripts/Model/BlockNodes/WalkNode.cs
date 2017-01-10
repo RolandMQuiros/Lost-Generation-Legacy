@@ -3,10 +3,13 @@ using System.Collections.Generic;
 
 namespace LostGen {
     public class WalkNode : BlockNode {
+        public bool CanWalkDiagonally;
         private Dictionary<WalkNode, int> _neighbors = null;
         
-        public WalkNode(Board board, Point point)
-            : base(board, point) { }
+        public WalkNode(Board board, Point point, bool canWalkDiagonally = true)
+            : base(board, point) {
+                CanWalkDiagonally = canWalkDiagonally;
+            }
         
         public override int GetEdgeCost(BlockNode neighbor) {
             BuildNeighbors();
@@ -25,7 +28,14 @@ namespace LostGen {
                 Stack<Point> open = new Stack<Point>();
                 _neighbors = new Dictionary<WalkNode, int>();
                 
-                foreach (Point offset in Point.TransverseNeighbors) {
+                Point[] neighborPoints;
+                if (CanWalkDiagonally) {
+                    neighborPoints = Point.TransverseOctoNeighbors; 
+                } else {
+                    neighborPoints = Point.TransverseNeighbors;
+                }
+
+                foreach (Point offset in neighborPoints) {
                     Point neighbor = offset + Point;
                     if (Board.InBounds(neighbor)) {
                         open.Push(neighbor);

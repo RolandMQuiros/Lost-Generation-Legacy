@@ -150,6 +150,7 @@ namespace Tests.Skills {
             }
         }
 
+        [Test]
         public void CornerToCorner() {
             Board board;
             Combatant combatant;
@@ -158,14 +159,15 @@ namespace Tests.Skills {
             ArrangeBoard(BoardCommon.GRID_12X1X8, start, end, out board, out combatant);
 
             WalkSkill walk = combatant.GetSkill<WalkSkill>();
+            walk.CanWalkDiagonally = false;
 
             Assert.LessOrEqual(walk.ActionPoints, combatant.ActionPoints);
 
-            walk.Fire();
+            Console.Write(BoardCommon.PrintBoard(board, walk.GetPath(), new List<Point>() {start, end}));
 
+            walk.Fire();
             board.Turn();
 
-            Console.Write(BoardCommon.PrintBoard(board, walk.GetPath()));
             Assert.AreEqual(end, combatant.Position);
         }
 
@@ -194,11 +196,12 @@ namespace Tests.Skills {
             WalkSkill walk = combatant.GetSkill<WalkSkill>();
 
             Assert.LessOrEqual(walk.ActionPoints, combatant.ActionPoints);
-            
+
+            Console.Write(BoardCommon.PrintBoard(board, walk.GetPath(), new List<Point>() {start, end}));
+
             walk.Fire();
             board.Turn();
 
-            Console.Write(BoardCommon.PrintBoard(board, walk.GetPath()));
             Assert.AreEqual(end, combatant.Position);
         }
 
@@ -225,14 +228,13 @@ namespace Tests.Skills {
             ArrangeBoard(grid, start, end, out board, out combatant);
 
             WalkSkill walk = combatant.GetSkill<WalkSkill>();
-
+            walk.CanWalkDiagonally = false;
+            Console.Write(BoardCommon.PrintBoard(board, walk.GetPath(), new List<Point>() {start, end}));
+            
             Assert.LessOrEqual(walk.ActionPoints, combatant.ActionPoints);
-
+            
             walk.Fire();
-
             board.Turn();
-
-            Console.Write(BoardCommon.PrintBoard(board, walk.GetPath()));
             
             Assert.AreEqual(end, combatant.Position);
         }

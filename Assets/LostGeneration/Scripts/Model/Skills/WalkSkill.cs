@@ -19,6 +19,7 @@ namespace LostGen {
     /// </summary>
     public class WalkSkill : RangedSkill {
         public override int ActionPoints { get { return _actionPoints; } }
+        public bool CanWalkDiagonally = true;
 
         protected Board _board;
         private int _actionPoints = 0;
@@ -83,11 +84,11 @@ namespace LostGen {
         }
 
         private List<WalkNode> FindPath(Point origin, Point target) {
-            WalkNode end = new WalkNode(_board, target);//_board.GetNode(target, TileCost);
+            WalkNode end = new WalkNode(_board, target, CanWalkDiagonally);
             List<WalkNode> path = null;
 
             if (end != null) {
-                WalkNode start = new WalkNode(_board, target);
+                WalkNode start = new WalkNode(_board, target, CanWalkDiagonally);
 
                 if (start == null) {
                     throw new Exception("This Skill's owner is positioned outside the graph");
@@ -95,12 +96,12 @@ namespace LostGen {
 
                 if (Point.TaxicabDistance(Owner.Position, target) == 1) {
                     path = new List<WalkNode>();
-                    path.Add(new WalkNode(_board, origin));
-                    path.Add(new WalkNode(_board, target));
+                    path.Add(new WalkNode(_board, origin, CanWalkDiagonally));
+                    path.Add(new WalkNode(_board, target, CanWalkDiagonally));
                 } else {
                     path = new List<WalkNode>(
                         GraphMethods<WalkNode>.FindPath(
-                            new WalkNode(_board, origin),
+                            new WalkNode(_board, origin, CanWalkDiagonally),
                             end,
                             Heuristic
                         )
@@ -118,7 +119,7 @@ namespace LostGen {
 
         private void ReinitializeRange(Point origin) {
             if (_range == null || _prevOrigin != origin) {
-                WalkNode startNode = new WalkNode(Owner.Board, origin);
+                WalkNode startNode = new WalkNode(Owner.Board, origin, CanWalkDiagonally);
                 _prevOrigin = origin;
                 _range = new HashSet<Point>();
                 if (startNode != null) {

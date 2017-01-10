@@ -51,7 +51,7 @@ namespace LostGen {
             Point.Down + Point.Backward + Point.Right,
         };
 
-        public static readonly Point[] TransverseNeighbors = new Point[] {
+        public static readonly Point[] TransverseOctoNeighbors = new Point[] {
             Point.Forward + Point.Left,
             Point.Forward,
             Point.Forward + Point.Right,
@@ -62,6 +62,13 @@ namespace LostGen {
             Point.Backward + Point.Left,
             Point.Backward,
             Point.Backward + Point.Right
+        };
+
+        public static readonly Point[] TransverseNeighbors = new Point[] {
+            Point.Forward,
+            Point.Right,
+            Point.Backward,
+            Point.Left
         };
 
         public int X;
