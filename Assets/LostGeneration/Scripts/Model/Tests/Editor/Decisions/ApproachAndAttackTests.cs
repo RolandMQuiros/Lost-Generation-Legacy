@@ -5,7 +5,7 @@ namespace Tests.Decisions {
     public class ApproachAndAttack {
         [Test]
         public void StationaryMelee() {
-            Board board = BoardCommon.ArrayToBoard(BoardCommon.GRID_12X1X8);
+            Board board = BoardCommon.ArrayToBoard(BoardCommon.GRID_12X1X9);
             Combatant attacker = new Combatant("Attacker", board, new Point(5, 4));
             Combatant defender = new Combatant("Defender", board, new Point(7, 4));
             board.AddPawn(attacker);

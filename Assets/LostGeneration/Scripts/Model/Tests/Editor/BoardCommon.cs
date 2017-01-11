@@ -6,7 +6,7 @@ using LostGen;
 
 namespace Tests {
     public class BoardCommon {
-        public static readonly int[,,] GRID_12X1X8 = new int[,,] {
+        public static readonly int[,,] GRID_12X1X9 = new int[,,] {
             {
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
                 { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 },

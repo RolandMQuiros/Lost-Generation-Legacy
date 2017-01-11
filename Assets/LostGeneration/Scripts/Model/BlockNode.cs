@@ -32,5 +32,9 @@ namespace LostGen {
                 throw new ArgumentException("Given GraphNode was not a BoardNode", "neighbor");
             }
         }
+
+        public override int GetHashCode() {
+            return Point.GetHashCode();
+        }
     }
 }

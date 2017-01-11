@@ -22,7 +22,7 @@ namespace Tests.Integration {
 
         [Test]
         public void PawnMovedButNotInBoard() {
-            Board board = BoardCommon.ArrayToBoard(BoardCommon.GRID_12X1X8);
+            Board board = BoardCommon.ArrayToBoard(BoardCommon.GRID_12X1X9);
             Pawn pawn = new Pawn("Add", board, board.Size / 2);
 
             // Expect an ArgumentException because the pawn doesn't exist on the board yet

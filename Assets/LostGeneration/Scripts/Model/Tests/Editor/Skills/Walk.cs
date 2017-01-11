@@ -45,7 +45,7 @@ namespace Tests.Skills {
             
 
             Point origin = new Point(3, 1, 2);
-            WalkNode walkNode = new WalkNode(board, origin);
+            WalkNode walkNode = new WalkNode(board, origin, true);
 
             HashSet<Point> actualNeighbors = new HashSet<Point>(
                 walkNode.GetNeighbors().Select(node => (node as BlockNode).Point)
@@ -117,7 +117,7 @@ namespace Tests.Skills {
             });
 
             Point origin = new Point(3, 2, 2);
-            WalkNode walkNode = new WalkNode(board, origin);
+            WalkNode walkNode = new WalkNode(board, origin, true);
 
             HashSet<Point> actualNeighbors = new HashSet<Point>(
                 walkNode.GetNeighbors().Select(node => (node as BlockNode).Point)
@@ -156,7 +156,10 @@ namespace Tests.Skills {
             Combatant combatant;
             Point start = new Point(1, 1, 1);
             Point end = new Point(10, 1, 6);
-            ArrangeBoard(BoardCommon.GRID_12X1X8, start, end, out board, out combatant);
+
+            int[,,] grid = new int[2, 8, 12];
+            Array.Copy(BoardCommon.GRID_12X1X9, 0, grid, 12*8, 12 * 8);
+            ArrangeBoard(grid, start, end, out board, out combatant);
 
             WalkSkill walk = combatant.GetSkill<WalkSkill>();
             walk.CanWalkDiagonally = false;
