@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Collections.Generic;
+using NUnit.Framework;
 using LostGen;
 
 namespace Tests.Decisions {
@@ -30,7 +31,8 @@ namespace Tests.Decisions {
             board.BeginTurn();
             Assert.AreEqual(10, attacker.ActionPoints);
 
-            board.Turn();
+            Queue<IPawnMessage> messages = new Queue<IPawnMessage>();
+            board.Turn(messages);
             Assert.AreEqual(0, defender.Health);
             Assert.AreEqual(7, attacker.ActionPoints);
         }
@@ -79,7 +81,8 @@ namespace Tests.Decisions {
             board.BeginTurn();
             Assert.AreEqual(25, attacker.ActionPoints);
 
-            board.Turn();
+            Queue<IPawnMessage> messages = new Queue<IPawnMessage>();
+            board.Turn(messages);
             Assert.AreEqual(new Point(10, 3), attacker.Position);
         }
     }

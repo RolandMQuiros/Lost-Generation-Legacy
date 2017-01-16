@@ -1,7 +1,11 @@
 using System;
 
 namespace LostGen {
-    public class MoveMessage : MessageArgs {
+    public class MoveMessage : IPawnMessage {
+        public Pawn Source { get; private set; }
+        public Pawn Target { get; private set; }
+        public String Text { get; private set; }
+        public bool IsCritical {get; private set; }
         public Point From;
         public Point To;
         public bool IsContinuous;

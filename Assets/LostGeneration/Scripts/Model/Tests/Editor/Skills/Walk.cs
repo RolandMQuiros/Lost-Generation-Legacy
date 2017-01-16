@@ -169,7 +169,9 @@ namespace Tests.Skills {
             Console.Write(BoardCommon.PrintBoard(board, walk.GetPath(), new List<Point>() {start, end}));
 
             walk.Fire();
-            board.Turn();
+
+            Queue<IPawnMessage> messages = new Queue<IPawnMessage>();
+            board.Turn(messages);
 
             Assert.AreEqual(end, combatant.Position);
         }
@@ -203,7 +205,8 @@ namespace Tests.Skills {
             Console.Write(BoardCommon.PrintBoard(board, walk.GetPath(), new List<Point>() {start, end}));
 
             walk.Fire();
-            board.Turn();
+            Queue<IPawnMessage> messages = new Queue<IPawnMessage>();
+            board.Turn(messages);
 
             Assert.AreEqual(end, combatant.Position);
         }
@@ -237,7 +240,8 @@ namespace Tests.Skills {
             Assert.LessOrEqual(walk.ActionPoints, combatant.ActionPoints);
             
             walk.Fire();
-            board.Turn();
+            Queue<IPawnMessage> messages = new Queue<IPawnMessage>();
+            board.Turn(messages);
             
             Assert.AreEqual(end, combatant.Position);
         }

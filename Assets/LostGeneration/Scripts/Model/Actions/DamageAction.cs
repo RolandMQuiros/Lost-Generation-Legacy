@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace LostGen {
     public class DamageAction : PawnAction {
@@ -15,12 +16,11 @@ namespace LostGen {
             Source = source;
         }
 
-        public override void Commit() {
+        public override void Commit(Queue<IPawnMessage> messages) {
             if (Amount > 0) {
                 Target.Health -= Amount;
-                Target.EmitMessage(
-                    new DamageMessage(Target, Amount, Source)
-                );
+
+                 messages.Enqueue(new DamageMessage(Target, Amount, Source));
             }
         }
     }

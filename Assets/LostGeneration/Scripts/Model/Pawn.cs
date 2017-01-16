@@ -71,10 +71,6 @@ namespace LostGen {
         public bool IsOpaque;
         #endregion Fields
 
-        #region Events
-        public event EventHandler<MessageArgs> Messages;
-        #endregion Events
-
         protected LinkedList<PawnAction> _actions = new LinkedList<PawnAction>();
         /// <summary>
         /// List of offsets that describe the space this Pawn takes up on the Board. For example, a very large door may take
@@ -125,11 +121,6 @@ namespace LostGen {
         public virtual void OnCollisionEnter(Pawn other) { }
         public virtual void OnCollisionStay(Pawn other) { }
         public virtual void OnCollisionExit(Pawn other) { }
-        public void EmitMessage(MessageArgs message) {
-            if (Messages != null) {
-                Messages(this, message);
-            }
-        }
 
         public virtual void PushActions(IEnumerable<PawnAction> actions) {
             foreach (PawnAction action in actions) {
@@ -151,14 +142,14 @@ namespace LostGen {
         ///<summary>
 		///Pops and runs a single action in the queue
 		///</summary>
-		public virtual PawnAction Step() {
+		public virtual PawnAction Step(Queue<IPawnMessage> messages) {
             PawnAction stepAction = null;
             if (_actions.Count > 0) {
                 stepAction = _actions.First.Value;
                 PreprocessAction(stepAction);
 
                 stepAction.Do();
-                stepAction.Commit();
+                stepAction.Commit(messages);
 
                 _actions.RemoveFirst();
             }

@@ -20,7 +20,7 @@ namespace LostGen {
             _areaOfEffect = new List<Point>(area);
         }
 
-        public override void Commit() {
+        public override void Commit(Queue<IPawnMessage> messages) {
             for (int i = 0; i < _areaOfEffect.Count; i++) {
                 int damage = Owner.EffectiveStats.Attack;
 
@@ -31,9 +31,7 @@ namespace LostGen {
                     if (target != null) {
                         target.Health = target.Health - damage;
 
-                        target.EmitMessage(
-                            new DamageMessage(target, damage, Owner)
-                        );
+                        messages.Enqueue(new DamageMessage(target, damage, Owner));
                     }
                 }
 

@@ -32,11 +32,9 @@ namespace LostGen {
             Owner.SetPositionInternal(_start);
         }
 
-        public override void Commit() {
+        public override void Commit(Queue<IPawnMessage> messages) {
             if (_moveSuccess) {
-                SendMessage(
-                    new MoveMessage(Owner, _start, _end, _isContinuous)
-                );
+                messages.Enqueue(new MoveMessage(Owner, _start, _end, _isContinuous));
             }
         }
 

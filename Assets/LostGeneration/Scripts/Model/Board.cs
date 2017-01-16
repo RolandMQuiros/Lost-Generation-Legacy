@@ -311,24 +311,23 @@ namespace LostGen {
         /// Calls the Step() function of each Pawn on the Board.
         /// </summary>
         /// <returns>true if a Pawn still has actions to perform in this step, false otherwise</returns>
-        public Queue<PawnAction> Step() {
+        public Queue<PawnAction> Step(Queue<IPawnMessage> messages) {
             _pawnOrder.Sort();
+            
             Queue<PawnAction> actions = new Queue<PawnAction>();
             for (int i = 0; i < _pawnOrder.Count; i++) {
-                PawnAction action = _pawnOrder[i].Step();
-                if (action != null) {
-                    actions.Enqueue(action);
-                }
+                PawnAction action = _pawnOrder[i].Step(messages);
+                actions.Enqueue(action);
             }
 
             return actions;
         }
 
-        public Queue<PawnAction> Turn() {
+        public Queue<PawnAction> Turn(Queue<IPawnMessage> messages) {
             Queue<PawnAction> actions = new Queue<PawnAction>();
             
             Queue<PawnAction> step;
-            while ((step = Step()).Count != 0) {
+            while ((step = Step(messages)).Count != 0) {
                 actions.Union(step);
             }
 
