@@ -107,7 +107,7 @@ namespace LostGen {
                         )
                     );
                 }
-
+                
                 _actionPoints = 0;
                 for (int i = 1; i < path.Count; i++) {
                     _actionPoints += ActionCostBetweenNodes(path[i-1], path[i]);
@@ -118,11 +118,14 @@ namespace LostGen {
         }
 
         private void ReinitializeRange(Point origin) {
+            // If the cached range collection doesn't exist yet, or the origin has changed,
+            // then create the range
             if (_range == null || _prevOrigin != origin) {
                 WalkNode startNode = new WalkNode(Owner.Board, origin, CanWalkDiagonally);
                 _prevOrigin = origin;
                 _range = new HashSet<Point>();
                 if (startNode != null) {
+                    // GraphMethods include the origin in their result sets.  Make sure we skip the first one. 
                     bool firstSkipped = false;
                     foreach (WalkNode node in GraphMethods<WalkNode>.FloodFill(startNode, Owner.ActionPoints + 1)) {
                         if (firstSkipped) {
@@ -134,7 +137,11 @@ namespace LostGen {
                 }
             }
         }
-
+        
+        /// <summary>Retrieves both the ActionPoint and Pathfinding cost between two nodes</summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <returns></returns>
         private int ActionCostBetweenNodes(BlockNode from, BlockNode to) {
             int actionPoints = Math.Abs(to.Point.X - from.Point.Y);
             int heightDifference = to.Point.Y - from.Point.Y;

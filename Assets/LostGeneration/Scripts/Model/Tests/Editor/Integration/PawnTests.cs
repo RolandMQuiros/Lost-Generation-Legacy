@@ -16,23 +16,26 @@ namespace Tests.Integration {
 
         [Test]
         public void MoveIntoWall() {
-            Board board = BoardCommon.ArrayToBoard(BoardCommon.GRID_12X1X9);
+            int[,,] grid = new int[2, 8, 12];
+            Array.Copy(BoardCommon.GRID_12X1X9, 0, grid, 12*8, 12 * 8);
+            
+            Board board = BoardCommon.ArrayToBoard(grid);
             Pawn pawn = new Pawn("Mover", board, Point.One, null, true, true);
 
             board.AddPawn(pawn);
 
-            Point expectedPosition = new Point(2, 1);
+            Point expectedPosition = new Point(2, 1, 1);
 
             bool moveRight = pawn.Offset(Point.Right);
             Point position1 = pawn.Position;
 
-            bool moveUp = pawn.Offset(Point.Up);
+            bool moveBackward = pawn.Offset(Point.Backward);
             Point position2 = pawn.Position;
 
             Assert.IsTrue(moveRight, "Offset returned false when moving right");
             Assert.AreEqual(expectedPosition, position1, "Pawn failed to move right to open tile");
 
-            Assert.IsFalse(moveUp, "Offset returned true when moving up into a wall");
+            Assert.IsFalse(moveBackward, "Offset returned true when moving backward into a wall");
             Assert.AreEqual(expectedPosition, position2, "Pawn failed to stay on one goddamn place");
         }
 

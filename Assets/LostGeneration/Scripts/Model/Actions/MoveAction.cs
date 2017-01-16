@@ -5,21 +5,6 @@ using System.Text;
 
 namespace LostGen {
     public class MoveAction : CombatantAction {
-        public class Message : MessageArgs {
-            public Point From;
-            public Point To;
-            public bool IsContinuous;
-
-            public Message(Pawn mover, Point from, Point to, bool isContinuous) {
-                Source = mover;
-                From = from;
-                To = to;
-                IsContinuous = isContinuous;
-
-                Text = Source.Name + " moved from " + From + " to " + To;
-            }
-        }
-
         public override int ActionPoints { get { return Point.TaxicabDistance(_start, _end); } }
         public override Point PostRunPosition {
             get { return _end; }
@@ -50,7 +35,7 @@ namespace LostGen {
         public override void Commit() {
             if (_moveSuccess) {
                 SendMessage(
-                    new Message(Owner, _start, _end, _isContinuous)
+                    new MoveMessage(Owner, _start, _end, _isContinuous)
                 );
             }
         }
