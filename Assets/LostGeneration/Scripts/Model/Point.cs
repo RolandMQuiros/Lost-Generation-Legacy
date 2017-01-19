@@ -1,6 +1,7 @@
 ﻿using System;
 
 namespace LostGen {
+    [Serializable]
     public struct Point : IEquatable<Point> {
         public static readonly Point Zero = new Point(0, 0, 0);
         public static readonly Point One = new Point(1, 1, 1);
