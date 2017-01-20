@@ -52,9 +52,12 @@ namespace Tests {
             for (int z = 0; z < array.GetLength(1); z++) {
                 for (int y = 0; y < array.GetLength(0); y++) {
                     for (int x = 0; x < array.GetLength(2); x++) {
-                        BoardBlock block = new BoardBlock();
-                        block.IsSolid = array[y, z, x] == 0;
-                        board.SetBlock(block, new Point(x, y, z));
+                        BoardBlock block = new BoardBlock() {
+                            Point = new Point(x, y, z),
+                            IsSolid = array[y, z, x] == 0,
+                            IsOpaque = array[y, z, x] == 0
+                        };
+                        board.SetBlock(block);
                     }
                 }
             }

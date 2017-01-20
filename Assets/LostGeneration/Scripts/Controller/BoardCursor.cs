@@ -5,19 +5,31 @@ using UnityEngine.Events;
 using LostGen;
 
 
-public class BoardCursor : MonoBehaviour {
+public class BoardCursor : MonoBehaviour,
+                           IPointerClickHandler,
+                           IPointerDownHandler,
+                           IPointerUpHandler {
 	public Camera Camera;
 	public BoardData BoardData;
 	public enum CursorAxis {
-		XZ = 0, XY = 1, ZY = 2
+		XZ, XY
 	}
 	public CursorAxis Axis = CursorAxis.XZ;
-    public int PlanePosition = 0;
 	public Vector3 ScreenPoint;
 	public Vector3 WorldPoint;
     public Point BoardPoint;
+
+    [Serializable]
+    public class CursorEvent : UnityEvent<Point> { }
+
+    public CursorEvent Clicked;
+    public CursorEvent TappedDown;
+    public CursorEvent TappedUp;
+
 	private Collider _clickCollider;
 	private bool _isWindowFocused;
+
+
 	#region MonoBehaviour
     private void Awake() {
 		_clickCollider = GetComponent<Collider>();
@@ -25,39 +37,36 @@ public class BoardCursor : MonoBehaviour {
     }
 
     private void Update() {
-        float shiftPlane = Input.GetAxis("Shift Plane");
-        if (shiftPlane > 0) {
-            PlanePosition++;
-        } else if (shiftPlane < 0) {
-            PlanePosition--;
-        }
+        // float shiftPlane = Input.GetAxis("Shift Plane");
+        // if (shiftPlane > 0) {
+        //     PlanePosition++;
+        // } else if (shiftPlane < 0) {
+        //     PlanePosition--;
+        // }
         
-        if (shiftPlane != 0) {
-            switch (Axis) {
-                case CursorAxis.XY:
-                    transform.position.Set(transform.position.x, transform.position.y, (float)PlanePosition);
-                    break;
-                case CursorAxis.XZ:
-                    transform.position.Set(transform.position.x, (float)PlanePosition, transform.position.z);
-                    break;
-                case CursorAxis.ZY:
-                    transform.position.Set((float)PlanePosition, transform.position.y, transform.position.z);
-                    break;
-            }
-        }
+        // if (shiftPlane != 0) {
+        //     switch (Axis) {
+        //         case CursorAxis.XY:
+        //             transform.position.Set(transform.position.x, transform.position.y, (float)PlanePosition);
+        //             break;
+        //         case CursorAxis.XZ:
+        //             transform.position.Set(transform.position.x, (float)PlanePosition, transform.position.z);
+        //             break;
+        //         case CursorAxis.ZY:
+        //             transform.position.Set((float)PlanePosition, transform.position.y, transform.position.z);
+        //             break;
+        //     }
+        // }
 
         bool flipPlane = Input.GetButtonDown("Flip Plane");
         if (flipPlane) {
-            Axis = (CursorAxis)(((int)Axis + 1) % 3);
+            Axis = (CursorAxis)(((int)Axis + 1) % 2);
             switch (Axis) {
                 case CursorAxis.XY:
                     transform.rotation = Quaternion.AngleAxis(90f, Vector3.right);
                     break;
                 case CursorAxis.XZ:
                     transform.rotation = Quaternion.identity;
-                    break;
-                case CursorAxis.ZY:
-                    transform.rotation = Quaternion.AngleAxis(90f, Vector3.forward);
                     break;
             }   
         }
@@ -77,16 +86,6 @@ public class BoardCursor : MonoBehaviour {
 			Vector3 snapped = PointVector.Round(WorldPoint);
             Point boardPoint = PointVector.ToPoint(snapped);
 
-            // Set the controlled axis on the point to the Plane position
-            switch (Axis) {
-                case CursorAxis.XY:
-                    boardPoint.Z = PlanePosition;
-                    break;
-                case CursorAxis.XZ:
-                    boardPoint.Y = PlanePosition;
-                    break;
-            }
-
             BoardPoint = boardPoint;
         }
     }
@@ -100,4 +99,19 @@ public class BoardCursor : MonoBehaviour {
                Input.mousePosition.y < 0 || Input.mousePosition.y >= Screen.height;
     }
     #endregion MonoBehaviour
+
+    #region PointerEvents
+
+    public void OnPointerClick(PointerEventData eventData) {
+        Clicked.Invoke(BoardPoint);
+    }
+
+    public void OnPointerDown(PointerEventData eventData) {
+        TappedDown.Invoke(BoardPoint);
+    }
+
+    public void OnPointerUp(PointerEventData eventData) {
+        TappedUp.Invoke(BoardPoint);
+    }
+    #endregion PointerEvents
 }

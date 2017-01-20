@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 
 namespace LostGen {
     public struct BoardBlock {
+        public Point Point;
         public bool IsSolid;
         public bool IsOpaque;
         public bool IsDiggable;
@@ -19,6 +20,7 @@ namespace LostGen {
 
         public event Action<Pawn> PawnAdded;
         public event Action<Pawn> PawnRemoved;
+        public event Action BlocksChanged;
 
         private HashSet<Pawn> _pawns = new HashSet<Pawn>();
         private List<Pawn> _pawnOrder = new List<Pawn>();
@@ -32,17 +34,23 @@ namespace LostGen {
             _blocks = new BoardBlock[width, height, depth];
         }
 
-        public void SetBlock(BoardBlock block, Point point) {
-            if (InBounds(point)) {
-                _blocks[point.X, point.Y, point.Z] = block;
+        public void SetBlock(BoardBlock block) {
+            if (InBounds(block.Point)) {
+                _blocks[block.Point.X, block.Point.Y, block.Point.Z] = block;
+                if (BlocksChanged != null) {
+                    BlocksChanged();
+                }
             } else {
-                throw new ArgumentOutOfRangeException("Given Point " + point + " is outside the bounds of the Board " + Size, "point");
+                throw new ArgumentOutOfRangeException("Given Point " + block.Point + " is outside the bounds of the Board " + Size, "point");
             }
         }
 
         public BoardBlock GetBlock(Point point) {
             if (InBounds(point)) {
                 return _blocks[point.X, point.Y, point.Z];
+                if (BlocksChanged != null) {
+                    BlocksChanged();
+                }
             } else {
                 throw new ArgumentOutOfRangeException("Given Point " + point + " is outside the bounds of the Board " + Size, "point");
             }
@@ -318,7 +326,9 @@ namespace LostGen {
             Queue<PawnAction> actions = new Queue<PawnAction>();
             for (int i = 0; i < _pawnOrder.Count; i++) {
                 PawnAction action = _pawnOrder[i].Step(messages);
-                actions.Enqueue(action);
+                if (action != null) {
+                    actions.Enqueue(action);
+                }
             }
 
             return actions;

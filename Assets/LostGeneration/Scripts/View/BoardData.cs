@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using LostGen;
 
 /// <summary>
@@ -7,7 +9,19 @@ using LostGen;
 /// Editor, instead of having to create classes specifically to assign the reference to components.
 /// </summary>
 public class BoardData : MonoBehaviour {
-    public Board Board; 
+    public Board Board;
+    public UnityEvent BlocksChanged;
+
+    public void Step() {
+        Queue<IPawnMessage> messages = new Queue<IPawnMessage>();
+        Board.Step(messages);
+    }
+
+    private void OnBlocksChanged() {
+        BlocksChanged.Invoke();
+    }
+
+    #region MonoBehaviour
     private void Awake() {
         int[,,] grid = new int[,,] {
             {
@@ -33,12 +47,15 @@ public class BoardData : MonoBehaviour {
                 for (int x = 0; x < grid.GetLength(2); x++) {
                     Point point = new Point(x, y, z);
                     if (grid[y,z,x] == 1) {
-                        Board.SetBlock(new BoardBlock() { IsSolid = true, IsOpaque = true }, point);
+                        Board.SetBlock(new BoardBlock() { Point = point, IsSolid = true, IsOpaque = true });
                     } else {
-                        Board.SetBlock(new BoardBlock() { IsSolid = false, IsOpaque = false }, point);
+                        Board.SetBlock(new BoardBlock() { Point = point, IsSolid = false, IsOpaque = false });
                     }
                 }
             }
         }
+
+        Board.BlocksChanged += OnBlocksChanged;
     }
+    #endregion MonoBehaviour
 }

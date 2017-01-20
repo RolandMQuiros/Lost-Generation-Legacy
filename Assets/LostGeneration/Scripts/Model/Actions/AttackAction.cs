@@ -4,9 +4,6 @@ using System.Collections.Generic;
 namespace LostGen {
     public class AttackAction : CombatantAction {
         public override int ActionPoints { get { return 3; } } // TODO: Change this shit when Inventory is implemented
-        public override Point PostRunPosition {
-            get { return Owner.Position; }
-        }
         private List<Point> _areaOfEffect;
 
         public AttackAction(Combatant source, Point point)

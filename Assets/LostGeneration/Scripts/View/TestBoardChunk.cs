@@ -3,9 +3,6 @@ using UnityEngine;
 using LostGen;
 public class TestBoardChunk : MonoBehaviour {
     public BoardData BoardInspector;
-    public Point Corner1;
-    public Point Corner2;
-
     public GameObject BlockPrefab;
 
     private Board _board;
@@ -17,10 +14,7 @@ public class TestBoardChunk : MonoBehaviour {
         }
 
         _board = BoardInspector.Board;
-        
-        if (!_board.InBounds(Corner1) || !_board.InBounds(Corner2)) {
-            throw new IndexOutOfRangeException("Given BoardChunk corners are outside the bounds of the Board");
-        }
+        _board.BlocksChanged += Rebuild;
 
         ConstructGridView();
     }
@@ -45,6 +39,13 @@ public class TestBoardChunk : MonoBehaviour {
                 }
             }
         }
+    }
+
+    private void Rebuild() {
+        for (int i = 0; i < transform.childCount; i++) {
+            GameObject.Destroy(transform.GetChild(i).gameObject);
+        }
+        ConstructGridView();
     }
     #endregion PrivateMethods
 }
