@@ -7,6 +7,7 @@ namespace LostGen {
     public struct BoardBlock {
         public bool IsSolid;
         public bool IsOpaque;
+        public bool IsDiggable;
     }
 
     public class Board {

@@ -8,7 +8,6 @@ using LostGen;
 /// </summary>
 public class BoardData : MonoBehaviour {
     public Board Board; 
-
     private void Awake() {
         int[,,] grid = new int[,,] {
             {

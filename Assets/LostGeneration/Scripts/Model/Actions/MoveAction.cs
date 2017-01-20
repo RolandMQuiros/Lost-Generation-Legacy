@@ -6,10 +6,6 @@ using System.Text;
 namespace LostGen {
     public class MoveAction : CombatantAction {
         public override int ActionPoints { get { return Point.TaxicabDistance(_start, _end); } }
-        public override Point PostRunPosition {
-            get { return _end; }
-        }
-
         private Point _start;
         private Point _end;
         private bool _isContinuous;

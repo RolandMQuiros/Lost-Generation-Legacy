@@ -3,7 +3,6 @@
 namespace LostGen {
     public abstract class PawnAction {
         public virtual Pawn Owner { get; protected set; }
-        public abstract Point PostRunPosition { get; }
 
         public PawnAction(Pawn owner) {
             Owner = owner;
