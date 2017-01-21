@@ -30,12 +30,12 @@ namespace LostGen {
             int distance = Point.TaxicabDistance(From, To);
             Text = faller.Name + " fell " + distance + " meters";
             if (_landedOn.Count > 0) {
-                Text += ", landing atop ";
+                Text += ", landing on ";
                 for (int i = 0; i < _landedOn.Count; i++) {
                     Text += _landedOn[i].Name;
-                    if (i < _landedOn.Count - 1) {
+                    if (i < _landedOn.Count - 2) {
                         Text += ", ";
-                    } else {
+                    } else if (i == _landedOn.Count - 2) {
                         Text += ", and ";
                     }
                 }

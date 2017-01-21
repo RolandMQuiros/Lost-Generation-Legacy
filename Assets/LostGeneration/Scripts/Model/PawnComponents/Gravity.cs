@@ -21,8 +21,8 @@ namespace LostGen {
         public int Weight;
         public event Action<Gravity> LandedUpon;
 
-        private AxisDirection _gravityDirection;
-        private Point _gravity;
+        private AxisDirection _gravityDirection = AxisDirection.Down;
+        private Point _gravity = Point.Down;
 
         private bool _isFalling = false;
         private List<Pawn> _landedOn;

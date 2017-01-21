@@ -64,7 +64,7 @@ public partial class TrashMan : MonoBehaviour
 		if( cullExcessObjectsInterval > 0 )
 			StartCoroutine( cullExcessObjects() );
 	}
-#if UNITY_5_4
+
     private void OnEnable() {
         SceneManager.sceneLoaded += OnSceneLoad;
     }
@@ -72,11 +72,7 @@ public partial class TrashMan : MonoBehaviour
     private void OnDisable() {
         SceneManager.sceneLoaded -= OnSceneLoad;
     }
-#else
-    private void OnLevelWasLoaded() {
-        OnSceneLoad(SceneManager.GetActiveScene(), LoadSceneMode.Single);
-    }
-#endif
+
     private void OnSceneLoad(Scene scene, LoadSceneMode mode) {
         for (var i = recycleBinCollection.Count - 1; i >= 0; i--) {
             if (!recycleBinCollection[i].persistBetweenScenes)

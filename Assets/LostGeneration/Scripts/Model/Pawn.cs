@@ -116,7 +116,6 @@ namespace LostGen {
 
         ///<summary>Used by internally by Board. Do not use.</summary>
         public void SetPositionInternal(Point newPosition) {
-            Point oldPosition = _position;
             _position = newPosition;
         }
 

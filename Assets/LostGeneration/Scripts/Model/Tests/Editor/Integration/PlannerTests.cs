@@ -162,7 +162,7 @@ namespace Tests.Integration {
             //goal.SetStateValue("HasBanana", true, false);
             GoalNode end = new GoalNode(goal, decisions);
 
-            int i = decisions.Count - 1;
+//            int i = decisions.Count - 1;
             foreach (GoalNode neighbor in end.GetNeighbors()) {
                 Console.WriteLine(end.GetEdge(neighbor));
                 //Assert.AreSame(decisions[i--], end.GetEdge(neighbor));
