@@ -22,26 +22,26 @@ namespace LostGen.Decision {
         public ApproachMeleeRange(Combatant source) : base(source) {
             _source = (Combatant)source;
             if ((_walk = _source.GetSkill<WalkSkill>()) == null) {
-                throw new ArgumentException("source", "Combatant " + source.Name + " doesn't have a Walk skill");
+                throw new ArgumentException("source", "Combatant " + source.Pawn.Name + " doesn't have a Walk skill");
             }
             if ((_melee = _source.GetSkill<MeleeAttackSkill>()) == null) {
-                throw new ArgumentException("source", "Combatant " + source.Name + " doesn't have a Melee Attack skill");
+                throw new ArgumentException("source", "Combatant " + source.Pawn.Name + " doesn't have a Melee Attack skill");
             }
         }
 
         public override StateOffset ApplyPostconditions(StateOffset state) {
             int actionPoints = state.Get(StateKey.AP(_source), _source.ActionPoints);
             state.Set(StateKey.AP(_source), actionPoints - _predictedCost);
-            state.Set(StateKey.Position(_source), _destination);
+            state.Set(StateKey.Position(_source.Pawn), _destination);
 
             return state;
         }
 
         public override bool ArePreconditionsMet(StateOffset state) {
             int actionPoints = state.Get(StateKey.AP(_source), _source.ActionPoints);
-            Point position = state.Get(StateKey.Position(_source), _source.Position);
+            Point position = state.Get(StateKey.Position(_source.Pawn), _source.Pawn.Position);
 
-            int predictedCost = Point.TaxicabDistance(position, _target.Position);
+            int predictedCost = Point.TaxicabDistance(position, _target.Pawn.Position);
 
             return actionPoints > predictedCost;
         }
@@ -59,11 +59,11 @@ namespace LostGen.Decision {
 
                 foreach (Point aoeOffset in _melee.GetAreaOfEffect()) {
                     // For each point in the area of effect, see where we would need to be
-                    Point strikePosition = _target.Position - aoeOffset;
-                    if (_source.Board.InBounds(strikePosition) && // Make sure new standing position is on the Board
-                        _source.Board.GetBlock(strikePosition).IsSolid && // and that it's not inside a wall
-                        _source.Board.PawnsAt(strikePosition).FirstOrDefault(pawn => pawn.IsCollidable && pawn.IsSolid) == null && // and not inside another solid Pawn
-                        _melee.CanAttackFrom(strikePosition, _target.Position)) { // and there's nothing in the way
+                    Point strikePosition = _target.Pawn.Position - aoeOffset;
+                    if (_source.Pawn.Board.InBounds(strikePosition) && // Make sure new standing position is on the Board
+                        _source.Pawn.Board.GetBlock(strikePosition).IsSolid && // and that it's not inside a wall
+                        _source.Pawn.Board.PawnsAt(strikePosition).FirstOrDefault(pawn => pawn.IsCollidable && pawn.IsSolid) == null && // and not inside another solid Pawn
+                        _melee.CanAttackFrom(strikePosition, _target.Pawn.Position)) { // and there's nothing in the way
 
                         possibleDestinations.Add(new KeyValuePair<CardinalDirection, Point>(direction, strikePosition));
                     }
@@ -72,7 +72,7 @@ namespace LostGen.Decision {
 
             if (possibleDestinations.Count > 0) {
                 // Pick the closest of the possible positions
-                KeyValuePair<CardinalDirection, Point> first = possibleDestinations.OrderBy(point => Point.TaxicabDistance(_source.Position, point.Value))
+                KeyValuePair<CardinalDirection, Point> first = possibleDestinations.OrderBy(point => Point.TaxicabDistance(_source.Pawn.Position, point.Value))
                                                                                    .First();
                 _direction = first.Key;
                 _destination = first.Value;

@@ -71,13 +71,21 @@ namespace LostGen {
         public bool IsOpaque;
         #endregion Fields
 
-        protected LinkedList<PawnAction> _actions = new LinkedList<PawnAction>();
+        private LinkedList<PawnAction> _actions = new LinkedList<PawnAction>();
         /// <summary>
         /// List of offsets that describe the space this Pawn takes up on the Board. For example, a very large door may take
         /// up four Points.
         /// </summary>
-        protected List<Point> _footprint;
+        private List<Point> _footprint;
         private Point _position;
+        private Queue<IPawnMessage> _messages = new Queue<IPawnMessage>();
+        private delegate void ComponentCall(PawnComponent component);
+
+
+        /// <summary>Contains components, keyed by type.  Allows us to access components by type, and to only contain a single component of each type.</summary>
+        private Dictionary<Type, PawnComponent> _components = new Dictionary<Type, PawnComponent>();
+        /// <summary>Contains components in the order they should be called, which is the same order as they were added.</summary>
+        private List<PawnComponent> _componentOrder = new List<PawnComponent>();
 
         public Pawn(string name, Board board, Point position, IEnumerable<Point> footprint = null, bool isCollidable = true, bool isSolid = false, bool isOpaque = true) {
             InstanceID = _idCounter++;
@@ -118,9 +126,15 @@ namespace LostGen {
         public bool Offset(Point offset) {
             return SetPosition(Position + offset);
         }
-        public virtual void OnCollisionEnter(Pawn other) { }
-        public virtual void OnCollisionStay(Pawn other) { }
-        public virtual void OnCollisionExit(Pawn other) { }
+        public void OnCollisionEnter(Pawn other) {
+            CallComponents(c => c.OnCollisionEnter(other));
+        }
+        public void OnCollisionStay(Pawn other) {
+            CallComponents(c => c.OnCollisionStay(other));
+        }
+        public void OnCollisionExit(Pawn other) {
+            CallComponents(c => c.OnCollisionExit(other));
+        }
 
         public virtual void PushActions(IEnumerable<PawnAction> actions) {
             foreach (PawnAction action in actions) {
@@ -130,31 +144,47 @@ namespace LostGen {
 
         public virtual void PushAction(PawnAction action) {
             _actions.AddLast(action);
+            CallComponents(c => c.OnPushAction(action));
         }
 
         public virtual void ClearActions() {
-            LinkedList<PawnAction> oldActions = _actions;
+            CallComponents(c => c.BeforeClearActions());
             _actions = new LinkedList<PawnAction>();
         }
         
-        public virtual void BeginTurn() { }
+        public void PushMessage(IPawnMessage message) {
+            _messages.Enqueue(message);
+        }
+
+        public void BeginTurn() {
+            CallComponents(c => c.BeginTurn());
+        }
 
         ///<summary>
 		///Pops and runs a single action in the queue
 		///</summary>
 		public virtual PawnAction Step(Queue<IPawnMessage> messages) {
             PawnAction stepAction = null;
+
+            CallComponents(c => c.PreStep());
+
             if (_actions.Count > 0) {
                 stepAction = _actions.First.Value;
-                PreprocessAction(stepAction);
+                CallComponents(c => c.PreAction(stepAction));
 
                 stepAction.Do();
-                stepAction.Commit(messages);
+                stepAction.Commit();
 
                 _actions.RemoveFirst();
+
+                CallComponents(c => c.PostAction(stepAction));
             }
 
-            PostStep(messages);
+            CallComponents(c => c.PostStep());
+
+            while (_messages.Count > 0) {
+                messages.Enqueue(_messages.Dequeue());
+            }
 
             return stepAction;
         }
@@ -169,7 +199,44 @@ namespace LostGen {
 
             return compare;
         }
-        protected virtual void PreprocessAction(PawnAction action) { }
-        protected virtual void PostStep(Queue<IPawnMessage> messages) { }
+
+        public T GetComponent<T>() where T : PawnComponent {
+            Type componentType = typeof(T);
+            PawnComponent component;
+            _components.TryGetValue(componentType, out component);
+            return component as T;
+        }
+
+        public PawnComponent AddComponent(PawnComponent component) {
+            Type componentType = component.GetType();
+            if (_components.ContainsKey(componentType)) {
+                throw new ArgumentException("This Pawn already contains a Component of type " + componentType, "component");
+            } else {
+                _components.Add(componentType, component);
+                _componentOrder.Add(component);
+                component.OnAdded(this);
+            }
+            
+            return component;
+        }
+
+        public T AddComponent<T>() where T : PawnComponent, new() {
+            T newComponent = new T();
+            AddComponent(newComponent);
+            return newComponent;
+        }
+
+        public bool RemoveComponent<T>() {
+            Type componentType = typeof(T);
+            return _components.Remove(componentType);
+        }
+
+        private void CallComponents(ComponentCall call) {
+            for (int i = 0; i < _componentOrder.Count; i++) {
+                if (_componentOrder[i].IsEnabled) {
+                    call(_componentOrder[i]);
+                }
+            }
+        }
     }
 }

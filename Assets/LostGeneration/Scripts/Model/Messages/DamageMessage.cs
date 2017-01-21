@@ -11,9 +11,9 @@ namespace LostGen {
         public bool IsCritical {get; private set; }
         public int Amount { get; private set; }
 
-        public DamageMessage(Combatant target, int amount, Pawn source = null) {
-            Target = target;
+        public DamageMessage(Pawn source, Pawn target, int amount) {
             Source = source;
+            Target = target;
             Amount = amount;
 
             if (Source != null) {

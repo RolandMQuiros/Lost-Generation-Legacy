@@ -7,17 +7,18 @@ using LostGen;
 namespace Tests.Skills {
     [TestFixture]
     public class Walk {
-        private void ArrangeBoard(int[,,] grid, Point start, Point end, out Board board, out Combatant pawn) {
+        private void ArrangeBoard(int[,,] grid, Point start, Point end, out Board board, out Pawn pawn) {
             board = BoardCommon.ArrayToBoard(grid);
-            pawn = new Combatant("Walker", board, start);
+            pawn = new Pawn("Walker", board, start);
+            Combatant combatant = pawn.AddComponent<Combatant>();
 
             Stats stats = new Stats() { Stamina = 100 };
-            pawn.BaseStats = stats;
+            combatant.BaseStats = stats;
 
             board.AddPawn(pawn);
 
-            WalkSkill walk = new WalkSkill(pawn);
-            pawn.AddSkill(walk);
+            WalkSkill walk = new WalkSkill(combatant);
+            combatant.AddSkill(walk);
 
             walk.SetTarget(end);
 
@@ -153,13 +154,15 @@ namespace Tests.Skills {
         [Test]
         public void CornerToCorner() {
             Board board;
-            Combatant combatant;
+            Pawn pawn;
             Point start = new Point(1, 1, 1);
             Point end = new Point(10, 1, 6);
 
             int[,,] grid = new int[2, 8, 12];
             Array.Copy(BoardCommon.GRID_12X1X9, 0, grid, 12*8, 12 * 8);
-            ArrangeBoard(grid, start, end, out board, out combatant);
+            ArrangeBoard(grid, start, end, out board, out pawn);
+
+            Combatant combatant = pawn.GetComponent<Combatant>();
 
             WalkSkill walk = combatant.GetSkill<WalkSkill>();
             walk.CanWalkDiagonally = false;
@@ -173,7 +176,7 @@ namespace Tests.Skills {
             Queue<IPawnMessage> messages = new Queue<IPawnMessage>();
             board.Turn(messages);
 
-            Assert.AreEqual(end, combatant.Position);
+            Assert.AreEqual(end, pawn.Position);
         }
 
         [Test]
@@ -193,10 +196,11 @@ namespace Tests.Skills {
             Array.Copy(space, 0, grid, space.Length, space.GetLength(1) * space.GetLength(2));
 
             Board board;
-            Combatant combatant;
+            Pawn pawn;
             Point start = new Point(1, 1, 1);
             Point end = new Point(10, 1, 6);
-            ArrangeBoard(grid, start, end, out board, out combatant);
+            ArrangeBoard(grid, start, end, out board, out pawn);
+            Combatant combatant = pawn.GetComponent<Combatant>();
 
             WalkSkill walk = combatant.GetSkill<WalkSkill>();
 
@@ -208,7 +212,7 @@ namespace Tests.Skills {
             Queue<IPawnMessage> messages = new Queue<IPawnMessage>();
             board.Turn(messages);
 
-            Assert.AreEqual(end, combatant.Position);
+            Assert.AreEqual(end, pawn.Position);
         }
 
         [Test]
@@ -228,10 +232,11 @@ namespace Tests.Skills {
             Array.Copy(space, 0, grid, space.Length, space.GetLength(1) * space.GetLength(2));
 
             Board board;
-            Combatant combatant;
+            Pawn pawn;
             Point start = new Point(1, 1, 1);
             Point end = new Point(10, 1, 6);
-            ArrangeBoard(grid, start, end, out board, out combatant);
+            ArrangeBoard(grid, start, end, out board, out pawn);
+            Combatant combatant = pawn.GetComponent<Combatant>();
 
             WalkSkill walk = combatant.GetSkill<WalkSkill>();
             walk.CanWalkDiagonally = false;
@@ -243,7 +248,7 @@ namespace Tests.Skills {
             Queue<IPawnMessage> messages = new Queue<IPawnMessage>();
             board.Turn(messages);
             
-            Assert.AreEqual(end, combatant.Position);
+            Assert.AreEqual(end, pawn.Position);
         }
     }
 

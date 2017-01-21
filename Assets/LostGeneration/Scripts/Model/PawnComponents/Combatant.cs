@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace LostGen {
-    public class Combatant : WeightedPawn {
+    public class Combatant : PawnComponent {
         #region Stats
         public Stats BaseStats {
             get { return _baseStats; }
@@ -21,7 +21,7 @@ namespace LostGen {
                     }
                     _effectiveStats = newStats;
 
-                    Priority = _effectiveStats.Agility;
+                    Pawn.Priority = _effectiveStats.Agility;
                 }
 
                 return _effectiveStats;
@@ -44,11 +44,6 @@ namespace LostGen {
         }
 
         public Team Team;
-
-        public Point GravityDirection {
-            get { return _gravity; }
-            set { _gravity = value; }
-        }
         #endregion Stats
 
         #region CollectionProperties
@@ -69,7 +64,6 @@ namespace LostGen {
         private bool _didStatsChange;
         private Stats _baseStats;
         private Stats _effectiveStats;
-        private Point _gravity;
         private int _health;
         private int _actionPoints;
         private int _queueCost;
@@ -79,11 +73,9 @@ namespace LostGen {
         private Dictionary<Type, ISkill> _skills = new Dictionary<Type, ISkill>();
         private HashSet<Pawn> _visiblePawns = new HashSet<Pawn>();
         private HashSet<Pawn> _knownPawns = new HashSet<Pawn>();
-        #endregion PrivateMembers
 
-        public Combatant(string name, Board board, Point position, bool isOpaque = true, IEnumerable<Point> footprint = null, bool isCollidable = true, bool isSolid = true)
-            : base(name, board, position, footprint, isCollidable, isSolid, isOpaque){
-        }
+        private Gravity _gravity;
+        #endregion PrivateMembers
 
         public void AddSkill(ISkill skill) {
             _skills.Add(skill.GetType(), skill);
@@ -125,49 +117,26 @@ namespace LostGen {
         }
 
         #region PawnOverrides
-
-        public override void PushAction(PawnAction action) {
-            base.PushAction(action);
-
-            CombatantAction combatantAction;
-            if ((combatantAction = action as CombatantAction) != null)  {
-                _queueCost += combatantAction.ActionPoints;
-            }
+        public override void Start() {
+            _gravity = Pawn.GetComponent<Gravity>();
+        }
+        public override void OnPushAction(PawnAction action) {
+            _queueCost += action.Cost;
         }
 
-        public override void PushActions(IEnumerable<PawnAction> actions) {
-            base.PushActions(actions);
-
-            foreach (PawnAction action in actions) {
-                CombatantAction combatantAction;
-                if ((combatantAction = action as CombatantAction) != null) {
-                    _queueCost += combatantAction.ActionPoints;
-                }
-            }
-        }
-
-        public override void ClearActions() {
-            base.ClearActions();
+        public override void BeforeClearActions() {
             _queueCost = 0;
         }
 
         public override void BeginTurn() {
             _actionPoints = EffectiveStats.Stamina;
         }
+        #endregion PawnOverrides
 
-        public override void OnLandedUpon(WeightedPawn by, Queue<IPawnMessage> messages) {
+        private void WhenLandedUpon(Gravity by) {
             int damage = Math.Max(by.Weight - EffectiveStats.Defense, 0);
             Health -= damage;
-            messages.Enqueue(new DamageMessage(this, damage, by));
+            Pawn.PushMessage(new DamageMessage(by.Pawn, Pawn, damage));
         }
-
-        protected override void PreprocessAction(PawnAction action) {
-            CombatantAction combatantAction = action as CombatantAction;
-            if (combatantAction != null) {
-                _actionPoints -= combatantAction.ActionPoints;
-            }
-        }
-
-        #endregion PawnOverrides
     }
 }

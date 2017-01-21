@@ -110,22 +110,19 @@ namespace Tests.Integration {
         }
 
 
-        private class TestPawn : Pawn {
+        private class TestComponent : PawnComponent {
             public event Action<Pawn, Pawn> CollisionEntered;
             public event Action<Pawn, Pawn> CollisionStayed;
             public event Action<Pawn, Pawn> CollisionExited;
-
-            public TestPawn(string name, Board board, Point position, IEnumerable<Point> footprint = null, bool isCollidable = true, bool isSolid = false, bool isOpaque = true)
-                : base(name, board, position, footprint, isCollidable, isSolid, isOpaque) { }
             
             public override void OnCollisionEnter(Pawn other) {
-                if (CollisionEntered != null) { CollisionEntered(this, other); }
+                if (CollisionEntered != null) { CollisionEntered(Pawn, other); }
             }
             public override void OnCollisionStay(Pawn other) {
-                if (CollisionStayed != null) { CollisionStayed(this, other); }
+                if (CollisionStayed != null) { CollisionStayed(Pawn, other); }
             }
             public override void OnCollisionExit(Pawn other) {
-                if (CollisionExited != null) { CollisionExited(this, other); }
+                if (CollisionExited != null) { CollisionExited(Pawn, other); }
             }
         }
 
@@ -141,8 +138,11 @@ namespace Tests.Integration {
                 Point.Zero, Point.Up, Point.Down, Point.Left, Point.Right
             });
 
-            TestPawn pawn1 = new TestPawn("First", board, pos1, footprint, true, true, true);
-            TestPawn pawn2 = new TestPawn("Second", board, pos2, footprint, true, true, true);
+            Pawn pawn1 = new Pawn("First", board, pos1, footprint, true, true, true);
+            TestComponent test1 = pawn1.AddComponent<TestComponent>();
+
+            Pawn pawn2 = new Pawn("Second", board, pos2, footprint, true, true, true);
+            TestComponent test2 = pawn2.AddComponent<TestComponent>();
 
             board.AddPawn(pawn1);
             board.AddPawn(pawn2);
@@ -150,13 +150,13 @@ namespace Tests.Integration {
             bool p1Triggered = false;
             bool p2Triggered = false;
 
-            pawn1.CollisionEntered += delegate (Pawn source, Pawn other) {
+            test1.CollisionEntered += delegate (Pawn source, Pawn other) {
                 p1Triggered = true;
                 Assert.AreSame(source, pawn1);
                 Assert.AreSame(other, pawn2);
             };
 
-            pawn2.CollisionEntered += delegate (Pawn source, Pawn other) {
+            test2.CollisionEntered += delegate (Pawn source, Pawn other) {
                 p2Triggered = true;
                 Assert.AreSame(source, pawn2);
                 Assert.AreSame(other, pawn1);

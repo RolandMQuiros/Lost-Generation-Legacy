@@ -45,7 +45,7 @@ namespace LostGen {
 
         private void FindTarget() {
             foreach (Pawn pawn in _owner.PawnsInView) {
-                Combatant target = pawn as Combatant;
+                Combatant target = pawn.GetComponent<Combatant>();
                 if (target != null && target.Team.IsHostile(_owner.Team)) {
                     _target = target;
                     _currentGoal = new StateOffset();

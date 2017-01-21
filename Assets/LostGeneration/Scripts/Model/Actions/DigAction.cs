@@ -33,9 +33,9 @@ namespace LostGen {
             }
         }
 
-        public override void Commit(Queue<IPawnMessage> messages) {
-            if (messages != null && _blocksDug.Count > 0) {
-                messages.Enqueue(new DigMessage(Owner, _blocksDug.Cast<BlockNode>()));
+        public override void Commit() {
+            if (_blocksDug.Count > 0) {
+                Owner.PushMessage(new DigMessage(Owner, _blocksDug.Cast<BlockNode>()));
             }
         }
     }

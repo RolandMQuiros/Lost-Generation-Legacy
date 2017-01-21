@@ -17,7 +17,7 @@ namespace LostGen {
 
         private List<Pawn> _landedOn;
 
-        public FallMessage(WeightedPawn faller, Point from, Point to, IEnumerable<Pawn> landedOn = null) {
+        public FallMessage(Pawn faller, Point from, Point to, IEnumerable<Pawn> landedOn = null) {
             Source = faller;
             From = from;
             To = to;

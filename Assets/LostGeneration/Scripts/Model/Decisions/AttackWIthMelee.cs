@@ -31,7 +31,7 @@ namespace LostGen.Decision {
         }
 
         public bool ArePreconditionsMet(StateOffset state) {
-            Point _targetPos = state.Get(StateKey.Position(_target), _target.Position);
+            Point _targetPos = state.Get(StateKey.Position(_target.Pawn), _target.Pawn.Position);
             return _melee.InFullAreaOfEffect(_targetPos);
         }
 
@@ -40,7 +40,7 @@ namespace LostGen.Decision {
             bool directionFound = false;
             for (direction = CardinalDirection.East; !directionFound && direction < CardinalDirection.Count; direction++) {
                 _melee.SetDirection(direction); // TODO: undo this
-                directionFound = _melee.GetAreaOfEffect().Contains(_target.Position);
+                directionFound = _melee.GetAreaOfEffect().Contains(_target.Pawn.Position);
             }
             _melee.Fire();
         }

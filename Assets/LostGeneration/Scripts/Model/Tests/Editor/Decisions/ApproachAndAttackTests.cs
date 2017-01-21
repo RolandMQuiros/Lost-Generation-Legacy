@@ -7,10 +7,14 @@ namespace Tests.Decisions {
         [Test]
         public void StationaryMelee() {
             Board board = BoardCommon.ArrayToBoard(BoardCommon.GRID_12X1X9);
-            Combatant attacker = new Combatant("Attacker", board, new Point(5, 4));
-            Combatant defender = new Combatant("Defender", board, new Point(7, 4));
-            board.AddPawn(attacker);
-            board.AddPawn(defender);
+            Pawn attackerPawn = new Pawn("Attacker", board, new Point(5, 4));
+            Combatant attacker = attackerPawn.AddComponent<Combatant>();
+
+            Pawn defenderPawn = new Pawn("Defender", board, new Point(7, 4));
+            Combatant defender = defenderPawn.AddComponent<Combatant>();
+
+            board.AddPawn(attackerPawn);
+            board.AddPawn(defenderPawn);
 
             attacker.Health = 10;
             defender.Health = 10;
@@ -50,10 +54,14 @@ namespace Tests.Decisions {
                 { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
             }});
-            Combatant attacker = new Combatant("Attacker", board, new Point(1, 7));
-            Combatant defender = new Combatant("Defender", board, new Point(10, 1));
-            board.AddPawn(attacker);
-            board.AddPawn(defender);
+            Pawn attackerPawn = new Pawn("Attacker", board, new Point(1, 7));
+            Combatant attacker = attackerPawn.AddComponent<Combatant>();
+
+            Pawn defenderPawn = new Pawn("Defender", board, new Point(10, 1));
+            Combatant defender = defenderPawn.AddComponent<Combatant>();
+
+            board.AddPawn(attackerPawn);
+            board.AddPawn(defenderPawn);
 
             attacker.Health = 10;
             defender.Health = 10;
@@ -63,7 +71,7 @@ namespace Tests.Decisions {
                 Stamina = 25
             };
 
-            attacker.AddPawnToView(defender);
+            attacker.AddPawnToView(defenderPawn);
 
             MeleeAttackSkill attack = new MeleeAttackSkill(attacker, new Point[] { Point.Right, 2 * Point.Right }) {
                 ActionPoints = 3
@@ -83,7 +91,7 @@ namespace Tests.Decisions {
 
             Queue<IPawnMessage> messages = new Queue<IPawnMessage>();
             board.Turn(messages);
-            Assert.AreEqual(new Point(10, 3), attacker.Position);
+            Assert.AreEqual(new Point(10, 3), attackerPawn.Position);
         }
     }
 }

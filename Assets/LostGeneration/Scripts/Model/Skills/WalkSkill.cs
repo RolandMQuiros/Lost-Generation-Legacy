@@ -29,18 +29,18 @@ namespace LostGen {
 
         public WalkSkill(Combatant owner)
             : base(owner, "Walk", "Move across tiles within a limited range") {
-            _board = Owner.Board;
+            _board = Owner.Pawn.Board;
         }
 
         #region PointCollections
 
         public override IEnumerable<Point> GetRange() {
-            ReinitializeRange(Owner.Position);
+            ReinitializeRange(Owner.Pawn.Position);
             return _range;
         }
 
         public override bool InRange(Point point) {
-            ReinitializeRange(Owner.Position);
+            ReinitializeRange(Owner.Pawn.Position);
             return _range.Contains(point);
         }
 
@@ -49,7 +49,7 @@ namespace LostGen {
         }
 
         public override IEnumerable<Point> GetPath() {
-            List<WalkNode> nodePath = FindPath(Owner.Position, Target);
+            List<WalkNode> nodePath = FindPath(Owner.Pawn.Position, Target);
             List<Point> path = new List<Point>();
 
             if (nodePath != null) {
@@ -65,13 +65,13 @@ namespace LostGen {
 
         public override void Fire() {
             MoveAction move = null;
-            List<WalkNode> path = FindPath(Owner.Position, Target);
+            List<WalkNode> path = FindPath(Owner.Pawn.Position, Target);
 
             if (path != null) {
                 Debug.Log("Repathed");
                 for (int i = 1; i < path.Count; i++) {
-                    move = new MoveAction(Owner, path[i - 1].Point, path[i].Point, true);
-                    Owner.PushAction(move);
+                    move = new MoveAction(Owner.Pawn, path[i - 1].Point, path[i].Point, true);
+                    Owner.Pawn.PushAction(move);
                 }
 
                 // Clear the range for the next step
@@ -94,7 +94,7 @@ namespace LostGen {
                     throw new Exception("This Skill's owner is positioned outside the graph");
                 }
 
-                if (Point.TaxicabDistance(Owner.Position, target) == 1) {
+                if (Point.TaxicabDistance(Owner.Pawn.Position, target) == 1) {
                     path = new List<WalkNode>();
                     path.Add(new WalkNode(_board, origin, CanWalkDiagonally));
                     path.Add(new WalkNode(_board, target, CanWalkDiagonally));
@@ -121,7 +121,7 @@ namespace LostGen {
             // If the cached range collection doesn't exist yet, or the origin has changed,
             // then create the range
             if (_range == null || _prevOrigin != origin) {
-                WalkNode startNode = new WalkNode(Owner.Board, origin, CanWalkDiagonally);
+                WalkNode startNode = new WalkNode(Owner.Pawn.Board, origin, CanWalkDiagonally);
                 _prevOrigin = origin;
                 _range = new HashSet<Point>();
                 if (startNode != null) {

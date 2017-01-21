@@ -1,41 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace LostGen {
-    public class MoveAction : CombatantAction {
-        public override int ActionPoints { get { return Point.TaxicabDistance(_start, _end); } }
+﻿namespace LostGen {
+    public class MoveAction : PawnAction {
+        public override int Cost { get { return Point.TaxicabDistance(_start, _end); } }
         private Point _start;
         private Point _end;
         private bool _isContinuous;
         private bool _moveSuccess;
 
-        public MoveAction(Combatant owner, Point start, Point end, bool isContinuous) 
+        private Combatant _combatant;
+
+        public MoveAction(Pawn owner, Point start, Point end, bool isContinuous) 
             : base(owner) {
             _start = start;
             _end = end;
             _isContinuous = isContinuous;
+            _combatant = Owner.GetComponent<Combatant>();
         }
 
         public override void Do() {
-            Owner.ActionPoints -= ActionPoints;
+            if (_combatant != null) {
+                _combatant.ActionPoints -= Cost;
+            }
             _moveSuccess = Owner.SetPosition(_end);
         }
 
         public override void Undo() {
-            Owner.ActionPoints += ActionPoints;
+            if (_combatant != null) {
+                _combatant.ActionPoints += Cost;
+            }
             Owner.SetPositionInternal(_start);
         }
 
-        public override void Commit(Queue<IPawnMessage> messages) {
+        public override void Commit() {
             if (_moveSuccess) {
-                messages.Enqueue(new MoveMessage(Owner, _start, _end, _isContinuous));
+                Owner.PushMessage(new MoveMessage(Owner, _start, _end, _isContinuous));
             }
         }
 
         public override string ToString() {
-            return "Move Action: { start: " + _start + "; end: " + _end + "; cost: " + ActionPoints + " }";
+            return "Move Action: { start: " + _start + "; end: " + _end + "; cost: " + Cost + " }";
         }
     }
 }

@@ -4,20 +4,19 @@ using System.Collections.Generic;
 namespace LostGen {
     public class DamageAction : PawnAction {
         public int Amount { get; private set; }
-        public Combatant Target { get; private set; }
-        public Combatant Source { get; private set; }
-
-        public DamageAction(Combatant target, int amount, Combatant source = null)
-            : base(target) {
+        public Pawn Target { get; private set; }
+        public DamageAction(Pawn attacker, Pawn target, int amount)
+            : base(attacker) {
             Amount = amount;
-            Source = source;
+            Target = target;
         }
 
-        public override void Commit(Queue<IPawnMessage> messages) {
+        public override void Commit() {
+            Combatant target = Target.GetComponent<Combatant>();
             if (Amount > 0) {
-                Target.Health -= Amount;
+                target.Health -= Amount;
 
-                messages.Enqueue(new DamageMessage(Target, Amount, Source));
+                Owner.PushMessage(new DamageMessage(Owner, Target, Amount));
             }
         }
     }
