@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace LostGen {
-    public class Combatant : Pawn {
+    public class Combatant : WeightedPawn {
         #region Stats
         public Stats BaseStats {
             get { return _baseStats; }
@@ -44,6 +44,11 @@ namespace LostGen {
         }
 
         public Team Team;
+
+        public Point GravityDirection {
+            get { return _gravity; }
+            set { _gravity = value; }
+        }
         #endregion Stats
 
         #region CollectionProperties
@@ -64,6 +69,7 @@ namespace LostGen {
         private bool _didStatsChange;
         private Stats _baseStats;
         private Stats _effectiveStats;
+        private Point _gravity;
         private int _health;
         private int _actionPoints;
         private int _queueCost;
@@ -147,6 +153,12 @@ namespace LostGen {
 
         public override void BeginTurn() {
             _actionPoints = EffectiveStats.Stamina;
+        }
+
+        public override void OnLandedUpon(WeightedPawn by, Queue<IPawnMessage> messages) {
+            int damage = Math.Max(by.Weight - EffectiveStats.Defense, 0);
+            Health -= damage;
+            messages.Enqueue(new DamageMessage(this, damage, by));
         }
 
         protected override void PreprocessAction(PawnAction action) {

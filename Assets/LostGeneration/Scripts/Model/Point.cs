@@ -21,7 +21,7 @@ namespace LostGen {
             Point.Backward
         };
 
-        public static readonly Point[] FullNeighbors = new Point[] {
+        public static readonly Point[] NeighborsFull = new Point[] {
             Point.Up + Point.Forward,
             Point.Up + Point.Forward + Point.Left,
             Point.Up + Point.Forward + Point.Right,
@@ -52,7 +52,7 @@ namespace LostGen {
             Point.Down + Point.Backward + Point.Right,
         };
 
-        public static readonly Point[] TransverseOctoNeighbors = new Point[] {
+        public static readonly Point[] NeighborsFullXZ = new Point[] {
             Point.Forward + Point.Left,
             Point.Forward,
             Point.Forward + Point.Right,
@@ -65,11 +65,47 @@ namespace LostGen {
             Point.Backward + Point.Right
         };
 
-        public static readonly Point[] TransverseNeighbors = new Point[] {
+        public static readonly Point[] NeighborsXZ = new Point[] {
             Point.Forward,
             Point.Right,
             Point.Backward,
             Point.Left
+        };
+
+        public static readonly Point[] NeighborsFullXY = new Point[] {
+            Point.Up,
+            Point.Up + Point.Right,
+            Point.Right,
+            Point.Right + Point.Down,
+            Point.Down,
+            Point.Down + Point.Left,
+            Point.Left +
+            Point.Left + Point.Up
+        };
+
+        public static readonly Point[] NeighborsXY = new Point[] {
+            Point.Up,
+            Point.Right,
+            Point.Down,
+            Point.Left
+        };
+
+        public static readonly Point[] NeighborsFullZY = new Point[] {
+            Point.Up,
+            Point.Up + Point.Forward,
+            Point.Forward,
+            Point.Forward + Point.Down,
+            Point.Down,
+            Point.Down + Point.Backward,
+            Point.Backward,
+            Point.Backward + Point.Up
+        };
+
+        public static readonly Point[] NeighborsZY = new Point[] {
+            Point.Up,
+            Point.Forward,
+            Point.Down,
+            Point.Backward
         };
 
         public int X;

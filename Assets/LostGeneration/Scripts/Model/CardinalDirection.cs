@@ -18,4 +18,14 @@
         North = 3,
         Count = 4
     }
+
+    public enum AxisDirection {
+        Down = 0,
+        Up = 1,
+        Left = 2,
+        Right = 3,
+        Forward = 4,
+        Backward = 5,
+        Count = 6
+    }
 }

@@ -154,6 +154,8 @@ namespace LostGen {
                 _actions.RemoveFirst();
             }
 
+            PostStep(messages);
+
             return stepAction;
         }
 
@@ -167,7 +169,7 @@ namespace LostGen {
 
             return compare;
         }
-
         protected virtual void PreprocessAction(PawnAction action) { }
+        protected virtual void PostStep(Queue<IPawnMessage> messages) { }
     }
 }

@@ -10,7 +10,8 @@ namespace Tests {
             public Point Point { get; private set; }
 
             private int[,] _grid;
-            private List<IGraphNode> _neighbors;
+            private Dictionary<Point, IGraphNode> _neighbors = new Dictionary<Point, IGraphNode>();
+            private bool _neighborsInitialized = false;
 
             public TestGridNode(int[,] grid, Point point) {
                 _grid = grid;
@@ -23,17 +24,19 @@ namespace Tests {
 
             public IEnumerable<IGraphNode> GetNeighbors() {
                 //Profiler.BeginSample("TestGridNode.GetNeighbors");
-                if (_neighbors == null) {
-                    _neighbors = new List<IGraphNode>();
-                    for (int i = 0; i < Point.Neighbors.Length; i++) {
-                        Point point = Point + Point.Neighbors[i];
-                        if (_grid[point.Y, point.X] == 1) {
-                            _neighbors.Add(new TestGridNode(_grid, point));
+                if (!_neighborsInitialized) {
+                    for (int i = 0; i < Point.NeighborsXY.Length; i++) {
+                        Point point = Point + Point.NeighborsXY[i];
+                        if (!_neighbors.ContainsKey(point) && _grid[point.Y, point.X] == 1) {
+                            TestGridNode neighbor = new TestGridNode(_grid, point);
+                            neighbor._neighbors.Add(Point, this);
+                            _neighbors.Add(point, neighbor);
                         }
                     }
+                    _neighborsInitialized = true;
                 }
                 //Profiler.EndSample();
-                return _neighbors;
+                return _neighbors.Values;
             }
 
             public bool IsMatch(IGraphNode other) {

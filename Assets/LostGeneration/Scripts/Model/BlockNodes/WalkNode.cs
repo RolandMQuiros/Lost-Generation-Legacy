@@ -31,9 +31,9 @@ namespace LostGen {
                 
                 Point[] neighborPoints;
                 if (CanWalkDiagonally) {
-                    neighborPoints = Point.TransverseOctoNeighbors; 
+                    neighborPoints = Point.NeighborsFullXZ; 
                 } else {
-                    neighborPoints = Point.TransverseNeighbors;
+                    neighborPoints = Point.NeighborsXZ;
                 }
 
                 foreach (Point offset in neighborPoints) {
