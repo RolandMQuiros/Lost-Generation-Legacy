@@ -12,8 +12,6 @@ namespace LostGen {
         public ulong InstanceID { get; private set; }
         /// <summary>User-facing name. Can also be used to search for Pawns on a Board.</summary>
         public string Name { get; set; }
-        /// <summary>String representing what type of Pawn this is. Used to generate the display components for this Pawn.</summary>
-        public int CharacterID { get; set; }
         /// <summary>Reference to the Board where this Pawn resides</summary>
         public Board Board { get; private set; }
         /// <summary>Returns a read-only version of the footprint</summary>

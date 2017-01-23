@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -9,16 +10,20 @@ using LostGen;
 /// Editor, instead of having to create classes specifically to assign the reference to components.
 /// </summary>
 public class BoardData : MonoBehaviour {
+    [Serializable]
+    public class BoardPawnEvent : UnityEvent<Pawn> { }
+
     public Board Board;
+
+    #region UnityEvents
     public UnityEvent BlocksChanged;
+    public BoardPawnEvent PawnAdded;
+    public BoardPawnEvent PawnRemoved; 
+    #endregion UnityEvents
 
     public void Step() {
         Queue<IPawnMessage> messages = new Queue<IPawnMessage>();
         Board.Step(messages);
-    }
-
-    private void OnBlocksChanged() {
-        BlocksChanged.Invoke();
     }
 
     #region MonoBehaviour
@@ -55,7 +60,9 @@ public class BoardData : MonoBehaviour {
             }
         }
 
-        Board.BlocksChanged += OnBlocksChanged;
+        Board.BlocksChanged += delegate() { BlocksChanged.Invoke(); };
+        Board.PawnAdded += delegate(Pawn pawn) { PawnAdded.Invoke(pawn); };
+        Board.PawnRemoved += delegate(Pawn pawn) { PawnRemoved.Invoke(pawn); };
     }
     #endregion MonoBehaviour
 }
