@@ -1,0 +1,240 @@
+fileFormatVersion: 2
+guid: 622ec67c01212cf40b0189f5fdb1b756
+timeCreated: 1487226017
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: Body
+    100004: Calf_L
+    100006: Calf_R
+    100008: Fingers_1_L
+    100010: Fingers_1_R
+    100012: Fingers_2_L
+    100014: Fingers_2_R
+    100016: Foot_L
+    100018: Foot_R
+    100020: FootControl_L
+    100022: FootControl_R
+    100024: Forearm_L
+    100026: Forearm_R
+    100028: Hand_L
+    100030: Hand_R
+    100032: Head
+    100034: HeelRoll_L
+    100036: HeelRoll_R
+    100038: IndexFinger_1_L
+    100040: IndexFinger_1_R
+    100042: IndexFinger_2_L
+    100044: IndexFinger_2_R
+    100046: Neck
+    100048: Pelvis
+    100050: Ribcage
+    100052: Root
+    100054: Shoulder_L
+    100056: Shoulder_R
+    100058: Skeleton
+    100060: Spine
+    100062: Thigh_L
+    100064: Thigh_R
+    100066: Thumb_1_L
+    100068: Thumb_1_R
+    100070: Thumb_2_L
+    100072: Thumb_2_R
+    100074: Toes_L
+    100076: Toes_R
+    100078: Torso
+    100080: UpperArm_L
+    100082: UpperArm_R
+    100084: Calf_L_end
+    100086: Calf_R_end
+    100088: Camera
+    100090: ElbowIK_L
+    100092: ElbowIK_L_end
+    100094: ElbowIK_R
+    100096: ElbowIK_R_end
+    100098: Fingers_2_L_end
+    100100: Fingers_2_R_end
+    100102: FootTarget_L
+    100104: FootTarget_L_end
+    100106: FootTarget_R
+    100108: FootTarget_R_end
+    100110: HandIK_L
+    100112: HandIK_L_end
+    100114: HandIK_R
+    100116: HandIK_R_end
+    100118: Head_end
+    100120: IndexFinger_2_L_end
+    100122: IndexFinger_2_R_end
+    100124: KneeIK_L
+    100126: KneeIK_L_end
+    100128: KneeIK_R
+    100130: KneeIK_R_end
+    100132: Lamp
+    100134: Lamp.002
+    100136: Thumb_2_L_end
+    100138: Thumb_2_R_end
+    100140: Toes_L_end
+    100142: Toes_R_end
+    100144: ToeTarget_L
+    100146: ToeTarget_L_end
+    100148: ToeTarget_R
+    100150: ToeTarget_R_end
+    400000: //RootNode
+    400002: Body
+    400004: Calf_L
+    400006: Calf_R
+    400008: Fingers_1_L
+    400010: Fingers_1_R
+    400012: Fingers_2_L
+    400014: Fingers_2_R
+    400016: Foot_L
+    400018: Foot_R
+    400020: FootControl_L
+    400022: FootControl_R
+    400024: Forearm_L
+    400026: Forearm_R
+    400028: Hand_L
+    400030: Hand_R
+    400032: Head
+    400034: HeelRoll_L
+    400036: HeelRoll_R
+    400038: IndexFinger_1_L
+    400040: IndexFinger_1_R
+    400042: IndexFinger_2_L
+    400044: IndexFinger_2_R
+    400046: Neck
+    400048: Pelvis
+    400050: Ribcage
+    400052: Root
+    400054: Shoulder_L
+    400056: Shoulder_R
+    400058: Skeleton
+    400060: Spine
+    400062: Thigh_L
+    400064: Thigh_R
+    400066: Thumb_1_L
+    400068: Thumb_1_R
+    400070: Thumb_2_L
+    400072: Thumb_2_R
+    400074: Toes_L
+    400076: Toes_R
+    400078: Torso
+    400080: UpperArm_L
+    400082: UpperArm_R
+    400084: Calf_L_end
+    400086: Calf_R_end
+    400088: Camera
+    400090: ElbowIK_L
+    400092: ElbowIK_L_end
+    400094: ElbowIK_R
+    400096: ElbowIK_R_end
+    400098: Fingers_2_L_end
+    400100: Fingers_2_R_end
+    400102: FootTarget_L
+    400104: FootTarget_L_end
+    400106: FootTarget_R
+    400108: FootTarget_R_end
+    400110: HandIK_L
+    400112: HandIK_L_end
+    400114: HandIK_R
+    400116: HandIK_R_end
+    400118: Head_end
+    400120: IndexFinger_2_L_end
+    400122: IndexFinger_2_R_end
+    400124: KneeIK_L
+    400126: KneeIK_L_end
+    400128: KneeIK_R
+    400130: KneeIK_R_end
+    400132: Lamp
+    400134: Lamp.002
+    400136: Thumb_2_L_end
+    400138: Thumb_2_R_end
+    400140: Toes_L_end
+    400142: Toes_R_end
+    400144: ToeTarget_L
+    400146: ToeTarget_L_end
+    400148: ToeTarget_R
+    400150: ToeTarget_R_end
+    4300000: Body
+    7400000: Default Take
+    7400002: idle_basic
+    7400004: walk_stiff
+    7400006: walk_sway
+    7400008: Skeleton|idle_basic
+    7400010: Skeleton|walk_stiff
+    7400012: Skeleton|walk_sway
+    7400014: Body|idle_basic
+    7400016: idle_basic_001
+    9500000: //RootNode
+    13700000: Body
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: "Invalid Avatar Rig Configuration. Missing or invalid transform:\n\tRequired
+      human bone 'LeftFoot' not found\n"
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 3
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 1
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
