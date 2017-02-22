@@ -15,7 +15,15 @@ public class CombatantView : MonoBehaviour {
 	#endregion EditorFields
 	public Pawn Pawn;
 	private Dictionary<IPawnMessage, Coroutine> _activeRuns = new Dictionary<IPawnMessage, Coroutine>();
-	
+	private Animator _animator;
+	private int _runTrigger = Animator.StringToHash("Base Layer.Grounded");
+
+	#region MonoBehaviour
+	private void Awake() {
+		_animator = GetComponent<Animator>();
+	}
+	#endregion MonoBehaviour
+
 	public void ProcessMessage(IPawnMessage message) {
 		// Check the type of the message, then fire off the appropriate Coroutine
 		if (Pawn == message.Source) {
@@ -39,23 +47,27 @@ public class CombatantView : MonoBehaviour {
 		Vector3 from = PointVector.ToVector(move.From);
 		Vector3 to = PointVector.ToVector(move.To);
 
+		Quaternion rotFrom = transform.rotation;
+		Quaternion rotTo = Quaternion.LookRotation((to - from).normalized, Vector3.up);
+
 		Vector3 step = (to - from) / MoveDuration;
 		float time = 0f;
 
+		_animator.SetFloat("Run", 1f);
 		while (time < MoveDuration) {
 			time += Time.deltaTime;
-			transform.position = transform.position + (step * Time.deltaTime);
+			transform.position = Vector3.Lerp(from, to, time / MoveDuration);
+			transform.rotation = Quaternion.Lerp(rotFrom, rotTo, time / (MoveDuration / 5f));
+			
 			yield return null;
 		}
+		_animator.SetFloat("Run", 0f);
 
 		transform.position = to;
+		transform.rotation = rotTo;
 
 		Finish(move);
 	}
 
-	#region MonoBehaviour
-	private void Awake() {
-		
-	}
-	#endregion MonoBehaviour
+
 }

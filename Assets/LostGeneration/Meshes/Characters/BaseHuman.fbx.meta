@@ -179,8 +179,7 @@ ModelImporter:
     resampleCurves: 1
     optimizeGameObjects: 0
     motionNodeName: 
-    animationImportErrors: "Invalid Avatar Rig Configuration. Missing or invalid transform:\n\tRequired
-      human bone 'LeftFoot' not found\n"
+    animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
@@ -190,11 +189,275 @@ ModelImporter:
     animationScaleError: 0.5
     animationWrapMode: 0
     extraExposedTransformPaths: []
-    clipAnimations: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Skeleton|idle_basic
+      takeName: Skeleton|idle_basic
+      firstFrame: 0
+      lastFrame: 24
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Body
+        weight: 1
+      - path: Skeleton
+        weight: 1
+      - path: Skeleton/FootControl_L
+        weight: 1
+      - path: Skeleton/FootControl_L/HeelRoll_L
+        weight: 1
+      - path: Skeleton/FootControl_L/HeelRoll_L/Foot_L
+        weight: 1
+      - path: Skeleton/FootControl_L/HeelRoll_L/Foot_L/Toes_L
+        weight: 1
+      - path: Skeleton/FootControl_L/HeelRoll_L/Foot_L/Toes_L/Toes_L_end
+        weight: 1
+      - path: Skeleton/FootControl_R
+        weight: 1
+      - path: Skeleton/FootControl_R/HeelRoll_R
+        weight: 1
+      - path: Skeleton/FootControl_R/HeelRoll_R/Foot_R
+        weight: 1
+      - path: Skeleton/FootControl_R/HeelRoll_R/Foot_R/Toes_R
+        weight: 1
+      - path: Skeleton/FootControl_R/HeelRoll_R/Foot_R/Toes_R/Toes_R_end
+        weight: 1
+      - path: Skeleton/Torso
+        weight: 1
+      - path: Skeleton/Torso/Pelvis
+        weight: 1
+      - path: Skeleton/Torso/Pelvis/Thigh_L
+        weight: 1
+      - path: Skeleton/Torso/Pelvis/Thigh_L/Calf_L
+        weight: 1
+      - path: Skeleton/Torso/Pelvis/Thigh_L/Calf_L/Calf_L_end
+        weight: 1
+      - path: Skeleton/Torso/Pelvis/Thigh_R
+        weight: 1
+      - path: Skeleton/Torso/Pelvis/Thigh_R/Calf_R
+        weight: 1
+      - path: Skeleton/Torso/Pelvis/Thigh_R/Calf_R/Calf_R_end
+        weight: 1
+      - path: Skeleton/Torso/Spine
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Neck
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Neck/Head
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Neck/Head/Head_end
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L/Forearm_L
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L/Forearm_L/Hand_L
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L/Forearm_L/Hand_L/Fingers_1_L
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L/Forearm_L/Hand_L/Fingers_1_L/Fingers_2_L
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L/Forearm_L/Hand_L/Fingers_1_L/Fingers_2_L/Fingers_2_L_end
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L/Forearm_L/Hand_L/IndexFinger_1_L
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L/Forearm_L/Hand_L/IndexFinger_1_L/IndexFinger_2_L
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L/Forearm_L/Hand_L/IndexFinger_1_L/IndexFinger_2_L/IndexFinger_2_L_end
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L/Forearm_L/Hand_L/Thumb_1_L
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L/Forearm_L/Hand_L/Thumb_1_L/Thumb_2_L
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L/Forearm_L/Hand_L/Thumb_1_L/Thumb_2_L/Thumb_2_L_end
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R/Forearm_R
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R/Forearm_R/Hand_R
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R/Forearm_R/Hand_R/Fingers_1_R
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R/Forearm_R/Hand_R/Fingers_1_R/Fingers_2_R
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R/Forearm_R/Hand_R/Fingers_1_R/Fingers_2_R/Fingers_2_R_end
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R/Forearm_R/Hand_R/IndexFinger_1_R
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R/Forearm_R/Hand_R/IndexFinger_1_R/IndexFinger_2_R
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R/Forearm_R/Hand_R/IndexFinger_1_R/IndexFinger_2_R/IndexFinger_2_R_end
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R/Forearm_R/Hand_R/Thumb_1_R
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R/Forearm_R/Hand_R/Thumb_1_R/Thumb_2_R
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R/Forearm_R/Hand_R/Thumb_1_R/Thumb_2_R/Thumb_2_R_end
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Skeleton|walk_sway
+      takeName: Skeleton|walk_sway
+      firstFrame: 0
+      lastFrame: 24
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Body
+        weight: 1
+      - path: Skeleton
+        weight: 1
+      - path: Skeleton/FootControl_L
+        weight: 1
+      - path: Skeleton/FootControl_L/HeelRoll_L
+        weight: 1
+      - path: Skeleton/FootControl_L/HeelRoll_L/Foot_L
+        weight: 1
+      - path: Skeleton/FootControl_L/HeelRoll_L/Foot_L/Toes_L
+        weight: 1
+      - path: Skeleton/FootControl_L/HeelRoll_L/Foot_L/Toes_L/Toes_L_end
+        weight: 1
+      - path: Skeleton/FootControl_R
+        weight: 1
+      - path: Skeleton/FootControl_R/HeelRoll_R
+        weight: 1
+      - path: Skeleton/FootControl_R/HeelRoll_R/Foot_R
+        weight: 1
+      - path: Skeleton/FootControl_R/HeelRoll_R/Foot_R/Toes_R
+        weight: 1
+      - path: Skeleton/FootControl_R/HeelRoll_R/Foot_R/Toes_R/Toes_R_end
+        weight: 1
+      - path: Skeleton/Torso
+        weight: 1
+      - path: Skeleton/Torso/Pelvis
+        weight: 1
+      - path: Skeleton/Torso/Pelvis/Thigh_L
+        weight: 1
+      - path: Skeleton/Torso/Pelvis/Thigh_L/Calf_L
+        weight: 1
+      - path: Skeleton/Torso/Pelvis/Thigh_L/Calf_L/Calf_L_end
+        weight: 1
+      - path: Skeleton/Torso/Pelvis/Thigh_R
+        weight: 1
+      - path: Skeleton/Torso/Pelvis/Thigh_R/Calf_R
+        weight: 1
+      - path: Skeleton/Torso/Pelvis/Thigh_R/Calf_R/Calf_R_end
+        weight: 1
+      - path: Skeleton/Torso/Spine
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Neck
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Neck/Head
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Neck/Head/Head_end
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L/Forearm_L
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L/Forearm_L/Hand_L
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L/Forearm_L/Hand_L/Fingers_1_L
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L/Forearm_L/Hand_L/Fingers_1_L/Fingers_2_L
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L/Forearm_L/Hand_L/Fingers_1_L/Fingers_2_L/Fingers_2_L_end
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L/Forearm_L/Hand_L/IndexFinger_1_L
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L/Forearm_L/Hand_L/IndexFinger_1_L/IndexFinger_2_L
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L/Forearm_L/Hand_L/IndexFinger_1_L/IndexFinger_2_L/IndexFinger_2_L_end
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L/Forearm_L/Hand_L/Thumb_1_L
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L/Forearm_L/Hand_L/Thumb_1_L/Thumb_2_L
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_L/UpperArm_L/Forearm_L/Hand_L/Thumb_1_L/Thumb_2_L/Thumb_2_L_end
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R/Forearm_R
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R/Forearm_R/Hand_R
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R/Forearm_R/Hand_R/Fingers_1_R
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R/Forearm_R/Hand_R/Fingers_1_R/Fingers_2_R
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R/Forearm_R/Hand_R/Fingers_1_R/Fingers_2_R/Fingers_2_R_end
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R/Forearm_R/Hand_R/IndexFinger_1_R
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R/Forearm_R/Hand_R/IndexFinger_1_R/IndexFinger_2_R
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R/Forearm_R/Hand_R/IndexFinger_1_R/IndexFinger_2_R/IndexFinger_2_R_end
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R/Forearm_R/Hand_R/Thumb_1_R
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R/Forearm_R/Hand_R/Thumb_1_R/Thumb_2_R
+        weight: 1
+      - path: Skeleton/Torso/Spine/Ribcage/Shoulder_R/UpperArm_R/Forearm_R/Hand_R/Thumb_1_R/Thumb_2_R/Thumb_2_R_end
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
     isReadable: 1
   meshes:
     lODScreenPercentages: []
-    globalScale: 1
+    globalScale: 0.25
     meshCompression: 0
     addColliders: 0
     importBlendShapes: 1
