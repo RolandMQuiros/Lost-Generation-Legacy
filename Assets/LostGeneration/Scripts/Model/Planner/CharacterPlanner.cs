@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 
+/*
 namespace LostGen {
     public class CharacterController {
         private Planner _planner = new Planner(StateOffset.Heuristic);
@@ -30,12 +31,12 @@ namespace LostGen {
                 Debug.Log("Target found");
                 _approachDecision.Setup();
                 _approachDecision.Run();
-                /*Queue<IDecision> plan = _planner.CreatePlan(_currentGoal);
-                if (plan.Count > 0) Debug.Log("Plan formulated");
-                while (plan.Count > 0) {
-                    CombatantDecision decision = plan.Dequeue() as CombatantDecision;
-                    decision.Run();
-                }*/
+                // Queue<IDecision> plan = _planner.CreatePlan(_currentGoal);
+                // if (plan.Count > 0) Debug.Log("Plan formulated");
+                // while (plan.Count > 0) {
+                //     CombatantDecision decision = plan.Dequeue() as CombatantDecision;
+                //     decision.Run();
+                // }
             }
         }
 
@@ -58,3 +59,4 @@ namespace LostGen {
         }
     }
 }
+*/

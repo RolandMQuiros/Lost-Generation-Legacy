@@ -23,7 +23,6 @@ public class PawnManager : MonoBehaviour {
                 
                 // Then, attach the MonoBehaviours to the MessageBuffer
 
-
                 _pawnObjects.Add(pawn, combatantObject);
             }
         }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+/*
 namespace LostGen.Decision {
     public class ApproachMeleeRange : CombatantDecision {
         public override int Cost { get { return _predictedCost; } }
@@ -82,3 +82,4 @@ namespace LostGen.Decision {
         }
     }
 }
+*/

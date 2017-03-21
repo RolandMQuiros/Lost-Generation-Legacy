@@ -39,23 +39,10 @@ namespace LostGen {
         }
         public int ActionQueueCost { get { return _queueCost; } }
 
-        public ISkill ActiveSkill {
-            get { return _activeSkill;  }
-        }
-
         public Team Team;
         #endregion Stats
 
         #region CollectionProperties
-        public IEnumerable<ISkill> Skills { get { return _skills.Values; } }
-        public int SkillCount { get { return _skills.Count; } }
-
-        public IEnumerable<Pawn> KnownPawns { get { return _knownPawns; } }
-        public int KnownPawnsCount { get { return _knownPawns.Count; } }
-
-        public IEnumerable<Pawn> PawnsInView { get { return _visiblePawns; } }
-        public int PawnsInViewCount { get { return _visiblePawns.Count; } }
-
         public IEnumerable<Gear> Gear { get { return _gear; } }
         public int GearCount { get { return _gear.Count; } }
         #endregion CollectionProperties
@@ -67,46 +54,10 @@ namespace LostGen {
         private int _health;
         private int _actionPoints;
         private int _queueCost;
-        private ISkill _activeSkill;
 
         private List<Gear> _gear = new List<Gear>();
-        private Dictionary<Type, ISkill> _skills = new Dictionary<Type, ISkill>();
-        private HashSet<Pawn> _visiblePawns = new HashSet<Pawn>();
-        private HashSet<Pawn> _knownPawns = new HashSet<Pawn>();
-
-        private Gravity _gravity;
+        
         #endregion PrivateMembers
-
-        public void AddSkill(ISkill skill) {
-            _skills.Add(skill.GetType(), skill);
-        }
-
-        public T GetSkill<T>() where T : ISkill {
-            ISkill skill;
-            _skills.TryGetValue(typeof(T), out skill);
-            return (T)skill;
-        }
-
-        public bool HasSkill(ISkill skill) {
-            return _skills.ContainsValue(skill);
-        }
-
-        public IEnumerable<Pawn> GetKnownPawns() {
-            return _knownPawns;
-        }
-
-        public bool AddPawnToView(Pawn pawn) {
-            _knownPawns.Add(pawn);
-            return _visiblePawns.Add(pawn);
-        }
-
-        public void RemovePawnFromView(Pawn pawn) {
-            _visiblePawns.Remove(pawn);
-        }
-
-        public bool IsPawnInView(Pawn pawn) {
-            return _visiblePawns.Contains(pawn);
-        }
 
         public void AddGear(Gear gear) {
             _gear.Add(gear);
@@ -117,9 +68,6 @@ namespace LostGen {
         }
 
         #region PawnOverrides
-        public override void Start() {
-            _gravity = Pawn.GetComponent<Gravity>();
-        }
         public override void OnPushAction(PawnAction action) {
             _queueCost += action.Cost;
         }
