@@ -18,14 +18,7 @@ public class AtlasMaterial : MonoBehaviour {
 	public Rect DebugTextureRect;
 	public Vector4 DebugUVs;
 
-	#region MonoBehaviour
-
-	private void Awake() {
-		_renderer = GetComponent<Renderer>();
-		_matBlock = new MaterialPropertyBlock();
-	}
-
-	private void Start() {
+	public void ApplyMaterial() {
 		_renderer.GetPropertyBlock(_matBlock);
 
 		Vector4 uvOffset = new Vector4(
@@ -47,6 +40,16 @@ public class AtlasMaterial : MonoBehaviour {
 
 		DebugTextureRect = Sprite.rect;
 		DebugUVs = uvOffset;
+	}
+
+	#region MonoBehaviour
+	private void OnEnable() {
+		_renderer = GetComponent<Renderer>();
+		_matBlock = new MaterialPropertyBlock();
+	}
+
+	private void Start() {
+		ApplyMaterial();
 	}
 	#endregion MonoBehaviour
 }
