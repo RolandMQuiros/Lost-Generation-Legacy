@@ -10,7 +10,7 @@ public class BoardCursor : MonoBehaviour,
                            IPointerDownHandler,
                            IPointerUpHandler {
 	public Camera Camera;
-	public BoardData BoardData;
+	public BoardRef BoardRef;
 	public enum CursorAxis {
 		XZ, XY
 	}

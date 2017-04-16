@@ -9,7 +9,7 @@ using LostGen;
 /// or by some procgen utility.  More importantly, it lets us spread references to the Board through the
 /// Editor, instead of having to create classes specifically to assign the reference to components.
 /// </summary>
-public class BoardData : MonoBehaviour {
+public class BoardRef : MonoBehaviour {
     [Serializable]
     public class BoardPawnEvent : UnityEvent<Pawn> { }
 

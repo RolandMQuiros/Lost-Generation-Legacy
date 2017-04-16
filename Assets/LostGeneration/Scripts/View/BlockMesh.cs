@@ -7,12 +7,12 @@ using LostGen;
 public class BlockMesh : MonoBehaviour {
 	public Point Size;
 	private static readonly int[,] _BLOCK_SIDE_INDICES = new int[,] {
-		{1, 3, 0, 1, 2, 3}, // Top
-		{1, 6, 2, 6, 5, 1}, // Right
-		{4, 6, 5, 6, 7, 4}, // Down
-		{3, 4, 0, 4, 7, 3}, // Left
-		{0, 5, 1, 5, 4, 0}, // Forward
-		{2, 7, 3, 7, 6, 2}, // Backward
+		{3, 0, 1, 1, 2, 3}, // Top
+		{6, 2, 1, 1, 5, 6}, // Right
+		{5, 4, 7, 7, 6, 5}, // Down
+		{4, 0, 3, 3, 7, 4}, // Left
+		{5, 1, 0, 0, 4, 5}, // Forward
+		{7, 3, 2, 2, 6, 7}, // Backward
 	};
 	private static readonly Vector3[] _BLOCK_VERTICES = new Vector3[] {
 		Vector3.up + Vector3.forward + Vector3.left,    // 0
@@ -35,13 +35,24 @@ public class BlockMesh : MonoBehaviour {
 		}
 	}
 
+	public void Resize(Point size, bool retainBlocks=false) {
+		int[,,] newBlocks = new int[size.X, size.Y, size.Z];
+		if (retainBlocks) {
+			Array.Copy(_blocks, newBlocks, Math.Min(newBlocks.Length, _blocks.Length));
+		}
+		_blocks = newBlocks;
+		Size = size;
+	}
+
+	public void Resize(bool retainBlocks = false) {
+		Resize(Size, retainBlocks);
+	}
+
 	public void Build() {
 		// Create a new block array based on new Size, if it changed
 		Point size = new Point(_blocks.GetLength(0), _blocks.GetLength(1), _blocks.GetLength(2));
 		if (size != Size) {
-			int[,,] newBlocks = new int[Size.X, Size.Y, Size.Z];
-			Array.Copy(_blocks, newBlocks, Math.Min(newBlocks.Length, _blocks.Length));
-			_blocks = newBlocks;
+			Resize(true);
 		}
 
 		Point point = new Point();
@@ -60,14 +71,14 @@ public class BlockMesh : MonoBehaviour {
 					
 					// Calculate the vertex indices of the current block
 					int sliceArea = gridSize.X * gridSize.Z;
-					int vertexLevelStart = point.Y * sliceArea; // The top-left corner of the current slice of the grid above point.Z
+					int vertexLevelStart = (gridSize.Y - point.Y) * sliceArea; // The top-left corner of the current slice of the grid above point.Z
 					
 					int topBackLeft = vertexLevelStart + point.X + point.Z * gridSize.X;
 					int topBackRight = topBackLeft + 1;
 					int topFrontLeft = vertexLevelStart + point.X + (point.Z + 1) * gridSize.X;
 					int topFrontRight = topFrontLeft + 1;
 
-					vertexLevelStart = (point.Y + 1) * sliceArea; // The top-left corner of the slice just below point.Z
+					vertexLevelStart = (gridSize.Y - point.Y + 1) * sliceArea; // The top-left corner of the slice just below point.Z
 					int bottomBackLeft = vertexLevelStart + point.X + point.Z * gridSize.X;
 					int bottomBackRight = bottomBackLeft + 1;
 					int bottomFrontLeft = vertexLevelStart + point.X + (point.Z + 1) * gridSize.X;
@@ -119,6 +130,7 @@ public class BlockMesh : MonoBehaviour {
 				int y = gridIndex / sliceArea;
 				int z = (gridIndex - y * sliceArea) / gridSize.X;
 				int x = (gridIndex - y * sliceArea - z * gridSize.X);
+				y = Size.Y - y;
 
 				Vector3 vertex = new Vector3((float)x, (float)y, (float)z);
 				meshIndex = vertices.Count;
@@ -130,6 +142,7 @@ public class BlockMesh : MonoBehaviour {
 			}
 		}
 
+		_meshFilter.mesh.Clear();
 		_meshFilter.mesh.vertices = vertices.ToArray();
 		_meshFilter.mesh.uv = uvs.ToArray();
 		_meshFilter.mesh.triangles = triangles.ToArray();

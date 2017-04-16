@@ -2,18 +2,18 @@ using System;
 using UnityEngine;
 using LostGen;
 public class TestBoardChunk : MonoBehaviour {
-    public BoardData BoardInspector;
+    public BoardRef BoardRef;
     public GameObject BlockPrefab;
 
     private Board _board;
 
     #region MonoBehaviour
     private void Start() {
-        if (BoardInspector == null) {
+        if (BoardRef == null) {
             throw new NullReferenceException("No Board Inspector assigned to this BoardGridView");
         }
 
-        _board = BoardInspector.Board;
+        _board = BoardRef.Board;
         _board.BlocksChanged += Rebuild;
 
         ConstructGridView();
@@ -22,7 +22,7 @@ public class TestBoardChunk : MonoBehaviour {
 
     #region PrivateMethods
     private void ConstructGridView() {
-        Board board = BoardInspector.Board;
+        Board board = BoardRef.Board;
         Point size = board.Size;
 
         for (int z = 0; z < size.Z; z++) {

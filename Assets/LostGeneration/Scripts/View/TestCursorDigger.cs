@@ -1,11 +1,11 @@
 using UnityEngine;
 using LostGen;
 public class TestCursorDigger : MonoBehaviour {
-    public BoardData BoardData;
+    public BoardRef BoardRef;
 
     public void Dig(Point point) {
-        if (BoardData.Board.InBounds(point)) {
-            BoardData.Board.SetBlock(new BoardBlock() { Point = point, IsSolid = false, IsOpaque = false });
+        if (BoardRef.Board.InBounds(point)) {
+            BoardRef.Board.SetBlock(new BoardBlock() { Point = point, IsSolid = false, IsOpaque = false });
         }
     }
 }
