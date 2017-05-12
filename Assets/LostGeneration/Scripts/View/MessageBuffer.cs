@@ -18,9 +18,13 @@ public class MessageBuffer {
         _messages.Enqueue(message);
     }
 
-    public Queue<IPawnMessage> PopMessages() {
-        Queue<IPawnMessage> popped = new Queue<IPawnMessage>();
+    public void PushMessages(IEnumerable<IPawnMessage> messages) {
+        foreach (IPawnMessage message in messages) {
+            _messages.Enqueue(message);
+        }
+    }
 
+    public void PopMessages(Queue<IPawnMessage> messages) {
         HashSet<Pawn> actingPawns = new HashSet<Pawn>();
         bool stopPopping = false;
 
@@ -38,10 +42,8 @@ public class MessageBuffer {
                 stopPopping = true;
             }
 
-            popped.Enqueue(next);
+            messages.Enqueue(next);
         }
-
-        return popped;
     }
 }
 

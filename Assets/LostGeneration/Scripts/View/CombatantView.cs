@@ -24,6 +24,14 @@ public class CombatantView : MonoBehaviour {
 	}
 	#endregion MonoBehaviour
 
+	/// <summary>
+    /// Takes a message and starts a Coroutine based on that message.
+	/// This should only be fed messages pumped out of a MessageBuffer on a
+	/// per-Step basis, which should prevent contradictory messages from running
+	/// at the same time. e.g., if two MoveMessages are processed at the same time,
+	/// the resulting Coroutines will fight to update the object's location.
+	/// </summary>
+    /// <param name="message">IPawnMessage to process</param>
 	public void ProcessMessage(IPawnMessage message) {
 		// Check the type of the message, then fire off the appropriate Coroutine
 		if (Pawn == message.Source) {

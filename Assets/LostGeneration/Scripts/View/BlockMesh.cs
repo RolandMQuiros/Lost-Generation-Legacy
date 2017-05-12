@@ -4,6 +4,7 @@ using UnityEngine;
 
 using LostGen;
 
+[RequireComponent(typeof(MeshFilter))]
 public class BlockMesh : MonoBehaviour {
 	public Point Size;
 	private static readonly int[,] _BLOCK_SIDE_INDICES = new int[,] {
@@ -148,6 +149,46 @@ public class BlockMesh : MonoBehaviour {
 		_meshFilter.mesh.triangles = triangles.ToArray();
 
 		_meshFilter.mesh.RecalculateNormals();
+	}
+
+	public void Build2()
+	{
+		List<Vector3> vertices = new List<Vector3>();
+		List<int> triangles = new List<int>();
+
+		Point point = new Point();
+		for (point.X = 0; point.X < Size.X; point.X++)
+		{
+			for (point.Y = 0; point.Y < Size.Y; point.Y++)
+			{
+				for (point.Z = 0; point.Z < Size.Z; point.Z++)
+				{
+
+					// Check neighboring blocks
+					for (int side = 0; side < Point.Neighbors.Length; side++)
+					{
+						Point offset = point + Point.Neighbors[side];
+						Vector3 center = PointVector.ToVector(point);
+
+						// If a neighboring block is free, add its side indices to list
+						if (_blocks[point.X, point.Y, point.Z] != 0 &&
+							(offset.X < 0 || offset.X >= Size.X || offset.Y < 0 || offset.Y >= Size.Y || offset.Z < 0 || offset.Z >= Size.Z ||
+							 _blocks[offset.X, offset.Y, offset.Z] == 0))
+						{
+							for (int sideVertex = 0; sideVertex < _BLOCK_SIDE_INDICES.GetLength(side); sideVertex++)
+							{
+								int vertexIndex = _BLOCK_SIDE_INDICES[side, sideVertex];
+								Vector3 vertex = _BLOCK_VERTICES[vertexIndex] + center;
+								vertices.Add(vertex);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		_meshFilter.mesh.Clear();
+		_meshFilter.mesh.vertices = vertices.ToArray();
 	}
 
 	#region MonoBehaviour
