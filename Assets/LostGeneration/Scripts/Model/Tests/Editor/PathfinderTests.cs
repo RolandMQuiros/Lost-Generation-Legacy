@@ -139,7 +139,7 @@ namespace Tests {
                 })
             );
 
-            Assert.IsNullOrEmpty(pathStr);
+            Assert.That(pathStr, Is.Null.Or.Empty);
         }
 
         [Test]
@@ -195,7 +195,7 @@ namespace Tests {
                 })
             );
             
-            Assert.IsNullOrEmpty(pathStr);
+            Assert.That(pathStr, Is.Null.Or.Empty);
         }
 
         [Test]
@@ -217,7 +217,7 @@ namespace Tests {
                 })
             );
 
-            Assert.IsNullOrEmpty(pathStr);
+            Assert.That(pathStr, Is.Null.Or.Empty);
         }
 
         [Test]
