@@ -1,22 +1,29 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 using LostGen;
 
 [RequireComponent(typeof(MeshFilter))]
-public class BlockMesh : MonoBehaviour {
-	public Point Size;
-	private static readonly int[,] _BLOCK_SIDE_INDICES = new int[,] {
-		{3, 0, 1, 1, 2, 3}, // Top
-		{6, 2, 1, 1, 5, 6}, // Right
-		{5, 4, 7, 7, 6, 5}, // Down
-		{4, 0, 3, 3, 7, 4}, // Left
-		{5, 1, 0, 0, 4, 5}, // Forward
-		{7, 3, 2, 2, 6, 7}, // Backward
+public class BlockMesh : MonoBehaviour
+{
+    public Point Size;
+    private static readonly int[,] _BLOCK_SIDE_INDICES = new int[,]
+	{
+        {0, 1, 2, 3}, // Top
+		{2, 1, 5, 6}, // Right
+		{5, 4, 7, 6}, // Down
+		{0, 3, 7, 4}, // Left
+		{1, 0, 4, 5}, // Forward
+		{3, 2, 6, 7}, // Backward
 	};
-	private static readonly Vector3[] _BLOCK_VERTICES = new Vector3[] {
-		Vector3.up + Vector3.forward + Vector3.left,    // 0
+	
+	private static readonly int[] _TRI_ORDER = new int[] { 0, 1, 3, 1, 2, 3 };//{ 0, 1, 3, 3, 2, 1 };
+
+    private static readonly Vector3[] _BLOCK_VERTICES = new Vector3[]
+	{
+        Vector3.up + Vector3.forward + Vector3.left,    // 0
 		Vector3.up + Vector3.forward + Vector3.right,	// 1
 		Vector3.up + Vector3.back + Vector3.right, 		// 2
 		Vector3.up + Vector3.back + Vector3.left,		// 3
@@ -26,31 +33,38 @@ public class BlockMesh : MonoBehaviour {
 		Vector3.down + Vector3.back + Vector3.left		// 7
 	};
 
-	private int[,,] _blocks;
-	private MeshFilter _meshFilter;
-	public void SetBlock(Point point, int blockType) {
-		if (point.X >= 0 && point.X < Size.X && point.Y >= 0 && point.Y < Size.Y && point.Z >= 0 && point.Z < Size.Z) {
-			_blocks[point.X, point.Y, point.Z] = blockType;
-		} else {
-			throw new ArgumentOutOfRangeException("point", "Given point " + point + " is outside the bounds " + Size + " of this BlockMesh");
-		}
-	}
+    private int[,,] _blocks;
+    private MeshFilter _meshFilter;
+    public void SetBlock(Point point, int blockType)
+    {
+        if (point.X >= 0 && point.X < Size.X && point.Y >= 0 && point.Y < Size.Y && point.Z >= 0 && point.Z < Size.Z)
+        {
+            _blocks[point.X, point.Y, point.Z] = blockType;
+        }
+        else
+        {
+            throw new ArgumentOutOfRangeException("point", "Given point " + point + " is outside the bounds " + Size + " of this BlockMesh");
+        }
+    }
 
-	public void Resize(Point size, bool retainBlocks=false) {
-		int[,,] newBlocks = new int[size.X, size.Y, size.Z];
-		if (retainBlocks) {
-			Array.Copy(_blocks, newBlocks, Math.Min(newBlocks.Length, _blocks.Length));
-		}
-		_blocks = newBlocks;
-		Size = size;
-	}
+    public void Resize(Point size, bool retainBlocks = false)
+    {
+        int[,,] newBlocks = new int[size.X, size.Y, size.Z];
+        if (retainBlocks)
+        {
+            Array.Copy(_blocks, newBlocks, Math.Min(newBlocks.Length, _blocks.Length));
+        }
+        _blocks = newBlocks;
+        Size = size;
+    }
 
-	public void Resize(bool retainBlocks = false) {
-		Resize(Size, retainBlocks);
-	}
+    public void Resize(bool retainBlocks = false)
+    {
+        Resize(Size, retainBlocks);
+    }
 
-	public void Build() {
-		// Create a new block array based on new Size, if it changed
+    public void Build()
+    {
 		Point size = new Point(_blocks.GetLength(0), _blocks.GetLength(1), _blocks.GetLength(2));
 		if (size != Size) {
 			Resize(true);
@@ -58,128 +72,39 @@ public class BlockMesh : MonoBehaviour {
 
 		Point point = new Point();
 		List<Vector3> vertices = new List<Vector3>();
+		List<int> triangles = new List<int>();
 		List<Vector2> uvs = new List<Vector2>();
-		List<int> triangles = new List<int>();
 
-
-		List<int> gridIndices = new List<int>();
-		Point gridSize = Size + Point.One;
-
-		// Find which vertices in the BlockMesh's grid are actually used in the BlockMesh
-		for (point.X = 0; point.X < Size.X; point.X++) {
-			for (point.Y = 0; point.Y < Size.Y; point.Y++) {
-				for (point.Z = 0; point.Z < Size.Z; point.Z++) {
-					
-					// Calculate the vertex indices of the current block
-					int sliceArea = gridSize.X * gridSize.Z;
-					int vertexLevelStart = (gridSize.Y - point.Y) * sliceArea; // The top-left corner of the current slice of the grid above point.Z
-					
-					int topBackLeft = vertexLevelStart + point.X + point.Z * gridSize.X;
-					int topBackRight = topBackLeft + 1;
-					int topFrontLeft = vertexLevelStart + point.X + (point.Z + 1) * gridSize.X;
-					int topFrontRight = topFrontLeft + 1;
-
-					vertexLevelStart = (gridSize.Y - point.Y + 1) * sliceArea; // The top-left corner of the slice just below point.Z
-					int bottomBackLeft = vertexLevelStart + point.X + point.Z * gridSize.X;
-					int bottomBackRight = bottomBackLeft + 1;
-					int bottomFrontLeft = vertexLevelStart + point.X + (point.Z + 1) * gridSize.X;
-					int bottomFrontRight = bottomFrontLeft + 1;
-
-					// Stick the above indices into an array so we can loop through the comparisons
-					// It's important that blockIndices follows the same ordering as _TRIANGLE_ORDER and _BLOCK_VERTICES
-					int[] blockIndices = new int[] {
-						topFrontLeft, topFrontRight, topBackRight, topBackLeft, bottomFrontLeft, bottomFrontRight, bottomBackRight, bottomBackLeft
-					};
-
-					// Check neighboring blocks
-					for (int side = 0; side < Point.Neighbors.Length; side++) {
-						Point offset = point + Point.Neighbors[side];
-
-						// If a neighboring block is free, add its side indices to list
-						if (_blocks[point.X, point.Y, point.Z] != 0 &&
-							(offset.X < 0 || offset.X >= Size.X || offset.Y < 0 || offset.Y >= Size.Y || offset.Z < 0 || offset.Z >= Size.Z ||
-							 _blocks[offset.X, offset.Y, offset.Z] == 0)) {
-							
-							// Get the block indices for the given side and add them to the gridIndices list
-							for (int i = 0; i < _BLOCK_SIDE_INDICES.GetLength(1); i++) {
-								int sideIndex = _BLOCK_SIDE_INDICES[side, i];
-								int blockIndex = blockIndices[sideIndex];
-
-								gridIndices.Add(blockIndex);
-							}
-						}
-					}
-				}
-			}
-		}
-
-		// Maps grid indices to mesh indices
-		Dictionary<int, int> gridMeshIndices = new Dictionary<int, int>();
-
-		// Generate vertices from the gridIndices
-		for (int i = 0; i < gridIndices.Count; i++) {
-			int gridIndex = gridIndices[i];
-			int meshIndex;
-			
-			// If a vertex already exists for the gridIndex, use that instead of creating a new one
-			if (gridMeshIndices.TryGetValue(gridIndex, out meshIndex)) {
-				triangles.Add(meshIndex);
-			// Otherwise, create a new vertex and cache the mapping in gridMeshIndices
-			} else {
-				// Turn the gridIndex into a vertex and add it to the vertex list
-				int sliceArea = gridSize.X * gridSize.Z;
-				int y = gridIndex / sliceArea;
-				int z = (gridIndex - y * sliceArea) / gridSize.X;
-				int x = (gridIndex - y * sliceArea - z * gridSize.X);
-				y = Size.Y - y;
-
-				Vector3 vertex = new Vector3((float)x, (float)y, (float)z);
-				meshIndex = vertices.Count;
-				vertices.Add(vertex);
-				triangles.Add(meshIndex);
-
-				// Map the gridIndex to the meshIndex
-				gridMeshIndices[gridIndex] = meshIndex;
-			}
-		}
-
-		_meshFilter.mesh.Clear();
-		_meshFilter.mesh.vertices = vertices.ToArray();
-		_meshFilter.mesh.uv = uvs.ToArray();
-		_meshFilter.mesh.triangles = triangles.ToArray();
-
-		_meshFilter.mesh.RecalculateNormals();
-	}
-
-	public void Build2()
-	{
-		List<Vector3> vertices = new List<Vector3>();
-		List<int> triangles = new List<int>();
-
-		Point point = new Point();
 		for (point.X = 0; point.X < Size.X; point.X++)
 		{
 			for (point.Y = 0; point.Y < Size.Y; point.Y++)
 			{
 				for (point.Z = 0; point.Z < Size.Z; point.Z++)
-				{
-
-					// Check neighboring blocks
-					for (int side = 0; side < Point.Neighbors.Length; side++)
+				{	
+					Vector3 blockCenter = PointVector.ToVector(point);
+					int blockType = _blocks[point.X, point.Y, point.Z];
+					if (blockType != 0)
 					{
-						Point offset = point + Point.Neighbors[side];
-						Vector3 center = PointVector.ToVector(point);
-
-						// If a neighboring block is free, add its side indices to list
-						if (_blocks[point.X, point.Y, point.Z] != 0 &&
-							(offset.X < 0 || offset.X >= Size.X || offset.Y < 0 || offset.Y >= Size.Y || offset.Z < 0 || offset.Z >= Size.Z ||
-							 _blocks[offset.X, offset.Y, offset.Z] == 0))
+						for (int side = 0; side < Point.Neighbors.Length; side++)
 						{
-							for (int sideVertex = 0; sideVertex < _BLOCK_SIDE_INDICES.GetLength(side); sideVertex++)
+							Point neighbor = point + Point.Neighbors[side];
+							
+							if (neighbor.X < 0 || neighbor.X >= Size.X ||
+								neighbor.Y < 0 || neighbor.Y >= Size.Y ||
+								neighbor.Z < 0 || neighbor.Z >= Size.Z ||
+								_blocks[neighbor.X, neighbor.Y, neighbor.Z] != blockType)
 							{
-								int vertexIndex = _BLOCK_SIDE_INDICES[side, sideVertex];
-								Vector3 vertex = _BLOCK_VERTICES[vertexIndex] + center;
-								vertices.Add(vertex);
+								int vertexCount = vertices.Count;
+								for (int sideIndex = 0; sideIndex < _BLOCK_SIDE_INDICES.GetLength(1); sideIndex++)
+								{
+									int corner = _BLOCK_SIDE_INDICES[side, sideIndex];
+									vertices.Add(blockCenter + _BLOCK_VERTICES[corner] * 0.5f);
+								}
+
+								for (int triIndex = 0; triIndex < _TRI_ORDER.Length; triIndex++)
+								{
+									triangles.Add(vertexCount + _TRI_ORDER[triIndex]);
+								}
 							}
 						}
 					}
@@ -189,12 +114,16 @@ public class BlockMesh : MonoBehaviour {
 
 		_meshFilter.mesh.Clear();
 		_meshFilter.mesh.vertices = vertices.ToArray();
-	}
+		_meshFilter.mesh.triangles = triangles.ToArray();
+		_meshFilter.mesh.uv = uvs.ToArray();
+		_meshFilter.mesh.RecalculateNormals();
+    }
 
-	#region MonoBehaviour
-	private void Awake() {
-		_blocks = new int[Size.X, Size.Y, Size.Z];
-		_meshFilter = GetComponent<MeshFilter>();
-	}
-	#endregion MonoBehaviour
+    #region MonoBehaviour
+    private void Awake()
+    {
+        _blocks = new int[Size.X, Size.Y, Size.Z];
+        _meshFilter = GetComponent<MeshFilter>();
+    }
+    #endregion MonoBehaviour
 }
