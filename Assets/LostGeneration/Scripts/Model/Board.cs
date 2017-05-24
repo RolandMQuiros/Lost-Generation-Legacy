@@ -9,6 +9,7 @@ namespace LostGen {
         public bool IsSolid;
         public bool IsOpaque;
         public bool IsDiggable;
+        public int BlockType;
     }
 
     public class Board {

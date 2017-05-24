@@ -83,7 +83,7 @@ public class BlockMesh : MonoBehaviour
         Resize(Size, retainBlocks);
     }
 
-    public IEnumerator Build()
+    public void Build()
     {
 		Point size = new Point(_blocks.GetLength(0), _blocks.GetLength(1), _blocks.GetLength(2));
 		if (size != Size) {
@@ -95,7 +95,6 @@ public class BlockMesh : MonoBehaviour
 		List<int> triangles = new List<int>();
 		List<Vector2> uvs = new List<Vector2>();
 
-		_meshFilter.mesh.Clear();
 		for (point.X = 0; point.X < Size.X; point.X++)
 		{
 			for (point.Y = 0; point.Y < Size.Y; point.Y++)
@@ -159,13 +158,6 @@ public class BlockMesh : MonoBehaviour
 									uvs.Add(boundsMin + new Vector2(tileX + tileWidth, boundsMin.y));
 									uvs.Add(boundsMin + new Vector2(tileX, boundsMin.y));
 								}
-
-								_meshFilter.mesh.Clear();
-								_meshFilter.mesh.vertices = vertices.ToArray();
-								_meshFilter.mesh.triangles = triangles.ToArray();
-								_meshFilter.mesh.uv = uvs.ToArray();
-								_meshFilter.mesh.RecalculateNormals();
-								yield return new WaitForSeconds(0.1f);
 							}
 						}
 					}
@@ -173,11 +165,11 @@ public class BlockMesh : MonoBehaviour
 			}
 		}
 
-		// _meshFilter.mesh.Clear();
-		// _meshFilter.mesh.vertices = vertices.ToArray();
-		// _meshFilter.mesh.triangles = triangles.ToArray();
-		// _meshFilter.mesh.uv = uvs.ToArray();
-		// _meshFilter.mesh.RecalculateNormals();
+		_meshFilter.mesh.Clear();
+		_meshFilter.mesh.vertices = vertices.ToArray();
+		_meshFilter.mesh.triangles = triangles.ToArray();
+		_meshFilter.mesh.uv = uvs.ToArray();
+		_meshFilter.mesh.RecalculateNormals();
     }
 
     #region MonoBehaviour
