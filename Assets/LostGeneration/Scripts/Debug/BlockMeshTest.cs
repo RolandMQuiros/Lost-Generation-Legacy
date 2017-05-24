@@ -40,8 +40,7 @@ public class BlockMeshTest : MonoBehaviour {
 			}
 		}
 		
-		// BlockMesh.Build();
-		StartCoroutine(BlockMesh.Build());
+		BlockMesh.Build();
 	}
 	
 	void BuildMesh() {
