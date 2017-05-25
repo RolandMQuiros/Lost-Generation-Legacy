@@ -57,9 +57,11 @@ public class BlockMesh : MonoBehaviour
 	}
     public void SetBlock(Point point, int blockType)
     {
-        if (InBounds(point))
+        if (point.X >= -1 && point.X <= Size.X &&
+			point.Y >= -1 && point.Y <= Size.Y &&
+			point.Z >= -1 && point.Z <= Size.Z)
         {
-            _blocks[point.X, point.Y, point.Z] = blockType;
+            _blocks[point.X + 1, point.Y + 1, point.Z + 1] = blockType;
         }
         else
         {
@@ -69,7 +71,7 @@ public class BlockMesh : MonoBehaviour
 
     public void Resize(Point size, bool retainBlocks = false)
     {
-        int[,,] newBlocks = new int[size.X, size.Y, size.Z];
+        int[,,] newBlocks = new int[size.X + 2, size.Y + 2, size.Z + 2];
         if (retainBlocks)
         {
             Array.Copy(_blocks, newBlocks, Math.Min(newBlocks.Length, _blocks.Length));
@@ -85,7 +87,7 @@ public class BlockMesh : MonoBehaviour
 
     public void Build()
     {
-		Point size = new Point(_blocks.GetLength(0), _blocks.GetLength(1), _blocks.GetLength(2));
+		Point size = new Point(_blocks.GetLength(0) - 2, _blocks.GetLength(1) - 2, _blocks.GetLength(2) - 2);
 		if (size != Size) {
 			Resize(true);
 		}
@@ -102,16 +104,14 @@ public class BlockMesh : MonoBehaviour
 				for (point.Z = 0; point.Z < Size.Z; point.Z++)
 				{	
 					Vector3 blockCenter = PointVector.ToVector(point);
-					int blockType = _blocks[point.X, point.Y, point.Z];
+					int blockType = _blocks[point.X + 1, point.Y + 1, point.Z + 1];
 					if (blockType != 0)
 					{
-						Int16 xzSides = 0;
-						Int16 xySides = 0;
 						for (int side = 0; side < Point.Neighbors.Length; side++)
 						{
 							Point neighbor = point + Point.Neighbors[side];
 							
-							if (!InBounds(neighbor) || _blocks[neighbor.X, neighbor.Y, neighbor.Z] != blockType)
+							if (!InBounds(neighbor) || _blocks[neighbor.X + 1, neighbor.Y + 1, neighbor.Z + 1] != blockType)
 							{
 								// Get the vertex count before adding the new ones, which will act as the offset
 								// for the triangle windings
@@ -137,8 +137,11 @@ public class BlockMesh : MonoBehaviour
 									int tileAdjacency = 0;
 									for (int sideNeighborIdx = 0; sideNeighborIdx < _BLOCK_SIDE_NEIGHBORS.GetLength(1); sideNeighborIdx++)
 									{
-										Point sideNeighbor = point + _BLOCK_SIDE_NEIGHBORS[side, sideNeighborIdx];
-										if (InBounds(sideNeighbor) && _blocks[sideNeighbor.X, sideNeighbor.Y, sideNeighbor.Z] == blockType)
+										Point sideNeighbor = point + Point.One + _BLOCK_SIDE_NEIGHBORS[side, sideNeighborIdx];
+										if (sideNeighbor.X >= 0 && sideNeighbor.X < _blocks.GetLength(0) &&
+											sideNeighbor.Y >= 0 && sideNeighbor.Y < _blocks.GetLength(1) &&
+											sideNeighbor.Z >= 0 && sideNeighbor.Z < _blocks.GetLength(2) &&
+										 	_blocks[sideNeighbor.X, sideNeighbor.Y, sideNeighbor.Z] == blockType)
 										{
 											tileAdjacency |= (1 << sideNeighborIdx);
 										}
@@ -179,7 +182,7 @@ public class BlockMesh : MonoBehaviour
     #region MonoBehaviour
     private void Awake()
     {
-        _blocks = new int[Size.X, Size.Y, Size.Z];
+        _blocks = new int[Size.X + 2, Size.Y + 2, Size.Z + 2];
         _meshFilter = GetComponent<MeshFilter>();
     }
     #endregion MonoBehaviour

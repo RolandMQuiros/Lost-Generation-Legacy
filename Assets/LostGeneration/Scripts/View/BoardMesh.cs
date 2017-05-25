@@ -51,14 +51,18 @@ public class BoardMesh : MonoBehaviour {
             renderer.sharedMaterial = BlockMaterial;
         }
 
-        for (blockCoords.X = 0; blockCoords.X < CellSize.X; blockCoords.X++)
+        for (blockCoords.X = -1; blockCoords.X <= CellSize.X; blockCoords.X++)
         {
-            for (blockCoords.Y = 0; blockCoords.Y < CellSize.Y; blockCoords.Y++)
+            for (blockCoords.Y = -1; blockCoords.Y <= CellSize.Y; blockCoords.Y++)
             {
-                for (blockCoords.Z = 0; blockCoords.Z < CellSize.Z; blockCoords.Z++)
-                {
-                    BoardBlock block = BoardRef.Board.GetBlock(blockCoords + start);
-                    cell.SetBlock(blockCoords, block.BlockType);
+                for (blockCoords.Z = -1; blockCoords.Z <= CellSize.Z; blockCoords.Z++)
+                {   
+                    Point point = blockCoords + start;
+                    if (BoardRef.Board.InBounds(point))
+                    {
+                        BoardBlock block = BoardRef.Board.GetBlock(point);
+                        cell.SetBlock(blockCoords, block.BlockType);
+                    }
                 }   
             }
         }
