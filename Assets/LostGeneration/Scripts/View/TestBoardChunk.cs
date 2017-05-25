@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using LostGen;
 public class TestBoardChunk : MonoBehaviour {
@@ -14,7 +15,7 @@ public class TestBoardChunk : MonoBehaviour {
         }
 
         _board = BoardRef.Board;
-        _board.BlocksChanged += Rebuild;
+        _board.BlockChanged += Rebuild;
 
         ConstructGridView();
     }
@@ -41,7 +42,7 @@ public class TestBoardChunk : MonoBehaviour {
         }
     }
 
-    private void Rebuild() {
+    private void Rebuild(BoardBlock oldBlock, BoardBlock newBlock) {
         for (int i = 0; i < transform.childCount; i++) {
             GameObject.Destroy(transform.GetChild(i).gameObject);
         }

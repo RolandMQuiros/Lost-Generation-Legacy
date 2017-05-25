@@ -14,11 +14,13 @@ public class BoardRef : MonoBehaviour {
     public class BoardPawnEvent : UnityEvent<Pawn> { }
     [Serializable]
     public class BoardStepEvent : UnityEvent<Queue<IPawnMessage>> { }
+    [Serializable]
+    public class BoardBlocksEvent : UnityEvent<Dictionary<BoardBlock, BoardBlock>> { }
 
     public Board Board;
 
     #region UnityEvents
-    public UnityEvent BlocksChanged;
+    public BoardBlocksEvent BlocksChanged;
     public BoardPawnEvent PawnAdded;
     public BoardPawnEvent PawnRemoved;
     public BoardStepEvent BoardStepped;
@@ -33,7 +35,39 @@ public class BoardRef : MonoBehaviour {
 
     #region MonoBehaviour
     private void Awake() {
-        Board.BlocksChanged += delegate() { BlocksChanged.Invoke(); };
+        int[,,] grid = new int[,,] {
+            {
+                { 1, 1, 1, 1, 1 },
+                { 1, 1, 1, 1, 1 },
+                { 1, 1, 1, 1, 1 },
+                { 1, 1, 1, 1, 1 },
+                { 1, 1, 1, 1, 1 }
+            },
+            {
+                { 1, 1, 1, 1, 1 },
+                { 1, 0, 0, 0, 1 },
+                { 1, 0, 0, 0, 1 },
+                { 1, 0, 0, 0, 1 },
+                { 1, 1, 1, 1, 1 }
+            }
+        };
+
+        Board = new Board(new Point(grid.GetLength(2), grid.GetLength(0), grid.GetLength(1)));
+
+        for (int y = 0; y < grid.GetLength(0); y++) {
+            for (int z = 0; z < grid.GetLength(1); z++) {
+                for (int x = 0; x < grid.GetLength(2); x++) {
+                    Point point = new Point(x, y, z);
+                    if (grid[y,z,x] == 1) {
+                        Board.SetBlock(new BoardBlock() { Point = point, IsSolid = true, IsOpaque = true });
+                    } else {
+                        Board.SetBlock(new BoardBlock() { Point = point, IsSolid = false, IsOpaque = false });
+                    }
+                }
+            }
+        }
+
+        Board.BlocksChanged += delegate(Dictionary<BoardBlock, BoardBlock> blocksChanged) { BlocksChanged.Invoke(blocksChanged); };
         Board.PawnAdded += delegate(Pawn pawn) { PawnAdded.Invoke(pawn); };
         Board.PawnRemoved += delegate(Pawn pawn) { PawnRemoved.Invoke(pawn); };
     }
