@@ -131,7 +131,7 @@ public class BlockMesh : MonoBehaviour
 								}
 
 								// Create UVs from autotiles
-								if (blockType != 0 && TileSprites.Length >= blockType)
+								if (blockType != 0 && TileSprites.Length > blockType)
 								{	
 									// Get the index of the tile
 									int tileAdjacency = 0;
@@ -157,6 +157,10 @@ public class BlockMesh : MonoBehaviour
 									uvs.Add(boundsMin + new Vector2(tileX + tileWidth, boundsMax.y));
 									uvs.Add(boundsMin + new Vector2(tileX + tileWidth, boundsMin.y));
 									uvs.Add(boundsMin + new Vector2(tileX, boundsMin.y));
+								}
+								else 
+								{
+									for (int u = 0; u < 4; u++) { uvs.Add(Vector2.zero); }
 								}
 							}
 						}

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using LostGen;
 public class BoardTest : MonoBehaviour
@@ -11,22 +12,25 @@ public class BoardTest : MonoBehaviour
         _boardRef = GetComponent<BoardRef>();
         _boardRef.Board = new Board(new Point(BoardSize.X, BoardSize.Y, BoardSize.Z));
 
+        List<BoardBlock> blocks = new List<BoardBlock>();
         for (int x = 0; x < _boardRef.Board.Size.X; x++)
         {
             for (int y = 0; y < _boardRef.Board.Size.Y; y++)
             {
-                for (int z = 0; y < _boardRef.Board.Size.Z; z++)
+                for (int z = 0; z < _boardRef.Board.Size.Z; z++)
                 {
-                    _boardRef.Board.SetBlock
+                    blocks.Add
                     (
                         new BoardBlock()
                         {
-                            BlockType = (int)(Random.value * 5f)
+                            Point = new Point(x, y, z),
+                            BlockType = Mathf.RoundToInt(Random.value)
                         }
                     );
                 }
             }
         }
+        _boardRef.Board.SetBlocks(blocks);
     }
     #endregion MonoBehaviour
 }

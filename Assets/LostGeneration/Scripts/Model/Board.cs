@@ -21,8 +21,8 @@ namespace LostGen {
 
         public event Action<Pawn> PawnAdded;
         public event Action<Pawn> PawnRemoved;
-        public event Action BlocksChanged;
-
+        public event Action<BoardBlock, BoardBlock> BlockChanged;
+        public event Action<Dictionary<BoardBlock, BoardBlock>> BlocksChanged;
         private HashSet<Pawn> _pawns = new HashSet<Pawn>();
         private List<Pawn> _pawnOrder = new List<Pawn>();
         private Dictionary<Point, HashSet<Pawn>> _pawnBuckets = new Dictionary<Point, HashSet<Pawn>>();
@@ -37,21 +37,47 @@ namespace LostGen {
 
         public void SetBlock(BoardBlock block) {
             if (InBounds(block.Point)) {
+                BoardBlock oldBlock = _blocks[block.Point.X, block.Point.Y, block.Point.Z];
                 _blocks[block.Point.X, block.Point.Y, block.Point.Z] = block;
-                if (BlocksChanged != null) {
-                    BlocksChanged();
+                if (BlockChanged != null) {
+                    BlockChanged(oldBlock, block);
                 }
             } else {
                 throw new ArgumentOutOfRangeException("Given Point " + block.Point + " is outside the bounds of the Board " + Size, "point");
             }
         }
 
+        public void SetBlocks(IEnumerable<BoardBlock> blocks)
+        {   
+            if (blocks != null && blocks.Any())
+            {
+                Dictionary<BoardBlock, BoardBlock> changeSet = null;
+                if (BlocksChanged != null)
+                {
+                    changeSet = new Dictionary<BoardBlock, BoardBlock>();
+                }
+                
+                foreach (BoardBlock block in blocks)
+                {
+                    BoardBlock oldBlock = _blocks[block.Point.X, block.Point.Y, block.Point.Z];
+                    _blocks[block.Point.X, block.Point.Y, block.Point.Z] = block;
+                    
+                    if (changeSet != null)
+                    {
+                        changeSet.Add(oldBlock, block);
+                    }
+                }
+
+                if (changeSet != null && BlocksChanged != null)
+                {
+                    BlocksChanged(changeSet);
+                }
+            }
+        }
+
         public BoardBlock GetBlock(Point point) {
             if (InBounds(point)) {
                 return _blocks[point.X, point.Y, point.Z];
-                if (BlocksChanged != null) {
-                    BlocksChanged();
-                }
             } else {
                 throw new ArgumentOutOfRangeException("Given Point " + point + " is outside the bounds of the Board " + Size, "point");
             }
