@@ -47,7 +47,7 @@ public class BlockMesh : MonoBehaviour
 	};
 
 	private const int _BLOCK_SIDE_TILE_COUNT = 16;
-	public Sprite[] TileSprites;
+	public BlockProperties[] BlockProperties;
     private int[,,] _blocks;
     private MeshFilter _meshFilter;
 
@@ -105,13 +105,14 @@ public class BlockMesh : MonoBehaviour
 				{	
 					Vector3 blockCenter = PointVector.ToVector(point);
 					int blockType = _blocks[point.X + 1, point.Y + 1, point.Z + 1];
-					if (blockType != 0)
+					if (blockType != 0 && BlockProperties.Length > blockType && BlockProperties[blockType] != null)
 					{
 						for (int side = 0; side < Point.Neighbors.Length; side++)
 						{
 							Point neighbor = point + Point.Neighbors[side];
 							
-							if (!InBounds(neighbor) || _blocks[neighbor.X + 1, neighbor.Y + 1, neighbor.Z + 1] != blockType)
+							if (BlockProperties[blockType].SideSprites[side] != null &&
+								(!InBounds(neighbor) || _blocks[neighbor.X + 1, neighbor.Y + 1, neighbor.Z + 1] != blockType))
 							{
 								// Get the vertex count before adding the new ones, which will act as the offset
 								// for the triangle windings
@@ -131,7 +132,7 @@ public class BlockMesh : MonoBehaviour
 								}
 
 								// Create UVs from autotiles
-								if (blockType != 0 && TileSprites.Length > blockType)
+								if (blockType != 0 && BlockProperties.Length > blockType)
 								{	
 									// Get the index of the tile
 									int tileAdjacency = 0;
@@ -148,7 +149,7 @@ public class BlockMesh : MonoBehaviour
 									}
 
 									// Apply that tile's UV coordinates to the quad
-									Sprite sprite = TileSprites[blockType];
+									Sprite sprite = BlockProperties[blockType].SideSprites[side];
 									Vector2 boundsMin = new Vector2(sprite.rect.x / sprite.texture.width, sprite.rect.y / sprite.texture.height);
 									Vector2 boundsMax = new Vector2(sprite.rect.size.x / sprite.texture.width, sprite.rect.size.y / sprite.texture.height);
 

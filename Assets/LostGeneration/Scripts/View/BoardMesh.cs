@@ -4,9 +4,10 @@ using UnityEngine;
 using LostGen;
 
 public class BoardMesh : MonoBehaviour {
+    public GameObject CellPrefab;
 	public Point CellSize;
 	public BoardRef BoardRef;
-    public Sprite[] TileSprites;
+    public BlockProperties[] BlockProperties;
     public Material BlockMaterial;
     private BlockMesh[,,] _cells;
 
@@ -38,16 +39,14 @@ public class BoardMesh : MonoBehaviour {
         BlockMesh cell = _cells[cx, cy, cz];
         if (cell == null)
         {
-            GameObject cellObj = new GameObject();
-            cellObj.transform.parent = transform;
+            GameObject cellObj = GameObject.Instantiate(CellPrefab, transform);
             cellObj.transform.localPosition = PointVector.ToVector(start);
             cellObj.name = "cell(" + cx + "," + cy + "," + cz + ")";
 
-            cellObj.AddComponent(typeof(MeshFilter));
-            MeshRenderer renderer = cellObj.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
-            cell = cellObj.AddComponent(typeof(BlockMesh)) as BlockMesh;
+            MeshRenderer renderer = cellObj.GetComponent<MeshRenderer>();//cellObj.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
+            cell = cellObj.GetComponent<BlockMesh>();//AddComponent(typeof(BlockMesh)) as BlockMesh;
             cell.Resize(CellSize);
-            cell.TileSprites = TileSprites;
+            cell.BlockProperties = BlockProperties;
             renderer.sharedMaterial = BlockMaterial;
         }
 
@@ -99,9 +98,9 @@ public class BoardMesh : MonoBehaviour {
     {   
         _cells = new BlockMesh
         [
-            BoardRef.Board.Size.X / CellSize.X,
-            BoardRef.Board.Size.Y / CellSize.Y,
-            BoardRef.Board.Size.Z / CellSize.Z
+            Mathf.CeilToInt((float)BoardRef.Board.Size.X / CellSize.X),
+            Mathf.CeilToInt((float)BoardRef.Board.Size.Y / CellSize.Y),
+            Mathf.CeilToInt((float)BoardRef.Board.Size.Z / CellSize.Z)
         ];
 
         BoardRef.Board.BlocksChanged += OnBlocksChanged;

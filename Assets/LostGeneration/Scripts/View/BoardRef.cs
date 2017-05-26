@@ -17,7 +17,23 @@ public class BoardRef : MonoBehaviour {
     [Serializable]
     public class BoardBlocksEvent : UnityEvent<Dictionary<BoardBlock, BoardBlock>> { }
 
-    public Board Board;
+    public Board Board
+    {
+        get { return _board; }
+        set
+        {
+            if (_board != null)
+            {
+                _board.BlocksChanged -= OnBlocksChanged;
+                _board.PawnAdded -= OnPawnAdded;
+                _board.PawnRemoved -= OnPawnRemoved;
+            }
+            _board = value;
+            _board.BlocksChanged += OnBlocksChanged;
+            _board.PawnAdded += OnPawnAdded;
+            _board.PawnRemoved += OnPawnRemoved;
+        }
+    }
 
     #region UnityEvents
     public BoardBlocksEvent BlocksChanged;
@@ -26,6 +42,8 @@ public class BoardRef : MonoBehaviour {
     public BoardStepEvent BoardStepped;
     #endregion UnityEvents
 
+    private Board _board;
+
     public void Step() {
         Queue<IPawnMessage> messages = new Queue<IPawnMessage>();
         Board.Step(messages);
@@ -33,11 +51,18 @@ public class BoardRef : MonoBehaviour {
         BoardStepped.Invoke(messages);
     }
 
-    #region MonoBehaviour
-    private void Awake() {
-        Board.BlocksChanged += delegate(Dictionary<BoardBlock, BoardBlock> blocksChanged) { BlocksChanged.Invoke(blocksChanged); };
-        Board.PawnAdded += delegate(Pawn pawn) { PawnAdded.Invoke(pawn); };
-        Board.PawnRemoved += delegate(Pawn pawn) { PawnRemoved.Invoke(pawn); };
+    private void OnBlocksChanged(Dictionary<BoardBlock, BoardBlock> blocksChanged)
+    {
+        BlocksChanged.Invoke(blocksChanged);
     }
-    #endregion MonoBehaviour
+
+    private void OnPawnAdded(Pawn pawn)
+    {
+        PawnAdded.Invoke(pawn);
+    }
+
+    private void OnPawnRemoved(Pawn pawn)
+    {
+        PawnRemoved.Invoke(pawn);
+    }
 }
