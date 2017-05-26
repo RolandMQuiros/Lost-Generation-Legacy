@@ -29,10 +29,30 @@ namespace LostGen {
 
         public Board(Point size) {
             _blocks = new BoardBlock[size.X, size.Y, size.Z];
+            for (int x = 0; x < size.X; x++)
+            {
+                for (int y = 0; y < size.Y; y++)
+                {
+                    for (int z = 0; z < size.Z; z++)
+                    {
+                        _blocks[x, y, z].Point = new Point(x, y, z);
+                    }
+                }
+            }
         }
 
         public Board(int width, int height, int depth) {
             _blocks = new BoardBlock[width, height, depth];
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    for (int z = 0; z < depth; z++)
+                    {
+                        _blocks[x, y, z].Point = new Point(x, y, z);
+                    }
+                }
+            }
         }
 
         public void SetBlock(BoardBlock block) {
@@ -60,11 +80,15 @@ namespace LostGen {
                 foreach (BoardBlock block in blocks)
                 {
                     BoardBlock oldBlock = _blocks[block.Point.X, block.Point.Y, block.Point.Z];
-                    _blocks[block.Point.X, block.Point.Y, block.Point.Z] = block;
-                    
-                    if (changeSet != null)
+
+                    if (!oldBlock.Equals(block))
                     {
-                        changeSet.Add(oldBlock, block);
+                        _blocks[block.Point.X, block.Point.Y, block.Point.Z] = block;
+                        
+                        if (changeSet != null)
+                        {
+                            changeSet.Add(oldBlock, block);
+                        }
                     }
                 }
 
