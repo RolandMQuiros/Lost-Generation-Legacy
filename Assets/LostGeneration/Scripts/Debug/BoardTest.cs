@@ -5,6 +5,7 @@ public class BoardTest : MonoBehaviour
 {   
     public Point BoardSize;
     private BoardRef _boardRef;
+    private Pawn _pawn;
 
     #region MonoBehaviour
     private void Awake()
@@ -31,6 +32,54 @@ public class BoardTest : MonoBehaviour
             }
         }
         _boardRef.Board.SetBlocks(blocks);
+    }
+
+    private void Start()
+    {
+        _pawn = new Pawn("Test Combatant", _boardRef.Board, _boardRef.Board.Size / 2);
+        _pawn.AddComponent
+        (
+            new Combatant()
+            {
+                BaseStats = new Stats()
+                {
+                    Health = 10,
+                    Attack = 6,
+                    Magic = 4,
+                    Agility = 7,
+                    Stamina = 5
+                },
+                Health = 10
+            }
+        );
+
+        _boardRef.Board.AddPawn(_pawn);
+    }
+
+    private void Update()
+    {   
+        Point offset = new Point();
+        if (Input.GetKeyDown(KeyCode.W)) {
+            offset = Point.Forward;
+        }
+        else if (Input.GetKeyDown(KeyCode.A))
+        {
+            offset = Point.Left;
+        }
+        else if (Input.GetKeyDown(KeyCode.S))
+        {
+            offset = Point.Backward;
+        }
+        else if (Input.GetKeyDown(KeyCode.D))
+        {
+            offset = Point.Right;
+        }
+
+        if (offset != Point.Zero)
+        {
+            _pawn.PushAction(new MoveAction(_pawn, _pawn.Position, _pawn.Position + Point.Forward, true));
+            _boardRef.Step();
+        }
     }
     #endregion MonoBehaviour
 }

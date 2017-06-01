@@ -7,7 +7,7 @@ using LostGen;
 /// That is, this class makes sure that messages that depend on the order of actions are displayed as such.
 /// </summary>
 public class MessageBuffer {
-    public bool IsStepFinished {
+    public bool HasMessages {
         get {
             return _messages.Count == 0;
         }
@@ -24,7 +24,7 @@ public class MessageBuffer {
         }
     }
 
-    public void PopMessages(Queue<IPawnMessage> messages) {
+    public void PopMessages(Queue<IPawnMessage> popped = null) {
         HashSet<Pawn> actingPawns = new HashSet<Pawn>();
         bool stopPopping = false;
 
@@ -42,7 +42,10 @@ public class MessageBuffer {
                 stopPopping = true;
             }
 
-            messages.Enqueue(next);
+            if (popped != null)
+            {
+                popped.Enqueue(next);
+            }
         }
     }
 }
