@@ -4,6 +4,7 @@ using LostGen;
 public class BoardTest : MonoBehaviour
 {   
     public Point BoardSize;
+    [SerializeField]private PawnManager _pawnManager;
     private BoardRef _boardRef;
     private Pawn _pawn;
 
@@ -77,8 +78,9 @@ public class BoardTest : MonoBehaviour
 
         if (offset != Point.Zero)
         {
-            _pawn.PushAction(new MoveAction(_pawn, _pawn.Position, _pawn.Position + Point.Forward, true));
+            _pawn.PushAction(new MoveAction(_pawn, _pawn.Position, _pawn.Position + offset, true));
             _boardRef.Step();
+            _pawnManager.DistributeMessages();
         }
     }
     #endregion MonoBehaviour

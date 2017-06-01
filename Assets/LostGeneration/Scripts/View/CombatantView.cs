@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using LostGen;
 
-public class CombatantView : MonoBehaviour {
+public class CombatantView : PawnComponentView {
 	#region EditorFields
 	/// <summary>Time needed to move across one block</summary>
 	[TooltipAttribute("Time needed to move across one block")]
@@ -32,7 +32,7 @@ public class CombatantView : MonoBehaviour {
 	/// the resulting Coroutines will fight to update the object's location.
 	/// </summary>
     /// <param name="message">IPawnMessage to process</param>
-	public void ProcessMessage(IPawnMessage message) {
+	public override void HandleMessage(IPawnMessage message) {
 		// Check the type of the message, then fire off the appropriate Coroutine
 		if (Pawn == message.Source) {
 			MoveMessage move = message as MoveMessage;

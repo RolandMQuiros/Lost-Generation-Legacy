@@ -9,7 +9,7 @@ using LostGen;
 public class MessageBuffer {
     public bool HasMessages {
         get {
-            return _messages.Count == 0;
+            return _messages.Count > 0;
         }
     }
     private Queue<IPawnMessage> _messages = new Queue<IPawnMessage>();

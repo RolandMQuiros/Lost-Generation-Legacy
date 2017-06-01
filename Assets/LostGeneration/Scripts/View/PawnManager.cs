@@ -8,46 +8,56 @@ using LostGen;
 /// <summary>
 /// Generates GameObjects based on Pawn composition.
 /// </summary>
-public class PawnManager : MonoBehaviour {
+public class PawnManager : MonoBehaviour
+{
     [TooltipAttribute("Temporary Prefab used to generate Pawns with Combatant components.")]
     public GameObject CombatantPrefab;
-    private Dictionary<Pawn, GameObject> _pawnObjects = new Dictionary<Pawn, GameObject>();
+    private Dictionary<Pawn, PawnView> _pawnViews = new Dictionary<Pawn, PawnView>();
     private MessageBuffer _messageBuffer = new MessageBuffer();
     private Queue<IPawnMessage> _messages = new Queue<IPawnMessage>();
 
-    public void OnPawnAdded(Pawn pawn) {
-        if (!_pawnObjects.ContainsKey(pawn)) {
+    public void OnPawnAdded(Pawn pawn)
+    {
+        if (!_pawnViews.ContainsKey(pawn))
+        {
             Combatant combatant = pawn.GetComponent<Combatant>();
-            if (combatant != null) {
+            if (combatant != null)
+            {
                 GameObject combatantObject = GameObject.Instantiate(CombatantPrefab, PointVector.ToVector(pawn.Position), Quaternion.identity, transform);
                 combatantObject.name = pawn.Name;
 
+                PawnView pawnView = combatantObject.GetComponent<PawnView>();
+
                 // Here, we need to pull Character information and apply it to the MonoBehaviours in combatantObject
-                CombatantView view = combatantObject.GetComponent<CombatantView>();
-                if (view == null) {
+                CombatantView combatantView = combatantObject.GetComponent<CombatantView>();
+                if (combatantView == null)
+                {
                     throw new Exception("Assigned Combatant Prefab does not have a CombatantView component");
                 }
-                view.Pawn = pawn;
-                
+                combatantView.Pawn = pawn;
+
                 // Then, attach the MonoBehaviours to the MessageBuffer
-                _pawnObjects.Add(pawn, combatantObject);
+                _pawnViews.Add(pawn, pawnView);
             }
         }
     }
 
-    public void OnPawnRemoved(Pawn pawn) {
-        GameObject pawnGO;
-        if (_pawnObjects.TryGetValue(pawn, out pawnGO)) {
-            _pawnObjects.Remove(pawn);
+    public void OnPawnRemoved(Pawn pawn)
+    {
+        PawnView pawnView;
+        if (_pawnViews.TryGetValue(pawn, out pawnView))
+        {
+            _pawnViews.Remove(pawn);
             // Add pawnGO to some pooling thing
         }
     }
 
-    public void OnStep(Queue<IPawnMessage> messages) {
+    public void OnStep(Queue<IPawnMessage> messages)
+    {
         _messageBuffer.PushMessages(messages);
     }
 
-    public bool StepPawns()
+    public bool DistributeMessages()
     {
         if (_messageBuffer.HasMessages)
         {
@@ -56,14 +66,15 @@ public class PawnManager : MonoBehaviour {
             while (_messages.Count > 0)
             {
                 IPawnMessage message = _messages.Dequeue();
-                GameObject pawnView;
-                if (message.Source != null && _pawnObjects.TryGetValue(message.Source, out pawnView))
+                PawnView pawnView;
+                if (message.Source != null && _pawnViews.TryGetValue(message.Source, out pawnView))
                 {
-                    
+                    pawnView.HandleMessage(message);
                 }
-                if (message.Target != null && _pawnObjects.TryGetValue(message.Target, out.pawnView))
+
+                if (message.Target != null && _pawnViews.TryGetValue(message.Target, out pawnView))
                 {
-                    
+                    pawnView.HandleMessage(message);
                 }
             }
         }
