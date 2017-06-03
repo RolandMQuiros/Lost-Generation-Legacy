@@ -26,7 +26,7 @@ public class BoardTest : MonoBehaviour
                         new BoardBlock()
                         {
                             Point = new Point(x, y, z),
-                            BlockType = Mathf.RoundToInt(Random.value)
+                            BlockType = Mathf.RoundToInt(Random.value * 2f)
                         }
                     );
                 }

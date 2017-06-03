@@ -151,16 +151,16 @@ public class BlockMesh : MonoBehaviour
 									// Apply that tile's UV coordinates to the quad
 									Sprite sprite = BlockProperties[blockType].SideSprites[side];
 									Vector2 boundsMin = new Vector2(sprite.rect.x / sprite.texture.width, sprite.rect.y / sprite.texture.height);
-									Vector2 boundsMax = new Vector2(sprite.rect.size.x / sprite.texture.width, sprite.rect.size.y / sprite.texture.height);
+									Vector2 boundsMax = boundsMin + new Vector2(sprite.rect.size.x / sprite.texture.width, sprite.rect.size.y / sprite.texture.height);
 
 									float tileWidth = (boundsMax.x - boundsMin.x) / _BLOCK_SIDE_TILE_COUNT;
 									float tileHeight = (boundsMax.y - boundsMin. y);
-									float tileX = boundsMin.x + tileWidth * tileAdjacency;
+									float tileX = tileWidth * tileAdjacency;
 									
-									uvs.Add(boundsMin + new Vector2(tileX, boundsMax.y));
-									uvs.Add(boundsMin + new Vector2(tileX + tileWidth, boundsMax.y));
-									uvs.Add(boundsMin + new Vector2(tileX + tileWidth, boundsMin.y));
-									uvs.Add(boundsMin + new Vector2(tileX, boundsMin.y));
+									uvs.Add(boundsMin + new Vector2(tileX, tileHeight));
+									uvs.Add(boundsMin + new Vector2(tileX + tileWidth, tileHeight));
+									uvs.Add(boundsMin + new Vector2(tileX + tileWidth, 0f));
+									uvs.Add(boundsMin + new Vector2(tileX, 0f));
 								}
 								else 
 								{
