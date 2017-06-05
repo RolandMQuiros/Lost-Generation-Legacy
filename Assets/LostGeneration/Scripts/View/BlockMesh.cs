@@ -112,7 +112,7 @@ public class BlockMesh : MonoBehaviour
 							Point neighbor = point + Point.Neighbors[side];
 							
 							if (BlockProperties[blockType].SideSprites[side] != null &&
-								(!InBounds(neighbor) || _blocks[neighbor.X + 1, neighbor.Y + 1, neighbor.Z + 1] != blockType))
+								_blocks[neighbor.X + 1, neighbor.Y + 1, neighbor.Z + 1] != blockType)
 							{
 								// Get the vertex count before adding the new ones, which will act as the offset
 								// for the triangle windings
