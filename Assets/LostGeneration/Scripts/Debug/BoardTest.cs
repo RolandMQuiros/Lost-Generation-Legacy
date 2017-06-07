@@ -5,6 +5,7 @@ public class BoardTest : MonoBehaviour
 {   
     public Point BoardSize;
     [SerializeField]private PawnManager _pawnManager;
+    [SerializeField]private int _boardTypes = 1;
     private BoardRef _boardRef;
     private Pawn _pawn;
 
@@ -26,7 +27,7 @@ public class BoardTest : MonoBehaviour
                         new BoardBlock()
                         {
                             Point = new Point(x, y, z),
-                            BlockType = Mathf.RoundToInt(Random.value * 2f)
+                            BlockType = (byte)Mathf.RoundToInt(Random.value * _boardTypes)
                         }
                     );
                 }

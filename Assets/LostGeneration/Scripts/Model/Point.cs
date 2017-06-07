@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace LostGen {
     [Serializable]
@@ -11,7 +12,8 @@ namespace LostGen {
         public static readonly Point Right = new Point(1, 0, 0);
         public static readonly Point Forward = new Point(0, 0, 1);
         public static readonly Point Backward = new Point(0, 0, -1);
-
+        public static readonly Point Max = new Point(Int32.MaxValue, Int32.MaxValue, Int32.MaxValue);
+        public static readonly Point Min = new Point(Int32.MinValue, Int32.MinValue, Int32.MinValue);
         public static readonly Point[] Neighbors = new Point[] {
             Point.Up,
             Point.Right,
@@ -273,6 +275,30 @@ namespace LostGen {
             }
 
             return direction;
+        }
+
+        public static Point LowerBound(IEnumerable<Point> points)
+        {   
+            Point max = Point.Min;
+            foreach (Point point in points)
+            {
+                if (point.X > max.X) { max.X = point.X; }
+                if (point.Y > max.Y) { max.Y = point.Y; }
+                if (point.Z > max.Z) { max.Z = point.Z; }
+            }
+            return max;
+        }
+
+        public static Point UpperBound(IEnumerable<Point> points)
+        {   
+            Point min = Point.Max;
+            foreach (Point point in points)
+            {
+                if (point.X < min.X) { min.X = point.X; }
+                if (point.Y < min.Y) { min.Y = point.Y; }
+                if (point.Z < min.Z) { min.Z = point.Z; }
+            }
+            return min;
         }
     }
 }

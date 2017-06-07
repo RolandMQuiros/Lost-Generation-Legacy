@@ -2,15 +2,15 @@
 using LostGen;
 
 public class BlockMeshTest : MonoBehaviour {
-	public BlockMesh BlockMesh;
+	[SerializeField]private BlockMesh _blockMesh;
 
 	// Use this for initialization
 	void Start () {
-		Debug.Log(BlockMesh);
+		Debug.Log(_blockMesh);
 
-		BlockMesh.Resize(new Point(4, 3, 4));
+		_blockMesh.Resize(new Point(4, 3, 4));
 
-		int[,,] pyramid = new int[,,] {
+		byte[,,] pyramid = new byte[,,] {
 			{
 				{ 1, 1, 1, 1 },
 				{ 1, 1, 1, 1 },
@@ -35,30 +35,30 @@ public class BlockMeshTest : MonoBehaviour {
 			for (int y = 0; y < 3; y++) {
 				for (int z = 0; z < 4; z++) {
 					Point point = new Point(x, y, z);
-					BlockMesh.SetBlock(point, pyramid[y, z ,x]);
+					_blockMesh.SetBlock(point, pyramid[y, z ,x]);
 				}
 			}
 		}
 		
-		BlockMesh.Build();
+		_blockMesh.Build();
 	}
 	
 	void BuildMesh() {
-		BlockMesh.Resize();
+		_blockMesh.Resize();
 		
-		for (int x = 0; x < BlockMesh.Size.X; x++) {
-			for (int y = 0; y < BlockMesh.Size.Y; y++) {
-				for (int z = 0; z < BlockMesh.Size.Z; z++) {
+		for (int x = 0; x < _blockMesh.Size.X; x++) {
+			for (int y = 0; y < _blockMesh.Size.Y; y++) {
+				for (int z = 0; z < _blockMesh.Size.Z; z++) {
 
 					//if ((y % 2 + x) % 2 == 0 && ((y % 2 + z) + 1) % 2 == 0) {
 					// if (x > BlockMesh.Size.X / 2) {
-						BlockMesh.SetBlock(new Point(x, y, z), 1);
+						_blockMesh.SetBlock(new Point(x, y, z), 1);
 					//}
 				}
 			}
 		}
 
-		BlockMesh.Build();
+		_blockMesh.Build();
 	}
 
 	// Update is called once per frame

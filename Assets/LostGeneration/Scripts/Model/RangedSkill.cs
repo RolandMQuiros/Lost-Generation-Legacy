@@ -21,6 +21,7 @@ namespace LostGen {
         public void SetTarget(Point target) {
             if (_target != target) {
                 _target = target;
+                InvokeAreaOfEffectChange();
                 if (TargetChanged != null) {
                     TargetChanged(_target);
                 }

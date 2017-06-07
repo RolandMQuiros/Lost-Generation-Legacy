@@ -10,6 +10,7 @@ namespace LostGen {
         public string Description { get; private set; }
         public virtual int ActionPoints { get; set; }
         public bool IsReadyToFire { get; set; }
+        public event Action AreaOfEffectChanged;
 
         public AreaOfEffectSkill(Combatant owner, string name, string description) {
             Owner = owner;
@@ -19,5 +20,13 @@ namespace LostGen {
 
         public abstract IEnumerable<Point> GetAreaOfEffect();
         public abstract void Fire();
+
+        protected void InvokeAreaOfEffectChange()
+        {
+            if (AreaOfEffectChanged != null)
+            {
+                AreaOfEffectChanged();
+            }
+        }
     }
 }

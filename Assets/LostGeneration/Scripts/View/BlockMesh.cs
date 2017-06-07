@@ -9,7 +9,7 @@ using LostGen;
 public class BlockMesh : MonoBehaviour
 {
     public Point Size;
-    private static readonly int[,] _BLOCK_SIDE_INDICES = new int[,]
+    private static readonly byte[,] _BLOCK_SIDE_INDICES = new byte[,]
 	{
         {0, 1, 2, 3}, // Top
 		{2, 1, 5, 6}, // Right
@@ -19,7 +19,7 @@ public class BlockMesh : MonoBehaviour
 		{3, 2, 6, 7}, // Backward
 	};
 
-	private static readonly int[] _TRI_ORDER = new int[] { 0, 1, 3, 1, 2, 3 };
+	private static readonly byte[] _TRI_ORDER = new byte[] { 0, 1, 3, 1, 2, 3 };
 
     private static readonly Vector3[] _BLOCK_VERTICES = new Vector3[]
 	{
@@ -46,16 +46,16 @@ public class BlockMesh : MonoBehaviour
 		{ Point.Up     , Point.Right   , Point.Down    , Point.Left     }  // Backward
 	};
 
-	private const int _BLOCK_SIDE_TILE_COUNT = 16;
+	private const byte _BLOCK_SIDE_TILE_COUNT = 16;
 	public BlockProperties[] BlockProperties;
-    private int[,,] _blocks;
+    private byte[,,] _blocks;
     private MeshFilter _meshFilter;
 
 	public bool InBounds(Point point)
 	{
 		return point.X >= 0 && point.X < Size.X && point.Y >= 0 && point.Y < Size.Y && point.Z >= 0 && point.Z < Size.Z;
 	}
-    public void SetBlock(Point point, int blockType)
+    public void SetBlock(Point point, byte blockType)
     {
         if (point.X >= -1 && point.X <= Size.X &&
 			point.Y >= -1 && point.Y <= Size.Y &&
@@ -71,7 +71,7 @@ public class BlockMesh : MonoBehaviour
 
     public void Resize(Point size, bool retainBlocks = false)
     {
-        int[,,] newBlocks = new int[size.X + 2, size.Y + 2, size.Z + 2];
+        byte[,,] newBlocks = new byte[size.X + 2, size.Y + 2, size.Z + 2];
         if (retainBlocks)
         {
             Array.Copy(_blocks, newBlocks, Math.Min(newBlocks.Length, _blocks.Length));
@@ -183,7 +183,7 @@ public class BlockMesh : MonoBehaviour
     #region MonoBehaviour
     private void Awake()
     {
-        _blocks = new int[Size.X + 2, Size.Y + 2, Size.Z + 2];
+        _blocks = new byte[Size.X + 2, Size.Y + 2, Size.Z + 2];
         _meshFilter = GetComponent<MeshFilter>();
     }
     #endregion MonoBehaviour

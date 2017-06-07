@@ -16,6 +16,8 @@ namespace LostGen {
         public void SetDirection(CardinalDirection direction) {
             if (_direction != direction) {
                 _direction = direction;
+                
+                InvokeAreaOfEffectChange();
                 if (DirectionChanged != null) {
                     DirectionChanged(_direction);
                 }
