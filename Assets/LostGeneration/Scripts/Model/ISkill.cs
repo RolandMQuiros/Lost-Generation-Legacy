@@ -15,8 +15,8 @@ namespace LostGen {
         string Name { get; }
         /// <summary>Description of Skill displayed to users</summary>
         string Description { get; }
-        /// <summary>Combatant that owns and executes this Skill</summary>
-        Combatant Owner { get; }
+        /// <summary>Pawn that owns and executes this Skill</summary>
+        Pawn Owner { get; }
         /// <summary>The number of Action Points this Skill will consume when fired</summary>
         int ActionPoints { get; }
 
@@ -24,6 +24,6 @@ namespace LostGen {
         /// Generates this Skill's Actions and pushes them onto the owning Combatant's Action queue,
         /// either on the front or back.
         /// </summary>
-        void Fire();
+        PawnAction Fire();
     }
 }

@@ -9,8 +9,9 @@ public class BoardCursor : MonoBehaviour,
                            IPointerClickHandler,
                            IPointerDownHandler,
                            IPointerUpHandler {
-	public Camera Camera;
-	public BoardRef BoardRef;
+	[SerializeField]private Camera _camera;
+	[SerializeField]private BoardRef _boardRef;
+    [SerializeField]private Transform _pointer;
 	public enum CursorAxis {
 		XZ, XY
 	}
@@ -33,7 +34,7 @@ public class BoardCursor : MonoBehaviour,
 	#region MonoBehaviour
     private void Awake() {
 		_clickCollider = GetComponent<Collider>();
-        Camera = Camera ?? Camera.main;
+        _camera = _camera ?? Camera.main;
     }
 
     private void Update() {
@@ -77,7 +78,7 @@ public class BoardCursor : MonoBehaviour,
             ScreenPoint = Input.mousePosition;
 
             // Get the point on the Collider beneath the cursor
-            Ray screenCast = Camera.ScreenPointToRay(ScreenPoint);
+            Ray screenCast = _camera.ScreenPointToRay(ScreenPoint);
 			RaycastHit hitInfo;
 			_clickCollider.Raycast(screenCast, out hitInfo, 100f);
             WorldPoint = hitInfo.point;
@@ -87,6 +88,11 @@ public class BoardCursor : MonoBehaviour,
             Point boardPoint = PointVector.ToPoint(snapped);
 
             BoardPoint = boardPoint;
+
+            if (_pointer)
+            {
+                _pointer.transform.position = PointVector.ToVector(BoardPoint);
+            }
         }
     }
 

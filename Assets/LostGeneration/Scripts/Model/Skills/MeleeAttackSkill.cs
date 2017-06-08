@@ -20,7 +20,7 @@ namespace LostGen {
         /// These offsets are rotated based on this skill's Direction attribute, and are defined based on the
         /// attacker facing east.
         /// </param>
-        public MeleeAttackSkill(Combatant attacker, IEnumerable<Point> areaOfEffect = null)
+        public MeleeAttackSkill(Pawn attacker, IEnumerable<Point> areaOfEffect = null)
             : base(attacker, "Melee Attack", "Attack an adjacent space") {
 
             if (areaOfEffect == null) {
@@ -52,20 +52,20 @@ namespace LostGen {
         }
 
         public override IEnumerable<Point> GetAreaOfEffect() {
-            return _transforms[Direction].Select(point => point + Owner.Pawn.Position);
+            return _transforms[Direction].Select(point => point + Owner.Position);
         }
 
         public bool InAreaOfEffect(Point target) {
             bool found = false;
 
-            if (_fullAreaOfEffect.Contains(target - Owner.Pawn.Position)) {
+            if (_fullAreaOfEffect.Contains(target - Owner.Position)) {
                 for (int i = 0; !found && i < _transforms[Direction].Length; i++) {
                     Point aoePoint = _transforms[Direction][i];
-                    if (aoePoint.Equals(Owner.Pawn.Position - target)) {
+                    if (aoePoint.Equals(Owner.Position - target)) {
                         if (PierceWalls && PierceSolids) {
                             found = true;
                         } else {
-                            found = Owner.Pawn.Board.LineCast(Owner.Pawn.Position, aoePoint, null, PierceWalls, PierceSolids);
+                            found = Owner.Board.LineCast(Owner.Position, aoePoint, null, PierceWalls, PierceSolids);
                         }
                     }
                 }
@@ -75,7 +75,7 @@ namespace LostGen {
         }
 
         public bool InFullAreaOfEffect(Point point) {
-            Point offset = point - Owner.Pawn.Position;
+            Point offset = point - Owner.Position;
             return _fullAreaOfEffect.Contains(offset);
         }
 
@@ -83,20 +83,20 @@ namespace LostGen {
             bool canAttack = false;
             bool inFullAOE = _fullAreaOfEffect.Contains(point - from);
 
-            if (Owner.Pawn.Board.InBounds(from)) {
+            if (Owner.Board.InBounds(from)) {
                 if (PierceWalls && PierceSolids) {
                     canAttack = inFullAOE;
                 } else if (inFullAOE) {
-                    canAttack = !Owner.Pawn.Board.LineCast(from, point, null, PierceWalls, PierceSolids);
+                    canAttack = !Owner.Board.LineCast(from, point, null, PierceWalls, PierceSolids);
                 }
             }
 
             return canAttack;
         }
 
-        public override void Fire() {
-            AttackAction attack = new AttackAction(Owner.Pawn, _transforms[Direction]);
-            Owner.Pawn.PushAction(attack);
+        public override PawnAction Fire() {
+            AttackAction attack = new AttackAction(Owner, _transforms[Direction]);
+            return attack;
         }
     }
 }

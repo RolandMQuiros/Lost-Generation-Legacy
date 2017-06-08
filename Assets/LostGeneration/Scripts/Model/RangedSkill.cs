@@ -9,7 +9,7 @@ namespace LostGen {
         public event Action<Point> TargetChanged;
         private Point _target;
 
-        public RangedSkill(Combatant owner, string name, string description)
+        public RangedSkill(Pawn owner, string name, string description)
             : base(owner, name, description) {
         }
 
@@ -18,14 +18,18 @@ namespace LostGen {
         public abstract override IEnumerable<Point> GetAreaOfEffect();
         public abstract IEnumerable<Point> GetPath();
 
-        public void SetTarget(Point target) {
-            if (_target != target) {
+        public virtual bool SetTarget(Point target) {
+            bool targetChanged = false;
+            if (_target != target && InRange(target)) {
                 _target = target;
+
+                targetChanged = true;
                 InvokeAreaOfEffectChange();
                 if (TargetChanged != null) {
                     TargetChanged(_target);
                 }
             }
+            return targetChanged;
         }
     }
 }
