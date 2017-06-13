@@ -28,22 +28,21 @@ public class SkillTray : MonoBehaviour
             int buttonIdx = 0;
             foreach (ISkill skill in _skillController.SkillSet.Skills)
             {
-                SkillButton button;
+                SkillButton skillButton;
                 if (buttonIdx < _buttons.Count)
                 {
-                    button = _buttons[buttonIdx];
+                    skillButton = _buttons[buttonIdx];
                 }
                 else
                 {
                     GameObject buttonObj = GameObject.Instantiate(_buttonPrefab, _buttonParent);
-                    button = buttonObj.GetComponent<SkillButton>();
-                    button.SkillActivated += _skillController.SetActiveSkill;
-
-                    _buttons.Add(button);
+                    skillButton = buttonObj.GetComponent<SkillButton>();
+                    skillButton.SkillActivated += _skillController.SetActiveSkill;
+                    _buttons.Add(skillButton);
                 }
                 
-                button.Skill = skill;
-                button.gameObject.SetActive(true);
+                skillButton.Skill = skill;
+                skillButton.gameObject.SetActive(true);
                 buttonIdx++;
             }
         }

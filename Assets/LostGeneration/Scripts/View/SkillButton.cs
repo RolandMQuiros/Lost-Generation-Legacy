@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using LostGen;
 
@@ -15,6 +16,15 @@ public class SkillButton : MonoBehaviour,
         if (SkillActivated != null)
         {
             SkillActivated(Skill);
+        }
+    }
+
+    private void Awake()
+    {
+        Text buttonText = GetComponentInChildren<Text>();
+        if (buttonText != null)
+        {
+            buttonText.text = Skill.Name;
         }
     }
 }
