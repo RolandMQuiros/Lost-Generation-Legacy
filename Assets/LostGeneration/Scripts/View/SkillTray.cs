@@ -42,12 +42,6 @@ public class SkillTray : MonoBehaviour
                     _buttons.Add(button);
                 }
                 
-                button.transform.localPosition = new Vector3
-                (
-                    _buttonPadding + (_buttonPadding + _buttonRect.width) * (buttonIdx % _buttonsPerRow),
-                    -(_buttonPadding + (_buttonPadding + _buttonRect.height) * (buttonIdx / _buttonsPerRow)),
-                    0f
-                );
                 button.Skill = skill;
                 button.gameObject.SetActive(true);
                 buttonIdx++;

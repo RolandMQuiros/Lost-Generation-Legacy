@@ -33,7 +33,7 @@ public class BoardCameraController : MonoBehaviour {
             Vector3 right = Vector3.Cross(Vector3.up, forward).normalized;
             Vector3 up = Vector3.Cross(forward, right).normalized;
 
-            Vector3 offset = (dx * right + dz * forward + dy * up) *
+            Vector3 offset = (dx * right + dz * forward + dy * up * 2f) *
                              (sprint ? _highSpeed : _regularSpeed) * Time.deltaTime;
             transform.position += offset;
         } else {

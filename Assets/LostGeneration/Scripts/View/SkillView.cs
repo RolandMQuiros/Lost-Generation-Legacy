@@ -8,52 +8,75 @@ public class SkillView : MonoBehaviour
 	private const byte _AOE_TYPE = 1;
 	private const byte _RANGE_TYPE = 2;
 	private const byte _PATH_TYPE = 3;
-    [SerializeField]private BlockMesh _selectorMesh;
+    [SerializeField]private BlockMesh _areaOfEffectMesh;
+	[SerializeField]private BlockMesh _rangeMesh;
+	[SerializeField]private BlockMesh _pathMesh;
 
-	public void SetAreaOfEffect(IEnumerable<Point> areaOfEffect)
+	private AreaOfEffectSkill _skill;
+
+	public void SetSkill(ISkill skill)
 	{
-		SetBlocks(areaOfEffect, _AOE_TYPE);
+		AreaOfEffectSkill aoe = skill as AreaOfEffectSkill;
+		if (aoe != null)
+		{
+			if (_skill != aoe)
+			{
+				_skill.AreaOfEffectChanged -= OnAreaOfEffectChange;
+			}
+			_skill = aoe;
+
+			RangedSkill ranged = skill as RangedSkill;
+			if (ranged != null)
+			{
+				SetBlocks(_rangeMesh, ranged.GetRange(), 1);
+				_rangeMesh.Build();
+			}
+		}
 	}
 
-	public void SetRange(IEnumerable<Point> range)
+	private void OnAreaOfEffectChange()
 	{
-		SetBlocks(range, _RANGE_TYPE);
+		SetBlocks(_areaOfEffectMesh, _skill.GetAreaOfEffect(), 1);
+
+		RangedSkill ranged = _skill as RangedSkill;
+		if (ranged != null)
+		{
+			SetBlocks(_pathMesh, ranged.GetRange(), 1);
+		}
+
+		_areaOfEffectMesh.Build();
+		_rangeMesh.Build();
 	}
 
-	public void SetPath(IEnumerable<Point> path)
+	private bool ResizeFromPoints(BlockMesh mesh, IEnumerable<Point> points)
 	{
-		SetBlocks(path, _PATH_TYPE);
-	}
-
-	private void ResizeFromPoints(IEnumerable<Point> points)
-	{
+		bool wasResized = false;
 		Point size = Point.UpperBound(points) - Point.LowerBound(points);
-		if (_selectorMesh.Size.X < size.X ||
-			_selectorMesh.Size.Y < size.Y ||
-			_selectorMesh.Size.Z < size.Z)
+		if (mesh.Size.X < size.X ||
+			mesh.Size.Y < size.Y ||
+			mesh.Size.Z < size.Z)
 		{
 			Point newSize = new Point
 			(
-				Math.Max(_selectorMesh.Size.X, size.X),
-				Math.Max(_selectorMesh.Size.Y, size.Y),
-				Math.Max(_selectorMesh.Size.Z, size.Z)
+				Math.Max(mesh.Size.X, size.X),
+				Math.Max(mesh.Size.Y, size.Y),
+				Math.Max(mesh.Size.Z, size.Z)
 			);
 
-			_selectorMesh.Resize(newSize, true);
+			mesh.Resize(newSize, true);
+			wasResized = true;
 		}
+
+		return wasResized;
 	}
 
-	private void SetBlocks(IEnumerable<Point> points, byte blockType)
+	private void SetBlocks(BlockMesh mesh, IEnumerable<Point> points, byte blockType)
 	{
-		ResizeFromPoints(points);
+		ResizeFromPoints(mesh, points);
 		foreach (Point point in points)
 		{
-			_selectorMesh.SetBlock(point, blockType);
+			mesh.SetBlock(point, blockType);
 		}
 	}
 
-    private void BuildMesh(BlockMesh mesh, IEnumerable<Point> points)
-	{
-		mesh.Build();
-	}
 }

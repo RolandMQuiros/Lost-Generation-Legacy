@@ -24,7 +24,7 @@ public class SkillController : MonoBehaviour
             SkillActivated.Invoke(_activeSkill);
         }
     }
-
+    
     public void OnCombatantActivated(Combatant combatant)
     {
         _skillSet = combatant.Pawn.GetComponent<SkillSet>();

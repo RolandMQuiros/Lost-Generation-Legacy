@@ -277,7 +277,7 @@ namespace LostGen {
             return direction;
         }
 
-        public static Point LowerBound(IEnumerable<Point> points)
+        public static Point UpperBound(IEnumerable<Point> points)
         {   
             Point max = Point.Min;
             foreach (Point point in points)
@@ -289,7 +289,7 @@ namespace LostGen {
             return max;
         }
 
-        public static Point UpperBound(IEnumerable<Point> points)
+        public static Point LowerBound(IEnumerable<Point> points)
         {   
             Point min = Point.Max;
             foreach (Point point in points)

@@ -26,6 +26,7 @@ public class BoardCursor : MonoBehaviour,
     public CursorEvent Clicked;
     public CursorEvent TappedDown;
     public CursorEvent TappedUp;
+    public CursorEvent Moved;
 
 	private Collider _clickCollider;
 	private bool _isWindowFocused;
@@ -87,7 +88,11 @@ public class BoardCursor : MonoBehaviour,
 			Vector3 snapped = PointVector.Round(WorldPoint);
             Point boardPoint = PointVector.ToPoint(snapped);
 
-            BoardPoint = boardPoint;
+            if (boardPoint != BoardPoint)
+            {
+                BoardPoint = boardPoint;
+                Moved.Invoke(BoardPoint);
+            }
 
             if (_pointer)
             {

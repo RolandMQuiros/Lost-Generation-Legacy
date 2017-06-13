@@ -31,8 +31,7 @@ namespace LostGen
         public override bool InRange(Point point)
         {
             BuildRange();
-            _neighbors.Contains(point);
-            return false;
+            return _neighbors.Contains(point);
         }
 
         public override IEnumerable<Point> GetAreaOfEffect()

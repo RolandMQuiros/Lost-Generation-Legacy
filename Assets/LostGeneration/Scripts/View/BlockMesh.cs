@@ -85,6 +85,11 @@ public class BlockMesh : MonoBehaviour
         Resize(Size, retainBlocks);
     }
 
+	public void Clear()
+	{
+		Array.Clear(_blocks, 0, _blocks.Length);
+	}
+
     public void Build()
     {
 		Point size = new Point(_blocks.GetLength(0) - 2, _blocks.GetLength(1) - 2, _blocks.GetLength(2) - 2);

@@ -17,9 +17,9 @@ public class BoardTest : MonoBehaviour
         _boardRef.Board = new Board(new Point(BoardSize.X, BoardSize.Y, BoardSize.Z));
 
         List<BoardBlock> blocks = new List<BoardBlock>();
+        int y = 0;
         for (int x = 0; x < _boardRef.Board.Size.X; x++)
         {
-            int y;
             for (y = 0; y < _boardRef.Board.Size.Y / 2; y++)
             {
                 for (int z = 0; z < _boardRef.Board.Size.Z; z++)
@@ -29,6 +29,9 @@ public class BoardTest : MonoBehaviour
                         new BoardBlock()
                         {
                             Point = new Point(x, y, z),
+                            IsSolid = true,
+                            IsOpaque = true,
+                            IsDiggable = true,
                             BlockType = 1
                         }
                     );
@@ -38,16 +41,35 @@ public class BoardTest : MonoBehaviour
             y = _boardRef.Board.Size.Y / 2;
             for (int z = 0; z < _boardRef.Board.Size.Z; z++)
             {
+                byte blockType = (byte)Mathf.RoundToInt(Random.value * _boardTypes);
                 blocks.Add
                 (
                     new BoardBlock()
                     {
                         Point = new Point(x, y, z),
-                        BlockType = (byte)Mathf.RoundToInt(Random.value * _boardTypes)
+                        IsSolid = blockType != 0,
+                        IsOpaque = blockType != 0,
+                        IsDiggable = blockType != 0,
+                        BlockType = blockType
                     }
                 );
             }
         }
+        // blocks.Add(new BoardBlock() {
+        //     Point = new Point(0, y, 0),
+        //     IsSolid = true,
+        //     IsOpaque = true,
+        //     IsDiggable = true,
+        //     BlockType = 1
+        // });
+        // blocks.Add(new BoardBlock() {
+        //     Point = new Point(_boardRef.Board.Size.X - 1, y, _boardRef.Board.Size.Z - 1),
+        //     IsSolid = true,
+        //     IsOpaque = true,
+        //     IsDiggable = true,
+        //     BlockType = 1
+        // });
+
         _boardRef.Board.SetBlocks(blocks);
     }
 
