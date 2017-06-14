@@ -131,9 +131,21 @@ public class BlockMesh : MonoBehaviour
 								}
 
 								// Push the triangle windings for the new quad onto the triangle list
-								for (int triIndex = 0; triIndex < _TRI_ORDER.Length; triIndex++)
+
+								// If side is marked with reversed normals, wind the tris in the opposite direction
+								if (BlockProperties[blockType].AreNormalsReversed[side])
 								{
-									triangles.Add(vertexCount + _TRI_ORDER[triIndex]);
+									for (int triIndex = _TRI_ORDER.Length - 1; triIndex >= 0; triIndex--)
+									{
+										triangles.Add(vertexCount + _TRI_ORDER[triIndex]);
+									}
+								}
+								else
+								{
+									for (int triIndex = 0; triIndex < _TRI_ORDER.Length; triIndex++)
+									{
+										triangles.Add(vertexCount + _TRI_ORDER[triIndex]);
+									}
 								}
 
 								// Create UVs from autotiles

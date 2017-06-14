@@ -12,13 +12,11 @@ public class BoardCursor : MonoBehaviour,
 	[SerializeField]private Camera _camera;
 	[SerializeField]private BoardRef _boardRef;
     [SerializeField]private Transform _pointer;
-	public enum CursorAxis {
-		XZ, XY
-	}
-	public CursorAxis Axis = CursorAxis.XZ;
 	public Vector3 ScreenPoint;
 	public Vector3 WorldPoint;
     public Point BoardPoint;
+    public bool ClipThroughSolids = true;
+    public bool StickToGround = true;
 
     [Serializable]
     public class CursorEvent : UnityEvent<Point> { }
@@ -38,42 +36,6 @@ public class BoardCursor : MonoBehaviour,
         _camera = _camera ?? Camera.main;
     }
 
-    private void Update() {
-        // float shiftPlane = Input.GetAxis("Shift Plane");
-        // if (shiftPlane > 0) {
-        //     PlanePosition++;
-        // } else if (shiftPlane < 0) {
-        //     PlanePosition--;
-        // }
-        
-        // if (shiftPlane != 0) {
-        //     switch (Axis) {
-        //         case CursorAxis.XY:
-        //             transform.position.Set(transform.position.x, transform.position.y, (float)PlanePosition);
-        //             break;
-        //         case CursorAxis.XZ:
-        //             transform.position.Set(transform.position.x, (float)PlanePosition, transform.position.z);
-        //             break;
-        //         case CursorAxis.ZY:
-        //             transform.position.Set((float)PlanePosition, transform.position.y, transform.position.z);
-        //             break;
-        //     }
-        // }
-
-        bool flipPlane = Input.GetButtonDown("Flip Plane");
-        if (flipPlane) {
-            Axis = (CursorAxis)(((int)Axis + 1) % 2);
-            switch (Axis) {
-                case CursorAxis.XY:
-                    transform.rotation = Quaternion.AngleAxis(90f, Vector3.right);
-                    break;
-                case CursorAxis.XZ:
-                    transform.rotation = Quaternion.identity;
-                    break;
-            }   
-        }
-    }
-
     private void LateUpdate() {
         if (!IsMouseOutsideWindow() && _isWindowFocused) {
             ScreenPoint = Input.mousePosition;
@@ -85,12 +47,58 @@ public class BoardCursor : MonoBehaviour,
             WorldPoint = hitInfo.point;
             
             // Convert to integer Point
-			Vector3 snapped = PointVector.Round(WorldPoint);
-            Point boardPoint = PointVector.ToPoint(snapped);
+			Point snapped = PointVector.ToPoint(WorldPoint);
+            snapped = new Point
+            (
+                Math.Min(Math.Max(snapped.X, 0), _boardRef.Board.Size.X - 1),
+                Math.Min(Math.Max(snapped.Y, 0), _boardRef.Board.Size.Y - 1),
+                Math.Min(Math.Max(snapped.Z, 0), _boardRef.Board.Size.Z - 1)
+            );
 
-            if (boardPoint != BoardPoint)
+            Point? boardPoint = null;
+
+            if (ClipThroughSolids)
             {
-                BoardPoint = boardPoint;
+                boardPoint = snapped;
+            }
+            else
+            {
+                BoardBlock block = _boardRef.Board.GetBlock(snapped);
+                if (block.IsSolid)
+                {
+                    while (block.IsSolid && _boardRef.Board.InBounds(block.Point + Point.Up))
+                    {
+                        block = _boardRef.Board.GetBlock(block.Point + Point.Up);
+                        if (!block.IsSolid)
+                        {
+                            boardPoint = block.Point;
+                        }
+                    }
+                }
+                else
+                {
+                    if (StickToGround)
+                    {
+                        while (!block.IsSolid && _boardRef.Board.InBounds(block.Point + Point.Down))
+                        {
+                            BoardBlock below = _boardRef.Board.GetBlock(block.Point + Point.Down);
+                            if (below.IsSolid)
+                            {
+                                boardPoint = below.Point;
+                            }
+                            block = below;
+                        }
+                    }
+                    else
+                    {
+                        boardPoint = block.Point;
+                    }
+                }
+            }
+
+            if (boardPoint != null && boardPoint.Value != BoardPoint)
+            {
+                BoardPoint = boardPoint.Value;
                 Moved.Invoke(BoardPoint);
             }
 
