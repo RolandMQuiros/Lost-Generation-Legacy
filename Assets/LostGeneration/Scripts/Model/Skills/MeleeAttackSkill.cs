@@ -35,9 +35,9 @@ namespace LostGen {
 
             for (int i = 0; i < _areaOfEffect.Count; i++) {
                 Point east = _areaOfEffect[i];
-                Point south = new Point(-east.Y, east.X);
-                Point west = new Point(-east.X, -east.Y);
-                Point north = new Point(east.Y, -east.X);
+                Point south = new Point(-east.Z,east.Y, -east.X);
+                Point west = new Point(-east.X, east.Y, -east.Z);
+                Point north = new Point(east.Z, east.Y, east.X);
 
                 _transforms[CardinalDirection.East][i] = east;
                 _transforms[CardinalDirection.South][i] = south;

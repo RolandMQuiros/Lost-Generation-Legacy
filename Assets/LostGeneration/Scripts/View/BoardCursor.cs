@@ -5,15 +5,17 @@ using UnityEngine.Events;
 using LostGen;
 
 
+[RequireComponent(typeof(BoxCollider))]
 public class BoardCursor : MonoBehaviour,
                            IPointerClickHandler,
                            IPointerDownHandler,
-                           IPointerUpHandler {
-	[SerializeField]private Camera _camera;
-	[SerializeField]private BoardRef _boardRef;
-    [SerializeField]private Transform _pointer;
-	public Vector3 ScreenPoint;
-	public Vector3 WorldPoint;
+                           IPointerUpHandler
+{
+    [SerializeField] private Camera _camera;
+    [SerializeField] private BoardRef _boardRef;
+    [SerializeField] private Transform _pointer;
+    public Vector3 ScreenPoint;
+    public Vector3 WorldPoint;
     public Point BoardPoint;
     public bool ClipThroughSolids = true;
     public bool StickToGround = true;
@@ -26,28 +28,42 @@ public class BoardCursor : MonoBehaviour,
     public CursorEvent TappedUp;
     public CursorEvent Moved;
 
-	private Collider _clickCollider;
-	private bool _isWindowFocused;
+    private BoxCollider _clickCollider;
+    private bool _isWindowFocused;
 
 
-	#region MonoBehaviour
-    private void Awake() {
-		_clickCollider = GetComponent<Collider>();
+    #region MonoBehaviour
+    private void Awake()
+    {
+        _clickCollider = GetComponent<BoxCollider>();
         _camera = _camera ?? Camera.main;
     }
 
-    private void LateUpdate() {
-        if (!IsMouseOutsideWindow() && _isWindowFocused) {
+    private void Start()
+    {
+        Bounds clickBounds = _clickCollider.bounds;
+        Vector3 size = PointVector.ToVector(_boardRef.Board.Size);
+        size.y = 1f;
+        clickBounds.SetMinMax(_boardRef.transform.position, size);
+
+        _clickCollider.center = clickBounds.center;
+        _clickCollider.size = clickBounds.size;
+    }
+
+    private void LateUpdate()
+    {
+        if (!IsMouseOutsideWindow() && _isWindowFocused)
+        {
             ScreenPoint = Input.mousePosition;
 
             // Get the point on the Collider beneath the cursor
             Ray screenCast = _camera.ScreenPointToRay(ScreenPoint);
-			RaycastHit hitInfo;
-			_clickCollider.Raycast(screenCast, out hitInfo, 100f);
+            RaycastHit hitInfo;
+            _clickCollider.Raycast(screenCast, out hitInfo, 100f);
             WorldPoint = hitInfo.point;
-            
+
             // Convert to integer Point
-			Point snapped = PointVector.ToPoint(WorldPoint);
+            Point snapped = PointVector.ToPoint(WorldPoint);
             snapped = new Point
             (
                 Math.Min(Math.Max(snapped.X, 0), _boardRef.Board.Size.X - 1),
@@ -63,6 +79,7 @@ public class BoardCursor : MonoBehaviour,
             }
             else
             {
+                // Move up until a non-solid block is found
                 BoardBlock block = _boardRef.Board.GetBlock(snapped);
                 if (block.IsSolid)
                 {
@@ -77,6 +94,7 @@ public class BoardCursor : MonoBehaviour,
                 }
                 else
                 {
+                    // Move down until a solid block is found
                     if (StickToGround)
                     {
                         while (!block.IsSolid && _boardRef.Board.InBounds(block.Point + Point.Down))
@@ -109,11 +127,13 @@ public class BoardCursor : MonoBehaviour,
         }
     }
 
-    private void OnApplicationFocus(bool hasFocus) {
+    private void OnApplicationFocus(bool hasFocus)
+    {
         _isWindowFocused = hasFocus;
     }
 
-    private bool IsMouseOutsideWindow() {
+    private bool IsMouseOutsideWindow()
+    {
         return Input.mousePosition.x < 0 || Input.mousePosition.x >= Screen.width &&
                Input.mousePosition.y < 0 || Input.mousePosition.y >= Screen.height;
     }
@@ -121,15 +141,18 @@ public class BoardCursor : MonoBehaviour,
 
     #region PointerEvents
 
-    public void OnPointerClick(PointerEventData eventData) {
+    public void OnPointerClick(PointerEventData eventData)
+    {
         Clicked.Invoke(BoardPoint);
     }
 
-    public void OnPointerDown(PointerEventData eventData) {
+    public void OnPointerDown(PointerEventData eventData)
+    {
         TappedDown.Invoke(BoardPoint);
     }
 
-    public void OnPointerUp(PointerEventData eventData) {
+    public void OnPointerUp(PointerEventData eventData)
+    {
         TappedUp.Invoke(BoardPoint);
     }
     #endregion PointerEvents

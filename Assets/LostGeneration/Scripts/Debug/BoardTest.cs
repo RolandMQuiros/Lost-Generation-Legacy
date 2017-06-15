@@ -95,8 +95,11 @@ public class BoardTest : MonoBehaviour
         
         SkillSet skillSet = new SkillSet();
         _pawn.AddComponent(skillSet);
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < 5; i++)
             skillSet.AddSkill(new WalkSkill(_pawn));
+
+        for (int i = 0; i < 5; i++)
+            skillSet.AddSkill(new MeleeAttackSkill(_pawn, new Point[] { Point.Right, Point.Right * 2}));
 
         _boardRef.Board.AddPawn(_pawn);
 

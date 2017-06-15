@@ -8,7 +8,8 @@ using LostGen;
 [RequireComponent(typeof(MeshFilter))]
 public class BlockMesh : MonoBehaviour
 {
-    public Point Size;
+	public Point Size { get { return _size; } }
+    [SerializeField]private Point _size;
     private static readonly byte[,] _BLOCK_SIDE_INDICES = new byte[,]
 	{
         {0, 1, 2, 3}, // Top
@@ -53,19 +54,19 @@ public class BlockMesh : MonoBehaviour
 
 	public bool InBounds(Point point)
 	{
-		return point.X >= 0 && point.X < Size.X && point.Y >= 0 && point.Y < Size.Y && point.Z >= 0 && point.Z < Size.Z;
+		return point.X >= 0 && point.X < _size.X && point.Y >= 0 && point.Y < _size.Y && point.Z >= 0 && point.Z < _size.Z;
 	}
     public void SetBlock(Point point, byte blockType)
     {
-        if (point.X >= -1 && point.X <= Size.X &&
-			point.Y >= -1 && point.Y <= Size.Y &&
-			point.Z >= -1 && point.Z <= Size.Z)
+        if (point.X >= -1 && point.X <= _size.X &&
+			point.Y >= -1 && point.Y <= _size.Y &&
+			point.Z >= -1 && point.Z <= _size.Z)
         {
             _blocks[point.X + 1, point.Y + 1, point.Z + 1] = blockType;
         }
         else
         {
-            throw new ArgumentOutOfRangeException("point", "Given point " + point + " is outside the bounds " + Size + " of this BlockMesh");
+            throw new ArgumentOutOfRangeException("point", "Given point " + point + " is outside the bounds " + _size + " of this BlockMesh");
         }
     }
 
@@ -77,12 +78,7 @@ public class BlockMesh : MonoBehaviour
             Array.Copy(_blocks, newBlocks, Math.Min(newBlocks.Length, _blocks.Length));
         }
         _blocks = newBlocks;
-        Size = size;
-    }
-
-    public void Resize(bool retainBlocks = false)
-    {
-        Resize(Size, retainBlocks);
+        _size = size;
     }
 
 	public void Clear()
@@ -93,8 +89,8 @@ public class BlockMesh : MonoBehaviour
     public void Build()
     {
 		Point size = new Point(_blocks.GetLength(0) - 2, _blocks.GetLength(1) - 2, _blocks.GetLength(2) - 2);
-		if (size != Size) {
-			Resize(true);
+		if (size != _size) {
+			Resize(size, true);
 		}
 
 		Point point = new Point();
@@ -102,11 +98,11 @@ public class BlockMesh : MonoBehaviour
 		List<int> triangles = new List<int>();
 		List<Vector2> uvs = new List<Vector2>();
 
-		for (point.X = 0; point.X < Size.X; point.X++)
+		for (point.X = 0; point.X < _size.X; point.X++)
 		{
-			for (point.Y = 0; point.Y < Size.Y; point.Y++)
+			for (point.Y = 0; point.Y < _size.Y; point.Y++)
 			{
-				for (point.Z = 0; point.Z < Size.Z; point.Z++)
+				for (point.Z = 0; point.Z < _size.Z; point.Z++)
 				{	
 					Vector3 blockCenter = PointVector.ToVector(point);
 					int blockType = _blocks[point.X + 1, point.Y + 1, point.Z + 1];
@@ -200,7 +196,7 @@ public class BlockMesh : MonoBehaviour
     #region MonoBehaviour
     private void Awake()
     {
-        _blocks = new byte[Size.X + 2, Size.Y + 2, Size.Z + 2];
+        _blocks = new byte[_size.X + 2, _size.Y + 2, _size.Z + 2];
         _meshFilter = GetComponent<MeshFilter>();
     }
     #endregion MonoBehaviour

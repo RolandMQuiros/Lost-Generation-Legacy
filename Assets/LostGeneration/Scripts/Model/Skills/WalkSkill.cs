@@ -41,7 +41,7 @@ namespace LostGen
 
         public override IEnumerable<Point> GetPath()
         {
-            yield return Target;
+            return Enumerable.Empty<Point>();
         }
 
         public override PawnAction Fire()

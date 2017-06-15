@@ -43,9 +43,7 @@ public class BlockMeshTest : MonoBehaviour {
 		_blockMesh.Build();
 	}
 	
-	void BuildMesh() {
-		_blockMesh.Resize();
-		
+	void BuildMesh() {		
 		for (int x = 0; x < _blockMesh.Size.X; x++) {
 			for (int y = 0; y < _blockMesh.Size.Y; y++) {
 				for (int z = 0; z < _blockMesh.Size.Z; z++) {
