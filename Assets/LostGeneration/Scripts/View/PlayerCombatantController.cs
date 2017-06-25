@@ -7,19 +7,50 @@ using LostGen;
 
 public class PlayerCombatantController : MonoBehaviour
 {
+    public int TimelineStep
+    {
+        get { return _step; }
+        set { SetStep(value); }
+    };
+
     [Serializable]
     public class CombatantEvent : UnityEvent<Combatant> { }
 
     public CombatantEvent CombatantActivated;
     private List<Combatant> _combatants = new List<Combatant>();
+    private Dictionary<Combatant, PawnActionTimeline> _timelines = new Dictionary<Combatant, PawnActionTimeline>();
     private Combatant _activeCombatant = null;
     private int _activeIdx = 0;
 
+    private int _step = 0;
+    
     public void AddCombatant(Combatant combatant)
     {
         if (!_combatants.Contains(combatant))
         {
             _combatants.Add(combatant);
+            _timelines.Insert
+            PawnActionTimeline timeline = new PawnActionTimeline();
+            timeline.SetStep(_step);
+            _timelines[combatant] = timeline;
+        }
+    }
+    
+    public void PushAction(Combatant combatant, PawnAction action)
+    {
+        PawnActionTimeline timeline;
+        if (_timelines.TryGetValue(combatant, ref timeline))
+        {
+            timeline.TruncateAt(_step);
+            timeline.PushBack(action);
+        }
+    }
+
+    public void SetStep(int step)
+    {
+        foreach (PawnActionTimeline timeline in _timelines.Values)
+        {
+            timeline.SetStep(step);
         }
     }
 

@@ -25,7 +25,9 @@ namespace LostGen
         public override IEnumerable<Point> GetRange()
         {
             BuildRange();
-            return _neighbors;
+            List<Point> neighbors = new List<Point>(_neighbors);
+            neighbors.Add(Owner.Position);
+            return neighbors;
         }
 
         public override bool InRange(Point point)
