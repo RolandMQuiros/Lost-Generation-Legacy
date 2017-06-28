@@ -109,29 +109,34 @@ public class BoardTest : MonoBehaviour
 
     private void Update()
     {   
-        Point offset = new Point();
-        if (Input.GetKeyDown(KeyCode.W)) {
-            offset = Point.Forward;
-        }
-        else if (Input.GetKeyDown(KeyCode.A))
-        {
-            offset = Point.Left;
-        }
-        else if (Input.GetKeyDown(KeyCode.S))
-        {
-            offset = Point.Backward;
-        }
-        else if (Input.GetKeyDown(KeyCode.D))
-        {
-            offset = Point.Right;
-        }
+        // Point offset = new Point();
+        // if (Input.GetKeyDown(KeyCode.W)) {
+        //     offset = Point.Forward;
+        // }
+        // else if (Input.GetKeyDown(KeyCode.A))
+        // {
+        //     offset = Point.Left;
+        // }
+        // else if (Input.GetKeyDown(KeyCode.S))
+        // {
+        //     offset = Point.Backward;
+        // }
+        // else if (Input.GetKeyDown(KeyCode.D))
+        // {
+        //     offset = Point.Right;
+        // }
 
-        if (offset != Point.Zero)
+        // if (offset != Point.Zero)
+        // {
+        //     _pawn.PushAction(new MoveAction(_pawn, _pawn.Position, _pawn.Position + offset, true));
+        //     _boardRef.Step();
+        //     _pawnManager.DistributeMessages();
+        // }
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            _pawn.PushAction(new MoveAction(_pawn, _pawn.Position, _pawn.Position + offset, true));
             _boardRef.Step();
-            _pawnManager.DistributeMessages();
-        }
+            _pawnManager.DistributeMessages();   
+        }   
     }
     #endregion MonoBehaviour
 }
