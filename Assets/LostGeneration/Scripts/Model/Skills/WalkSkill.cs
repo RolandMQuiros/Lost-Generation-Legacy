@@ -48,11 +48,12 @@ namespace LostGen
 
         public override PawnAction Fire()
         {
-            if (!InRange(Target))
+            PawnAction move = null;
+            if (InRange(Target))
             {
-                throw new IndexOutOfRangeException("WalkSkill's target is outside its range");
+                move = new MoveAction(Owner, Owner.Position, Target, true);
             }
-            return new MoveAction(Owner, Owner.Position, Target, true);
+            return move;
         }
 
         private void BuildRange()

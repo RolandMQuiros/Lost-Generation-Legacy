@@ -4,25 +4,16 @@ using UnityEngine;
 using UnityEngine.Events;
 using LostGen;
 
-public class CombatantView : PawnComponentView {
+[RequireComponent(typeof(CombatantAnimator))]
+public class CombatantView : PawnComponentView
+{
 	#region EditorFields
-	/// <summary>Time needed to move across one block</summary>
-	[TooltipAttribute("Time needed to move across one block")]
-	public float MoveDuration = 0.5f;
 	/// <summary>Invoked when this CombatantView's coroutines finish.</summary>
 	[TooltipAttribute("Invoked when this CombatantView's coroutines finish")]
 	public UnityEvent Finished;
 	#endregion EditorFields
-	public Pawn Pawn;
+	private CombatantAnimator _view;
 	private Dictionary<IPawnMessage, Coroutine> _activeRuns = new Dictionary<IPawnMessage, Coroutine>();
-	private Animator _animator;
-	private int _runTrigger = Animator.StringToHash("Base Layer.Grounded");
-
-	#region MonoBehaviour
-	private void Awake() {
-		_animator = GetComponent<Animator>();
-	}
-	#endregion MonoBehaviour
 
 	/// <summary>
     /// Takes a message and starts a Coroutine based on that message.
@@ -37,7 +28,7 @@ public class CombatantView : PawnComponentView {
 		if (Pawn == message.Source) {
 			MoveMessage move = message as MoveMessage;
 			if (move != null) {
-				Coroutine moveCo = StartCoroutine(Move(move));
+				Coroutine moveCo = StartCoroutine(OnMoveMessage(move));
 				_activeRuns.Add(move, moveCo);
 			}
 		}
@@ -51,31 +42,17 @@ public class CombatantView : PawnComponentView {
 		}
 	}
 
-	private IEnumerator Move(MoveMessage move) {
-		Vector3 from = PointVector.ToVector(move.From);
-		Vector3 to = PointVector.ToVector(move.To);
-
-		Quaternion rotFrom = transform.rotation;
-		Quaternion rotTo = Quaternion.LookRotation((to - from).normalized, Vector3.up);
-
-		Vector3 step = (to - from) / MoveDuration;
-		float time = 0f;
-
-		_animator.SetFloat("Run", 1f);
-		while (time < MoveDuration) {
-			time += Time.deltaTime;
-			transform.position = Vector3.Lerp(from, to, time / MoveDuration);
-			transform.rotation = Quaternion.Lerp(rotFrom, rotTo, time / (MoveDuration / 5f));
-			
-			yield return null;
-		}
-		_animator.SetFloat("Run", 0f);
-
-		transform.position = to;
-		transform.rotation = rotTo;
-
+	private IEnumerator OnMoveMessage(MoveMessage move)
+	{
+		yield return _view.Move(move.From, move.To);
 		Finish(move);
 	}
 
 
+	#region MonoBehaviour
+	private void Awake()
+	{
+		_view = GetComponent<CombatantAnimator>();
+	}
+	#endregion MonoBehaviour
 }

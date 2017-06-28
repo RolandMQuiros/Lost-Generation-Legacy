@@ -5,9 +5,10 @@ using LostGen;
 
 public class PawnActionTimeline
 {
+    public Pawn Pawn { get; }
     public int Step { get { return _step; } }
     public int Count { get { return _actions.Count; } }
-
+    
     private List<PawnAction> _actions = new List<PawnAction>();
     private int _step;
 
@@ -18,7 +19,6 @@ public class PawnActionTimeline
 
     public void TruncateAt(int step)
     {
-        SetStep(step);
         _actions.RemoveRange(step, _actions.Count - step);
     }
 
@@ -40,7 +40,7 @@ public class PawnActionTimeline
 
     public void SetStep(int step)
     {
-        if (step < _actions.Count)
+        if (step <= _actions.Count)
         {
             int deltaStep = _step - step;
             if (deltaStep > 0)

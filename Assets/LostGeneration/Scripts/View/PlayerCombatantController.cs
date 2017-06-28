@@ -5,18 +5,21 @@ using UnityEngine;
 using UnityEngine.Events;
 using LostGen;
 
+[RequireComponent(typeof(SkillController))]
 public class PlayerCombatantController : MonoBehaviour
 {
     public int TimelineStep
     {
         get { return _step; }
         set { SetStep(value); }
-    };
+    }
 
     [Serializable]
     public class CombatantEvent : UnityEvent<Combatant> { }
 
     public CombatantEvent CombatantActivated;
+    
+    private SkillController _skillController;
     private List<Combatant> _combatants = new List<Combatant>();
     private Dictionary<Combatant, PawnActionTimeline> _timelines = new Dictionary<Combatant, PawnActionTimeline>();
     private Combatant _activeCombatant = null;
@@ -29,20 +32,19 @@ public class PlayerCombatantController : MonoBehaviour
         if (!_combatants.Contains(combatant))
         {
             _combatants.Add(combatant);
-            _timelines.Insert
             PawnActionTimeline timeline = new PawnActionTimeline();
-            timeline.SetStep(_step);
             _timelines[combatant] = timeline;
         }
     }
     
-    public void PushAction(Combatant combatant, PawnAction action)
+    public void SetAction(PawnAction action)
     {
         PawnActionTimeline timeline;
-        if (_timelines.TryGetValue(combatant, ref timeline))
+        if (_timelines.TryGetValue(action.Owner.GetComponent<Combatant>(), out timeline))
         {
             timeline.TruncateAt(_step);
             timeline.PushBack(action);
+            SetStep(_step + 1);
         }
     }
 
@@ -71,6 +73,7 @@ public class PlayerCombatantController : MonoBehaviour
             if (_activeCombatant != _combatants[_activeIdx])
             {
                 _activeCombatant = _combatants[_activeIdx];
+                _skillController.OnCombatantActivated(_activeCombatant);
                 CombatantActivated.Invoke(_activeCombatant);
             }
         }
@@ -80,5 +83,10 @@ public class PlayerCombatantController : MonoBehaviour
         }
 
         return _activeCombatant;
+    }
+
+    private void Awake()
+    {
+        _skillController = GetComponent<SkillController>();
     }
 }

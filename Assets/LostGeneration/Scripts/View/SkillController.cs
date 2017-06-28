@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using LostGen;
 
+[RequireComponent(typeof(PlayerCombatantController))]
 public class SkillController : MonoBehaviour
 {
 
@@ -12,7 +13,12 @@ public class SkillController : MonoBehaviour
     {
         get { return _skillSet; }
     }
+
     public SkillEvent SkillActivated;
+    public SkillEvent SkillFired;
+
+    private PlayerCombatantController _playerController;
+
     private SkillSet _skillSet;
     private ISkill _activeSkill;
 
@@ -28,5 +34,23 @@ public class SkillController : MonoBehaviour
     public void OnCombatantActivated(Combatant combatant)
     {
         _skillSet = combatant.Pawn.GetComponent<SkillSet>();
+    }
+
+    public void FireActiveSkill()
+    {
+        if (_activeSkill != null)
+        {
+            PawnAction action = _activeSkill.Fire();
+            if (action != null)
+            {
+                _playerController.SetAction(action);
+                SkillFired.Invoke(_activeSkill);
+            }
+        }
+    }
+
+    private void Awake()
+    {
+        _playerController = GetComponent<PlayerCombatantController>();
     }
 }
