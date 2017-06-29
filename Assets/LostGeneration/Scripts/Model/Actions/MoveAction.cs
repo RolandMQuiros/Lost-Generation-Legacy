@@ -1,6 +1,10 @@
 ﻿namespace LostGen {
     public class MoveAction : PawnAction {
         public override int Cost { get { return Point.TaxicabDistance(_start, _end); } }
+        public Point Start { get { return _start; } }
+        public Point End { get { return _end; } }
+        public bool IsContinuous{ get { return _isContinuous; } }
+        
         private Point _start;
         private Point _end;
         private bool _isContinuous;

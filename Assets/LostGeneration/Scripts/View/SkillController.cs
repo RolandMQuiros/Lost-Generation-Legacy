@@ -4,6 +4,7 @@ using UnityEngine.Events;
 using LostGen;
 
 [RequireComponent(typeof(PlayerCombatantController))]
+[RequireComponent(typeof(PlayerTimelines))]
 public class SkillController : MonoBehaviour
 {
 
@@ -18,6 +19,7 @@ public class SkillController : MonoBehaviour
     public SkillEvent SkillFired;
 
     private PlayerCombatantController _playerController;
+    private PlayerTimelines _timelines;
 
     private SkillSet _skillSet;
     private ISkill _activeSkill;
@@ -43,7 +45,7 @@ public class SkillController : MonoBehaviour
             PawnAction action = _activeSkill.Fire();
             if (action != null)
             {
-                _playerController.SetAction(action);
+                _timelines.SetAction(action);
                 SkillFired.Invoke(_activeSkill);
             }
         }
@@ -52,5 +54,6 @@ public class SkillController : MonoBehaviour
     private void Awake()
     {
         _playerController = GetComponent<PlayerCombatantController>();
+        _timelines = GetComponent<PlayerTimelines>();
     }
 }

@@ -6,22 +6,18 @@ using UnityEngine.Events;
 using LostGen;
 
 [RequireComponent(typeof(SkillController))]
+[RequireComponent(typeof(PlayerTimelines))]
 public class PlayerCombatantController : MonoBehaviour
 {
-    public int TimelineStep
-    {
-        get { return _step; }
-        set { SetStep(value); }
-    }
-
     [Serializable]
     public class CombatantEvent : UnityEvent<Combatant> { }
 
     public CombatantEvent CombatantActivated;
     
     private SkillController _skillController;
+    private PlayerTimelines _timelines;
+
     private List<Combatant> _combatants = new List<Combatant>();
-    private Dictionary<Combatant, PawnActionTimeline> _timelines = new Dictionary<Combatant, PawnActionTimeline>();
     private Combatant _activeCombatant = null;
     private int _activeIdx = 0;
 
@@ -32,30 +28,10 @@ public class PlayerCombatantController : MonoBehaviour
         if (!_combatants.Contains(combatant))
         {
             _combatants.Add(combatant);
-            PawnActionTimeline timeline = new PawnActionTimeline();
-            _timelines[combatant] = timeline;
+            _timelines.AddPawn(combatant.Pawn);
         }
     }
     
-    public void SetAction(PawnAction action)
-    {
-        PawnActionTimeline timeline;
-        if (_timelines.TryGetValue(action.Owner.GetComponent<Combatant>(), out timeline))
-        {
-            timeline.TruncateAt(_step);
-            timeline.PushBack(action);
-            SetStep(_step + 1);
-        }
-    }
-
-    public void SetStep(int step)
-    {
-        foreach (PawnActionTimeline timeline in _timelines.Values)
-        {
-            timeline.SetStep(step);
-        }
-    }
-
     public Combatant CycleForward()
     {
         if (_combatants.Count > 0)
@@ -88,5 +64,6 @@ public class PlayerCombatantController : MonoBehaviour
     private void Awake()
     {
         _skillController = GetComponent<SkillController>();
+        _timelines = GetComponent<PlayerTimelines>();
     }
 }
