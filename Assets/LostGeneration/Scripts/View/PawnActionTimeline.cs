@@ -54,16 +54,16 @@ public class PawnActionTimeline
     {
         if (step >= 0 && step < _count)
         {
+            // If the current node is out-of-bounds, bring it back in
+            if (_step >= _count)
+            {
+                _current = _tail;
+            }
+
             // Delete everything after the given step
             while (_count > step)
             {
-                // If we pass by the current node, move it back in the timeline
-                if (_count - 1 <= _step)
-                {
-                    _current = _tail;
-                }
-
-                while (_count - 1 <= _step)
+                while (_count <= _step)
                 {
                     PawnAction action = Back();
                     if (action != null && undone != null)

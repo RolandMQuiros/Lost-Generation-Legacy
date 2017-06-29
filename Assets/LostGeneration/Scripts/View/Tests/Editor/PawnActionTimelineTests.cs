@@ -28,7 +28,9 @@ namespace Tests
 		public void Truncate()
 		{
 			PawnActionTimeline timeline = new PawnActionTimeline();
-			timeline.PushAction(new TestMoveAction(null, Point.Zero, Point.One));
+			PawnAction action = new TestMoveAction(null, Point.Zero, Point.One);
+			timeline.PushAction(action);
+			Assert.AreEqual(action, timeline.Next());
 
 			List<PawnAction> undone = new List<PawnAction>();
 			timeline.TruncateAt(0, undone);
@@ -70,7 +72,9 @@ namespace Tests
 			PawnActionTimeline timeline = new PawnActionTimeline();
 			for (int i = 0; i < 10; i++)
 			{
-				timeline.PushAction(new TestMoveAction(null, Point.Zero, Point.One));
+				PawnAction action = new TestMoveAction(null, Point.Zero, Point.One);
+				timeline.PushAction(action);
+				Assert.AreEqual(action, timeline.Next());
 			}
 
 			List<PawnAction> undone = new List<PawnAction>();
