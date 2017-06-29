@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 3110d58228a315b408db93ee8d0141bd
-timeCreated: 1497321851
+timeCreated: 1497812209
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -8,6 +8,7 @@ TextureImporter:
     21300002: Sprite_BoardSelector_White
     21300004: Sprite_BoardSelector_Red
     21300006: Sprite_BoardSelector_Green
+    21300008: Sprite_TileNode
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -116,7 +117,7 @@ TextureImporter:
         width: 128
         height: 8
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -128,6 +129,19 @@ TextureImporter:
         y: 96
         width: 128
         height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Sprite_TileNode
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 6
+        height: 6
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

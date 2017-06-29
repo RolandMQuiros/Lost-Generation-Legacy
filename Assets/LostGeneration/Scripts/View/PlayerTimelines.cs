@@ -75,7 +75,7 @@ public class PlayerTimelines : MonoBehaviour {
 		foreach (KeyValuePair<Pawn, PawnActionTimeline> pair in _timelines)
 		{
 			// Push all actions on the timeline into the Pawn's action queue
-			pair.Key.PushActions(pair.Value.Actions);
+			pair.Key.PushActions(pair.Value.GetPawnActions());
 
 			// Undo all actions on the timeline, so we're at the proper state
 			pair.Value.Clear();
