@@ -18,7 +18,7 @@ public class PawnManager : MonoBehaviour
     [TooltipAttribute("Temporary Prefab used to generate Pawns with Combatant components.")]
     [SerializeField]private GameObject _combatantPrefab;
     
-    [SerializeField]private PlayerTimelines _timelines;
+    [SerializeField]private PlayerTimelineController _timelines;
     public PawnViewEvent PawnViewAdded;
     public PawnViewEvent PawnViewRemoved;
 

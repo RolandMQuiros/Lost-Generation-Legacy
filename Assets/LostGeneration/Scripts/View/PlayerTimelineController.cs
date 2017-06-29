@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LostGen;
 
-public class PlayerTimelines : MonoBehaviour {
+public class PlayerTimelineController : MonoBehaviour {
 	public int Step
 	{
 		get { return _step; }
@@ -36,18 +36,18 @@ public class PlayerTimelines : MonoBehaviour {
 			while (timeline.Step > _step)
 			{
 				PawnAction undone = timeline.Back();
-				if (ActionUndone != null) { ActionUndone(undone); } 
+				if (undone != null && ActionUndone != null) { ActionUndone(undone); } 
 			}
 
 			while (timeline.Step < _step)
 			{
 				PawnAction done = timeline.Next();
-				if (ActionDone != null) { ActionDone(done); }
+				if (done != null && ActionDone != null) { ActionDone(done); }
 			}
 		}
 	}
 
-	public void TruncateTimeline(Pawn pawn)
+	public void TruncateToStep(Pawn pawn)
 	{
 		PawnActionTimeline timeline;
 		if (_timelines.TryGetValue(pawn, out timeline))
@@ -83,6 +83,7 @@ public class PlayerTimelines : MonoBehaviour {
 			// Do the new action
 			PawnAction done = timeline.Next();
 			if (ActionDone != null) { ActionDone(done); }
+			SetStep(_step + 1);
 		}
 	}
 

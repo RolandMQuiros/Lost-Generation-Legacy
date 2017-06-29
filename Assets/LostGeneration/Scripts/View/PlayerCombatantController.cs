@@ -6,7 +6,7 @@ using UnityEngine.Events;
 using LostGen;
 
 [RequireComponent(typeof(SkillController))]
-[RequireComponent(typeof(PlayerTimelines))]
+[RequireComponent(typeof(PlayerTimelineController))]
 public class PlayerCombatantController : MonoBehaviour
 {
     [Serializable]
@@ -15,7 +15,7 @@ public class PlayerCombatantController : MonoBehaviour
     public CombatantEvent CombatantActivated;
     
     private SkillController _skillController;
-    private PlayerTimelines _timelines;
+    private PlayerTimelineController _timelines;
 
     private List<Combatant> _combatants = new List<Combatant>();
     private Combatant _activeCombatant = null;
@@ -64,6 +64,6 @@ public class PlayerCombatantController : MonoBehaviour
     private void Awake()
     {
         _skillController = GetComponent<SkillController>();
-        _timelines = GetComponent<PlayerTimelines>();
+        _timelines = GetComponent<PlayerTimelineController>();
     }
 }
