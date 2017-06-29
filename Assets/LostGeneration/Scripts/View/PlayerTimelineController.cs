@@ -16,6 +16,8 @@ public class PlayerTimelineController : MonoBehaviour {
 	private Dictionary<Pawn, PawnActionTimeline> _timelines = new Dictionary<Pawn, PawnActionTimeline>();
 	private int _step = 0;
 
+	[SerializeField]private int _debugStep;
+
 	public void AddPawn(Pawn pawn)
 	{
 		PawnActionTimeline timeline = new PawnActionTimeline();
@@ -30,21 +32,28 @@ public class PlayerTimelineController : MonoBehaviour {
 
 	public void SetStep(int step)
 	{
-		_step = step;
+		int maxStep = 0;
 		foreach (PawnActionTimeline timeline in _timelines.Values)
 		{
-			while (timeline.Step > _step)
+			if (timeline.Count - 1 > maxStep)
 			{
-				PawnAction undone = timeline.Back();
-				if (undone != null && ActionUndone != null) { ActionUndone(undone); } 
+				maxStep = timeline.Count - 1;
 			}
 
-			while (timeline.Step < _step)
+			PawnAction undone;
+			while (timeline.Step > Math.Max(0, _step) && (undone = timeline.Back()) != null)
 			{
-				PawnAction done = timeline.Next();
-				if (done != null && ActionDone != null) { ActionDone(done); }
+				if (ActionUndone != null) { ActionUndone(undone); } 
+			}
+
+			PawnAction done;
+			while (timeline.Step < Math.Min(timeline.Count, _step) && (done = timeline.Next()) != null)
+			{
+				if (ActionDone != null) { ActionDone(done); }
 			}
 		}
+		//_step = Math.Min(Math.Max(0, step), maxStep);
+		_step = step;
 	}
 
 	public void TruncateToStep(Pawn pawn)
@@ -97,5 +106,18 @@ public class PlayerTimelineController : MonoBehaviour {
 			// Undo all actions on the timeline, so we're at the proper state
 			pair.Value.Clear();
 		}
+	}
+
+	private void Update()
+	{
+		if (Input.GetKeyDown(KeyCode.LeftBracket))
+		{
+			SetStep(_step - 1);
+		}
+		if (Input.GetKeyDown(KeyCode.RightBracket))
+		{
+			SetStep(_step + 1);
+		}
+		_debugStep = _step;
 	}
 }

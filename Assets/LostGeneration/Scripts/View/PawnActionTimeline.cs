@@ -79,12 +79,6 @@ public class PawnActionTimeline
     {
         if (step >= 0 && step < _count)
         {
-            // If the current node is out-of-bounds, bring it back in
-            if (_step >= _count)
-            {
-                _current = _tail;
-            }
-
             // Delete everything after the given step
             while (_count > step)
             {
@@ -130,6 +124,7 @@ public class PawnActionTimeline
     public PawnAction Next()
     {
         PawnAction currentAction = null;
+
         if (_current != null)
         {
             currentAction = _current.Action;
@@ -139,10 +134,14 @@ public class PawnActionTimeline
         }
         return currentAction;
     }
+    
 
+    // PROBLEM: _current going past bounds into null is expected by some parts, and not by others.
+    //          Figure out how to add sentinel nodes without breaking your unit tests!
     public PawnAction Back()
     {
         PawnAction currentAction = null;
+
         if (_current != null)
         {
             currentAction = _current.Action;
