@@ -29,8 +29,15 @@ public class SkillController : MonoBehaviour
         if (_skillSet.HasSkill(skill))
         {
             _activeSkill = skill;
+            _timelines.TruncateTimeline(skill.Owner);
             SkillActivated.Invoke(_activeSkill);
         }
+    }
+
+    public void DeactivateSkill()
+    {
+        _activeSkill = null;
+        SkillActivated.Invoke(null);
     }
     
     public void OnCombatantActivated(Combatant combatant)
@@ -47,6 +54,7 @@ public class SkillController : MonoBehaviour
             {
                 _timelines.SetAction(action);
                 SkillFired.Invoke(_activeSkill);
+                DeactivateSkill();
             }
         }
     }

@@ -37,7 +37,46 @@ namespace Tests
 			
 			TestMoveAction undoneMove = (TestMoveAction)undone[0];
 			Point undoneTo = undoneMove.To;
-			// Assert.AreEqual(Point.One, undoneTo);
+			Assert.AreEqual(Point.One, undoneTo);
+		}
+
+		[Test]
+		public void TruncateEmpty()
+		{
+			PawnActionTimeline timeline = new PawnActionTimeline();	
+			timeline.TruncateAt(0);
+		}
+
+		[Test]
+		public void BigTruncate()
+		{
+			PawnActionTimeline timeline = new PawnActionTimeline();
+			for (int i = 0; i < 10; i++)
+			{
+				PawnAction action = new TestMoveAction(null, Point.Zero, Point.One);
+				timeline.PushAction(action);
+				Assert.AreEqual(action, timeline.Next());
+			}
+
+			List<PawnAction> undone = new List<PawnAction>();
+			timeline.TruncateAt(0, undone);
+
+			Assert.AreEqual(10, undone.Count);
+		}
+
+		[Test]
+		public void TruncateHalf()
+		{
+			PawnActionTimeline timeline = new PawnActionTimeline();
+			for (int i = 0; i < 10; i++)
+			{
+				timeline.PushAction(new TestMoveAction(null, Point.Zero, Point.One));
+			}
+
+			List<PawnAction> undone = new List<PawnAction>();
+			timeline.TruncateAt(5, undone);
+
+			Assert.AreEqual(5, undone.Count);
 		}
 	}
 

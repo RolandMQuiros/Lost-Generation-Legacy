@@ -23,7 +23,18 @@ public class SkillSelector : MonoBehaviour
 
 	public void SetSkill(ISkill skill)
 	{
-		if (skill != null && _skill != skill)
+		if (skill == null)
+		{
+			_skill = null;
+			_aoe = null;
+			_ranged = null;
+			_directional = null;
+			
+			_areaOfEffectMesh.gameObject.SetActive(false);
+			_rangeMesh.gameObject.SetActive(false);
+			_pathMesh.gameObject.SetActive(false);
+		}
+		else if (_skill != skill)
 		{	
 			_areaOfEffectMesh.gameObject.SetActive(false);
 			_rangeMesh.gameObject.SetActive(false);

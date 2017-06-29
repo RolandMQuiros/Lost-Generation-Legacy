@@ -52,7 +52,7 @@ public class CombatantActionView : MonoBehaviour {
 		Vector3 end = PointVector.ToVector(move.End);
 		
 		transform.position = start;
-		transform.rotation = Quaternion.FromToRotation(start, start - end);
+		transform.rotation = Quaternion.AngleAxis(Vector3.Angle(start, end), Vector3.up);
 	}
 
 	#endregion PawnActionMethods

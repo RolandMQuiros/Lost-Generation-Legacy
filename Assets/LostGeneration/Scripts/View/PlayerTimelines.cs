@@ -47,6 +47,22 @@ public class PlayerTimelines : MonoBehaviour {
 		}
 	}
 
+	public void TruncateTimeline(Pawn pawn)
+	{
+		PawnActionTimeline timeline;
+		if (_timelines.TryGetValue(pawn, out timeline))
+		{
+			// Undo all actions that have been set after the current step
+			List<PawnAction> undone = new List<PawnAction>();
+			timeline.TruncateAt(_step, undone);
+			for (int i = 0; i < undone.Count; i++)
+			{
+				// Unwind the deleted actions
+				if (ActionUndone != null) { ActionUndone(undone[i]); }
+			}
+		}
+	}
+
 	public void SetAction(PawnAction action)
 	{
 		PawnActionTimeline timeline;
