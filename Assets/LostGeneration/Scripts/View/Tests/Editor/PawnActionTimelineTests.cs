@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using UnityEngine.TestTools;
+//using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections.Generic;
 
@@ -31,6 +31,7 @@ namespace Tests
 			PawnAction action = new TestMoveAction(null, Point.Zero, Point.One);
 			timeline.PushAction(action);
 			Assert.AreEqual(action, timeline.Next());
+			Assert.IsNull(timeline.Next()); // Push us to the end of the timeline
 
 			List<PawnAction> undone = new List<PawnAction>();
 			timeline.TruncateAt(0, undone);
@@ -59,6 +60,7 @@ namespace Tests
 				timeline.PushAction(action);
 				Assert.AreEqual(action, timeline.Next());
 			}
+			Assert.IsNull(timeline.Next()); // Push us to the end of the timeline
 
 			List<PawnAction> undone = new List<PawnAction>();
 			timeline.TruncateAt(0, undone);
@@ -76,6 +78,7 @@ namespace Tests
 				timeline.PushAction(action);
 				Assert.AreEqual(action, timeline.Next());
 			}
+			Assert.IsNull(timeline.Next()); // Push us to the end of the timeline
 
 			List<PawnAction> undone = new List<PawnAction>();
 			timeline.TruncateAt(5, undone);

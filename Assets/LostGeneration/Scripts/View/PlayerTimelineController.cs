@@ -35,25 +35,27 @@ public class PlayerTimelineController : MonoBehaviour {
 		int maxStep = 0;
 		foreach (PawnActionTimeline timeline in _timelines.Values)
 		{
-			if (timeline.Count - 1 > maxStep)
+			if (timeline.Count > maxStep)
 			{
-				maxStep = timeline.Count - 1;
-			}
-
-			PawnAction undone;
-			while (timeline.Step > Math.Max(0, _step) && (undone = timeline.Back()) != null)
-			{
-				if (ActionUndone != null) { ActionUndone(undone); } 
-			}
-
-			PawnAction done;
-			while (timeline.Step < Math.Min(timeline.Count, _step) && (done = timeline.Next()) != null)
-			{
-				if (ActionDone != null) { ActionDone(done); }
+				maxStep = timeline.Count;
 			}
 		}
-		//_step = Math.Min(Math.Max(0, step), maxStep);
-		_step = step;
+		_step = Math.Min(Math.Max(0, step), maxStep);
+
+		foreach (PawnActionTimeline timeline in _timelines.Values)
+		{
+			while (timeline.Step > Math.Max(0, _step))
+			{
+				PawnAction undone = timeline.Back();
+				if (undone != null && ActionUndone != null) { ActionUndone(undone); } 
+			}
+
+			while (timeline.Step < Math.Min(timeline.Count, _step))
+			{
+				PawnAction done = timeline.Next();
+				if (done != null && ActionDone != null) { ActionDone(done); }
+			}
+		}
 	}
 
 	public void TruncateToStep(Pawn pawn)

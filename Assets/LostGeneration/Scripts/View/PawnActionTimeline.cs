@@ -18,7 +18,7 @@ public class PawnActionTimeline
     /// <summary>
     /// The index of the current action being observed.
     /// </summary>
-    public int Step { get { return _step; } }
+    public int Step { get { return _step + 1; } }
     /// <summary>
     /// The total number of PawnActions in this timeline
     /// </summary>
@@ -31,7 +31,15 @@ public class PawnActionTimeline
     /// <summary>The currently observed PawnAction in the timeline. Should always match the current value of Step.</summary>
     private Node _current = null;
     private int _count = 0;
-    private int _step;
+    private int _step = -1;
+
+    public PawnActionTimeline()
+    {
+        _head = new Node();
+        _tail = new Node() { Previous = _head };
+        _head.Next = _tail;
+        _current = _head;
+    }
 
     /// <summary>
     /// Adds a new action to the end of this PawnActionTimeline
@@ -45,22 +53,9 @@ public class PawnActionTimeline
         }
         else
         {
-            if (_head == null)
-            {
-                _head = new Node() { Action = action };
-                _tail = _head;
-                _current = _head;
-            }
-            else
-            {
-                _tail.Next = new Node() { Previous = _tail, Action = action };
-                _tail = _tail.Next;
-            }
-
-            if (_count == _step)
-            {
-                _current = _tail;
-            }
+            _tail.Action = action;
+            _tail.Next = new Node() { Previous = _tail };
+            _tail = _tail.Next;
             _count++;
         }
     }
@@ -72,17 +67,17 @@ public class PawnActionTimeline
     /// This is typically called when the player wants to rethink their strategy from a given step, allowing them to redo every action after the step while
     /// preserving what comes before.
     /// </summary>
-    /// <param name="step">The step from which to truncate the timeline.</param>
+    /// <param name="fromStep">The step from which to truncate the timeline.</param>
     /// <param name="undone">List of PawnActions that were undone by the truncate. Includes all actions between the currently observed Step and the given
     /// step parameter, inclusive.</param>
-    public void TruncateAt(int step, List<PawnAction> undone = null)
+    public void TruncateAt(int fromStep, List<PawnAction> undone = null)
     {
-        if (step >= 0 && step < _count)
+        if (fromStep >= 0 && fromStep < _count)
         {
             // Delete everything after the given step
-            while (_count > step)
+            while (_count > fromStep)
             {
-                while (_count <= _step)
+                while (_count <= _step - 1)
                 {
                     PawnAction action = Back();
                     if (action != null && undone != null)
@@ -95,14 +90,7 @@ public class PawnActionTimeline
                 Node previous = _tail.Previous;
                 _tail.Previous = null;
                 _tail = previous;
-                if (_tail != null)
-                {
-                    _tail.Next = null;
-                }
-                else
-                {
-                    _head = null;
-                }
+                _tail.Action = null;
                 _count--;
             }
         }
@@ -125,11 +113,11 @@ public class PawnActionTimeline
     {
         PawnAction currentAction = null;
 
-        if (_current != null)
+        if (_current.Next != null)
         {
-            currentAction = _current.Action;
-            currentAction.Do();
             _current = _current.Next;
+            currentAction = _current.Action;
+            if (currentAction != null) { currentAction.Do(); }
             _step++;
         }
         return currentAction;
@@ -142,11 +130,11 @@ public class PawnActionTimeline
     {
         PawnAction currentAction = null;
 
-        if (_current != null)
+        if (_current.Previous != null)
         {
-            currentAction = _current.Action;
-            currentAction.Undo();
             _current = _current.Previous;
+            currentAction = _current.Action;
+            if (currentAction != null) { currentAction.Undo(); }
             _step--;
         }
         return currentAction;
