@@ -29,10 +29,11 @@ namespace Tests
 		{
 			PawnActionTimeline timeline = new PawnActionTimeline();
 			PawnAction action = new TestMoveAction(null, Point.Zero, Point.One);
-			timeline.PushAction(action);
-			Assert.AreEqual(action, timeline.Next());
-			Assert.IsNull(timeline.Next()); // Push us to the end of the timeline
-
+			
+			timeline.PushAction(action);	
+			timeline.Next();
+			Assert.AreEqual(action, timeline.CurrentAction);
+			
 			List<PawnAction> undone = new List<PawnAction>();
 			timeline.TruncateAt(0, undone);
 
@@ -58,10 +59,10 @@ namespace Tests
 			{
 				PawnAction action = new TestMoveAction(null, Point.Zero, Point.One);
 				timeline.PushAction(action);
-				Assert.AreEqual(action, timeline.Next());
+				timeline.Next();
+				Assert.AreEqual(action, timeline.CurrentAction);
 			}
-			Assert.IsNull(timeline.Next()); // Push us to the end of the timeline
-
+			
 			List<PawnAction> undone = new List<PawnAction>();
 			timeline.TruncateAt(0, undone);
 
@@ -76,10 +77,9 @@ namespace Tests
 			{
 				PawnAction action = new TestMoveAction(null, Point.Zero, Point.One);
 				timeline.PushAction(action);
-				Assert.AreEqual(action, timeline.Next());
+				timeline.Next();
+				Assert.AreEqual(action, timeline.CurrentAction);
 			}
-			Assert.IsNull(timeline.Next()); // Push us to the end of the timeline
-
 			List<PawnAction> undone = new List<PawnAction>();
 			timeline.TruncateAt(5, undone);
 

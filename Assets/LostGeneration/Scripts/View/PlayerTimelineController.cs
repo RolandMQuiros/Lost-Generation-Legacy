@@ -46,14 +46,16 @@ public class PlayerTimelineController : MonoBehaviour {
 		{
 			while (timeline.Step > Math.Max(0, _step))
 			{
-				PawnAction undone = timeline.Back();
-				if (undone != null && ActionUndone != null) { ActionUndone(undone); } 
+				PawnAction undone = timeline.CurrentAction;
+				if (undone != null && ActionUndone != null) { ActionUndone(undone); }
+				timeline.Back(); 
 			}
 
 			while (timeline.Step < Math.Min(timeline.Count, _step))
 			{
-				PawnAction done = timeline.Next();
+				PawnAction done = timeline.CurrentAction;
 				if (done != null && ActionDone != null) { ActionDone(done); }
+				timeline.Next();
 			}
 		}
 	}
@@ -92,7 +94,8 @@ public class PlayerTimelineController : MonoBehaviour {
 			timeline.PushAction(action);
 
 			// Do the new action
-			PawnAction done = timeline.Next();
+			timeline.Next();
+			PawnAction done = timeline.CurrentAction;
 			if (ActionDone != null) { ActionDone(done); }
 			SetStep(_step + 1);
 		}
