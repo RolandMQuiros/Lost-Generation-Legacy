@@ -13,16 +13,19 @@ public class PlayerTimelineController : MonoBehaviour {
 	public event Action<PawnAction> ActionDone;
 	public event Action<PawnAction> ActionUndone;
 
-	private Dictionary<Pawn, PawnActionTimeline> _timelines = new Dictionary<Pawn, PawnActionTimeline>();
+	private Dictionary<Pawn, Timeline> _timelines = new Dictionary<Pawn, Timeline>();
 	private int _step = 0;
 
 	[SerializeField]private int _debugStep;
 
 	public void AddPawn(Pawn pawn)
 	{
-		PawnActionTimeline timeline = new PawnActionTimeline();
-		_timelines.Add(pawn, timeline);
-		SetStep(_step);
+		Timeline timeline = pawn.GetComponent<Timeline>();
+		if (timeline != null)
+		{
+			_timelines.Add(pawn, timeline);
+			SetStep(_step);
+		}
 	}
 
 	public bool RemovePawn(Pawn pawn)
@@ -33,7 +36,7 @@ public class PlayerTimelineController : MonoBehaviour {
 	public void SetStep(int step)
 	{
 		int maxStep = 0;
-		foreach (PawnActionTimeline timeline in _timelines.Values)
+		foreach (Timeline timeline in _timelines.Values)
 		{
 			if (timeline.Count > maxStep)
 			{
@@ -42,19 +45,21 @@ public class PlayerTimelineController : MonoBehaviour {
 		}
 		_step = Math.Min(Math.Max(0, step), maxStep);
 
-		foreach (PawnActionTimeline timeline in _timelines.Values)
+		foreach (Timeline timeline in _timelines.Values)
 		{
 			while (timeline.Step > Math.Max(0, _step))
 			{
 				PawnAction undone = timeline.CurrentAction;
-				if (undone != null && ActionUndone != null) { ActionUndone(undone); }
+				undone.Undo();
+				if (ActionUndone != null) { ActionUndone(undone); }
 				timeline.Back(); 
 			}
 
 			while (timeline.Step < Math.Min(timeline.Count, _step))
 			{
 				PawnAction done = timeline.CurrentAction;
-				if (done != null && ActionDone != null) { ActionDone(done); }
+				done.Do();
+				if (ActionDone != null) { ActionDone(done); }
 				timeline.Next();
 			}
 		}
@@ -62,7 +67,7 @@ public class PlayerTimelineController : MonoBehaviour {
 
 	public void TruncateToStep(Pawn pawn)
 	{
-		PawnActionTimeline timeline;
+		Timeline timeline;
 		if (_timelines.TryGetValue(pawn, out timeline))
 		{
 			// Undo all actions that have been set after the current step
@@ -78,7 +83,7 @@ public class PlayerTimelineController : MonoBehaviour {
 
 	public void SetAction(PawnAction action)
 	{
-		PawnActionTimeline timeline;
+		Timeline timeline;
 		if (_timelines.TryGetValue(action.Owner, out timeline))
 		{
 			// Undo all actions that have been set after the current step
@@ -103,7 +108,7 @@ public class PlayerTimelineController : MonoBehaviour {
 
 	public void ApplyTimelines()
 	{
-		foreach (KeyValuePair<Pawn, PawnActionTimeline> pair in _timelines)
+		foreach (KeyValuePair<Pawn, Timeline> pair in _timelines)
 		{
 			// Push all actions on the timeline into the Pawn's action queue
 			pair.Key.PushActions(pair.Value.GetPawnActions());

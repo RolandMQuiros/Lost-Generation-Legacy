@@ -7,7 +7,7 @@ namespace LostGen
     /// <summary>
     /// A buffer of PawnActions that the player can scroll through, previewing the results of each action.
     /// </summary>
-    public class PawnActionTimeline
+    public class Timeline : PawnComponent
     {
         private class Node
         {
@@ -82,6 +82,7 @@ namespace LostGen
                     while (_count - 1 <= _step)
                     {
                         PawnAction action = _current.Action; 
+                        action.Undo();
                         if (undone != null) { undone.Add(action); }
                         if (!Back()) { break; }
                     }
@@ -138,6 +139,14 @@ namespace LostGen
             {
                 yield return node.Action;
                 node = node.Next;
+            }
+        }
+
+        public void Apply()
+        {
+            foreach (PawnAction action in GetPawnActions())
+            {
+                Pawn.PushAction(action);
             }
         }
     }

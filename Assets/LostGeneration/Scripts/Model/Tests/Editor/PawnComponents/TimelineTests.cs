@@ -6,10 +6,10 @@ using System.Collections.Generic;
 
 using LostGen;
 
-namespace Tests
+namespace Tests.PawnComponents
 {
 
-	public class PawnActionTimelineTests
+	public class TimelineTests
 	{
 
 		private class TestMoveAction : PawnAction
@@ -27,7 +27,7 @@ namespace Tests
 		[Test]
 		public void Truncate()
 		{
-			PawnActionTimeline timeline = new PawnActionTimeline();
+			Timeline timeline = new Timeline();
 			PawnAction action = new TestMoveAction(null, Point.Zero, Point.One);
 			
 			timeline.PushAction(action);	
@@ -47,14 +47,14 @@ namespace Tests
 		[Test]
 		public void TruncateEmpty()
 		{
-			PawnActionTimeline timeline = new PawnActionTimeline();	
+			Timeline timeline = new Timeline();	
 			timeline.TruncateAt(0);
 		}
 
 		[Test]
 		public void BigTruncate()
 		{
-			PawnActionTimeline timeline = new PawnActionTimeline();
+			Timeline timeline = new Timeline();
 			for (int i = 0; i < 10; i++)
 			{
 				PawnAction action = new TestMoveAction(null, Point.Zero, Point.One);
@@ -72,7 +72,7 @@ namespace Tests
 		[Test]
 		public void TruncateHalf()
 		{
-			PawnActionTimeline timeline = new PawnActionTimeline();
+			Timeline timeline = new Timeline();
 			for (int i = 0; i < 10; i++)
 			{
 				PawnAction action = new TestMoveAction(null, Point.Zero, Point.One);
