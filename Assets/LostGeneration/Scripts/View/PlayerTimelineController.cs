@@ -12,6 +12,7 @@ public class PlayerTimelineController : MonoBehaviour {
 	}
 	public event Action<PawnAction> ActionDone;
 	public event Action<PawnAction> ActionUndone;
+	public event Action<PawnAction> ActionAdded;
 
 	private Dictionary<Pawn, Timeline> _timelines = new Dictionary<Pawn, Timeline>();
 	private int _step = 0;
@@ -47,20 +48,23 @@ public class PlayerTimelineController : MonoBehaviour {
 
 		foreach (Timeline timeline in _timelines.Values)
 		{
-			while (timeline.Step > Math.Max(0, _step))
+			if (!timeline.IsEmpty)
 			{
-				PawnAction undone = timeline.CurrentAction;
-				undone.Undo();
-				if (ActionUndone != null) { ActionUndone(undone); }
-				timeline.Back(); 
-			}
+				while (timeline.Step >= _step)
+				{
+					PawnAction undone = timeline.CurrentAction;
+					undone.Undo();
+					if (ActionUndone != null) { ActionUndone(undone); }
+					if (!timeline.Back()) { break; }
+				}
 
-			while (timeline.Step < Math.Min(timeline.Count, _step))
-			{
-				PawnAction done = timeline.CurrentAction;
-				done.Do();
-				if (ActionDone != null) { ActionDone(done); }
-				timeline.Next();
+				while (timeline.Step < _step)
+				{
+					PawnAction done = timeline.CurrentAction;
+					done.Do();
+					if (ActionDone != null) { ActionDone(done); }
+					if (!timeline.Next()) { break; }
+				}
 			}
 		}
 	}
@@ -101,7 +105,7 @@ public class PlayerTimelineController : MonoBehaviour {
 			// Do the new action
 			timeline.Next();
 			PawnAction done = timeline.CurrentAction;
-			if (ActionDone != null) { ActionDone(done); }
+			if (ActionAdded != null) { ActionAdded(done); }
 			SetStep(_step + 1);
 		}
 	}

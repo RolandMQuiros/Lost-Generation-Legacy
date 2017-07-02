@@ -16,8 +16,7 @@ public class CombatantActionView : MonoBehaviour {
 			MoveAction move = action as MoveAction;
 			if (move != null)
 			{
-				Coroutine moveCo = StartCoroutine(DoMove(move));
-				_activeRuns.Add(move, moveCo);
+				DoMove(move);
 			}
 		}
 	}
@@ -34,16 +33,36 @@ public class CombatantActionView : MonoBehaviour {
 		}
 	}
 
+	public void OnActionAdded(PawnAction action)
+	{
+		if (action.Owner == Pawn)
+		{
+			MoveAction move = action as MoveAction;
+			if (move != null)
+			{
+				Coroutine moveCo = StartCoroutine(AddMove(move));
+				_activeRuns.Add(move, moveCo);
+			}
+		}
+	}
 	private void Finish(PawnAction action) {
 		// Removes the action from the list of active Coroutines
 		_activeRuns.Remove(action);
 	}
 
 	#region PawnActionMethods
-	private IEnumerator DoMove(MoveAction move)
+
+	private IEnumerator AddMove(MoveAction move)
 	{
 		yield return _animator.Move(move.Start, move.End);
 		Finish(move);
+	}
+	private void DoMove(MoveAction move)
+	{
+		Vector3 start = PointVector.ToVector(move.Start);
+		Vector3 end = PointVector.ToVector(move.End);
+		
+		transform.position = end;
 	}
 
 	private void UndoMove(MoveAction move)

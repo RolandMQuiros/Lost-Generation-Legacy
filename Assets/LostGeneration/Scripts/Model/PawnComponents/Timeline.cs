@@ -25,7 +25,10 @@ namespace LostGen
         /// </summary>
         public int Count { get { return _count; } }
         public PawnAction CurrentAction { get { return (_current != null) ? _current.Action : null; } }
-        
+        public bool HasNext { get { return _current != null && _current.Next != null; } }
+        public bool HasPrevious { get { return _current != null && _current.Previous != null; } }
+        public bool IsEmpty { get { return _head == null; } }
+
         /// <summary>Front of the linked list. In lists with one element, the head and tail are the same.</summary>
         private Node _head = null;
         /// <summary>End of the linked list. In lists with one element, the head and tail are the same.</summary>
@@ -89,9 +92,17 @@ namespace LostGen
 
                     // Chop off the last node
                     Node previous = _tail.Previous;
-                    _tail.Previous = null;
-                    _tail.Action = null;
-                    _tail = previous;
+                    if (previous != null)
+                    {
+                        _tail.Previous = null;
+                        _tail.Action = null;
+                        _tail = previous;
+                    }
+                    else
+                    {
+                        _head = null;
+                        _tail = null;
+                    }
                     _count--;
                 }
             }
@@ -112,7 +123,7 @@ namespace LostGen
         /// <returns>The action that was Done. null if before the beginning or past the end.</returns>
         public bool Next()
         {
-            bool hasNext = _current.Next != null; 
+            bool hasNext = HasNext;
             if (hasNext)
             {
                 _current = _current.Next;
@@ -123,7 +134,7 @@ namespace LostGen
 
         public bool Back()
         {
-            bool hasPrevious = _current.Previous != null;
+            bool hasPrevious = HasPrevious;
             if (hasPrevious)
             {
                 _current = _current.Previous;

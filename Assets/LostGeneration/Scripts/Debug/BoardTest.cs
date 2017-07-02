@@ -101,6 +101,8 @@ public class BoardTest : MonoBehaviour
         for (int i = 0; i < 5; i++)
             skillSet.AddSkill(new MeleeAttackSkill(_pawn, new Point[] { Point.Right, Point.Right * 2}));
 
+        _pawn.AddComponent(new Timeline());
+        
         _boardRef.Board.AddPawn(_pawn);
 
         _playerController.AddCombatant(combatant);

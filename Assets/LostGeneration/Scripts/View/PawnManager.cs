@@ -58,6 +58,7 @@ public class PawnManager : MonoBehaviour
                     actionView.Pawn = pawn;
                     _timelines.ActionDone += actionView.OnActionDone;
                     _timelines.ActionUndone += actionView.OnActionUndone;
+                    _timelines.ActionAdded += actionView.OnActionAdded;
                 }
 
                 // Then, attach the MonoBehaviours to the MessageBuffer
