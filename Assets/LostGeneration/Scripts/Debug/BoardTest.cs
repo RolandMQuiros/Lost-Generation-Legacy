@@ -55,20 +55,6 @@ public class BoardTest : MonoBehaviour
                 );
             }
         }
-        // blocks.Add(new BoardBlock() {
-        //     Point = new Point(0, y, 0),
-        //     IsSolid = true,
-        //     IsOpaque = true,
-        //     IsDiggable = true,
-        //     BlockType = 1
-        // });
-        // blocks.Add(new BoardBlock() {
-        //     Point = new Point(_boardRef.Board.Size.X - 1, y, _boardRef.Board.Size.Z - 1),
-        //     IsSolid = true,
-        //     IsOpaque = true,
-        //     IsDiggable = true,
-        //     BlockType = 1
-        // });
 
         _boardRef.Board.SetBlocks(blocks);
     }
@@ -102,38 +88,15 @@ public class BoardTest : MonoBehaviour
             skillSet.AddSkill(new MeleeAttackSkill(_pawn, new Point[] { Point.Right, Point.Right * 2}));
 
         _pawn.AddComponent(new Timeline());
-        
-        _boardRef.Board.AddPawn(_pawn);
 
+        _boardRef.Board.AddPawn(_pawn);
+        _pawn.BeginTurn();
         _playerController.AddCombatant(combatant);
         Debug.Log(_playerController.CycleForward());
     }
 
     private void Update()
     {   
-        // Point offset = new Point();
-        // if (Input.GetKeyDown(KeyCode.W)) {
-        //     offset = Point.Forward;
-        // }
-        // else if (Input.GetKeyDown(KeyCode.A))
-        // {
-        //     offset = Point.Left;
-        // }
-        // else if (Input.GetKeyDown(KeyCode.S))
-        // {
-        //     offset = Point.Backward;
-        // }
-        // else if (Input.GetKeyDown(KeyCode.D))
-        // {
-        //     offset = Point.Right;
-        // }
-
-        // if (offset != Point.Zero)
-        // {
-        //     _pawn.PushAction(new MoveAction(_pawn, _pawn.Position, _pawn.Position + offset, true));
-        //     _boardRef.Step();
-        //     _pawnManager.DistributeMessages();
-        // }
         if (Input.GetKeyDown(KeyCode.Space))
         {
             _boardRef.Step();

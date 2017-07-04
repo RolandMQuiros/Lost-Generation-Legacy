@@ -50,7 +50,7 @@ public class PlayerTimelineController : MonoBehaviour {
 		{
 			if (!timeline.IsEmpty)
 			{
-				while (timeline.Step >= _step)
+				while (timeline.Step > _step)
 				{
 					PawnAction undone = timeline.CurrentAction;
 					undone.Undo();

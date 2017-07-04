@@ -30,19 +30,19 @@ namespace LostGen {
 
         public LongWalkSkill(Pawn owner)
             : base(owner, "Walk", "Move across tiles within a limited range") {
-            _board = Owner.Board;
-            _combatant = Owner.GetComponent<Combatant>();
+            _board = Pawn.Board;
+            _combatant = Pawn.GetComponent<Combatant>();
         }
 
         #region PointCollections
 
         public override IEnumerable<Point> GetRange() {
-            ReinitializeRange(Owner.Position);
+            ReinitializeRange(Pawn.Position);
             return _range;
         }
 
         public override bool InRange(Point point) {
-            ReinitializeRange(Owner.Position);
+            ReinitializeRange(Pawn.Position);
             return _range.Contains(point);
         }
 
@@ -51,7 +51,7 @@ namespace LostGen {
         }
 
         public override IEnumerable<Point> GetPath() {
-            List<WalkNode> nodePath = FindPath(Owner.Position, Target);
+            List<WalkNode> nodePath = FindPath(Pawn.Position, Target);
             List<Point> path = new List<Point>();
 
             if (nodePath != null) {
@@ -67,13 +67,13 @@ namespace LostGen {
 
         public override PawnAction Fire() {
             MoveAction move = null;
-            List<WalkNode> path = FindPath(Owner.Position, Target);
+            List<WalkNode> path = FindPath(Pawn.Position, Target);
 
             if (path != null) {
                 Debug.Log("Repathed");
                 for (int i = 1; i < path.Count; i++) {
-                    move = new MoveAction(Owner, path[i - 1].Point, path[i].Point, true);
-                    Owner.PushAction(move);
+                    move = new MoveAction(Pawn, path[i - 1].Point, path[i].Point, true);
+                    Pawn.PushAction(move);
                 }
 
                 // Clear the range for the next step
@@ -84,7 +84,7 @@ namespace LostGen {
         }
 
         public override string ToString() {
-            return "WalkSkill : { Owner: " + Owner + ", Range: " + _range.Count + "}";
+            return "WalkSkill : { Owner: " + Pawn + ", Range: " + _range.Count + "}";
         }
 
         private List<WalkNode> FindPath(Point origin, Point target) {
@@ -98,7 +98,7 @@ namespace LostGen {
                     throw new Exception("This Skill's owner is positioned outside the graph");
                 }
 
-                if (Point.TaxicabDistance(Owner.Position, target) == 1) {
+                if (Point.TaxicabDistance(Pawn.Position, target) == 1) {
                     path = new List<WalkNode>();
                     path.Add(new WalkNode(_board, origin, CanWalkDiagonally));
                     path.Add(new WalkNode(_board, target, CanWalkDiagonally));
@@ -125,7 +125,7 @@ namespace LostGen {
             // If the cached range collection doesn't exist yet, or the origin has changed,
             // then create the range
             if (_range == null || _prevOrigin != origin) {
-                WalkNode startNode = new WalkNode(Owner.Board, origin, CanWalkDiagonally);
+                WalkNode startNode = new WalkNode(Pawn.Board, origin, CanWalkDiagonally);
                 _prevOrigin = origin;
                 _range = new HashSet<Point>();
                 if (startNode != null) {

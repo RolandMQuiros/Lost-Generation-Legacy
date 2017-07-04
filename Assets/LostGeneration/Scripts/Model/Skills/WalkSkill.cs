@@ -10,9 +10,9 @@ namespace LostGen
         {
             get
             {
-                return Math.Abs(Target.X - Owner.Position.X) +
-                       Math.Abs(Target.Z - Owner.Position.Z) +
-                       Math.Max(Target.Y - Owner.Position.Y, 0); 
+                return Math.Abs(Target.X - Pawn.Position.X) +
+                       Math.Abs(Target.Z - Pawn.Position.Z) +
+                       Math.Max(Target.Y - Pawn.Position.Y, 0); 
             }
         }
 
@@ -26,7 +26,7 @@ namespace LostGen
         {
             BuildRange();
             List<Point> neighbors = new List<Point>(_neighbors);
-            neighbors.Add(Owner.Position);
+            neighbors.Add(Pawn.Position);
             return neighbors;
         }
 
@@ -51,16 +51,16 @@ namespace LostGen
             PawnAction move = null;
             if (InRange(Target))
             {
-                move = new MoveAction(Owner, Owner.Position, Target, true);
+                move = new MoveAction(Pawn, Pawn.Position, Target, true);
             }
             return move;
         }
 
         private void BuildRange()
         {
-            if (_walkNode == null || _walkNode.Point != Owner.Position)
+            if (_walkNode == null || _walkNode.Point != Pawn.Position)
             {
-                _walkNode = new WalkNode(Owner.Board, Owner.Position, true);
+                _walkNode = new WalkNode(Pawn.Board, Pawn.Position, true);
                 _neighbors = new HashSet<Point>
                 (
                     _walkNode.GetNeighbors().Cast<WalkNode>()

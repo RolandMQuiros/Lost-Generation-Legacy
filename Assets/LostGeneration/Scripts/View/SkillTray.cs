@@ -14,9 +14,10 @@ public class SkillTray : MonoBehaviour
     private List<SkillButton> _buttons = new List<SkillButton>();
     private Rect _buttonRect;
 
-    public void SetupButtons()
+    public void SetupButtons(Combatant combatant)
     {
-        if (_skillController.SkillSet == null)
+        SkillSet skillSet = combatant.Pawn.GetComponent<SkillSet>();
+        if (skillSet == null)
         {
             for (int i = 0; i < _buttons.Count; i++)
             {
@@ -26,7 +27,7 @@ public class SkillTray : MonoBehaviour
         else
         {
             int buttonIdx = 0;
-            foreach (ISkill skill in _skillController.SkillSet.Skills)
+            foreach (ISkill skill in skillSet.Skills)
             {
                 SkillButton skillButton;
                 if (buttonIdx < _buttons.Count)

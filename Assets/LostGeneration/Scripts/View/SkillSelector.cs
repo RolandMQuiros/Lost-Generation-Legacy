@@ -80,7 +80,7 @@ public class SkillSelector : MonoBehaviour
 		}
 		if (_directional != null)
 		{
-			Point delta = point - _directional.Owner.Position;
+			Point delta = point - _directional.Pawn.Position;
 			Point absDelta = Point.Abs(delta);
 
 			CardinalDirection direction = _directional.Direction;

@@ -16,7 +16,7 @@ namespace LostGen {
         /// <summary>Description of Skill displayed to users</summary>
         string Description { get; }
         /// <summary>Pawn that owns and executes this Skill</summary>
-        Pawn Owner { get; }
+        Pawn Pawn { get; }
         /// <summary>The number of Action Points this Skill will consume when fired</summary>
         int ActionPoints { get; }
 
@@ -25,5 +25,11 @@ namespace LostGen {
         /// either on the front or back.
         /// </summary>
         PawnAction Fire();
+
+        /// <summary>
+        /// Whether or not this Skill is usable based on the Pawn's current state.
+        /// </summary>
+        /// <returns>True if this Skill is usable, false otherwise.</returns>
+        bool IsUsable();
     }
 }

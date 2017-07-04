@@ -20,8 +20,8 @@ public class PlayerCombatantController : MonoBehaviour
     private List<Combatant> _combatants = new List<Combatant>();
     private Combatant _activeCombatant = null;
     private int _activeIdx = 0;
-
     private int _step = 0;
+    [SerializeField]private int _debugActionPoints;
     
     public void AddCombatant(Combatant combatant)
     {
@@ -65,5 +65,10 @@ public class PlayerCombatantController : MonoBehaviour
     {
         _skillController = GetComponent<SkillController>();
         _timelines = GetComponent<PlayerTimelineController>();
+    }
+
+    private void Update()
+    {
+        _debugActionPoints = _activeCombatant.ActionPoints;
     }
 }

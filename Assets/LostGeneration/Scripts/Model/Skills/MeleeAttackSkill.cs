@@ -52,20 +52,20 @@ namespace LostGen {
         }
 
         public override IEnumerable<Point> GetAreaOfEffect() {
-            return _transforms[Direction].Select(point => point + Owner.Position);
+            return _transforms[Direction].Select(point => point + Pawn.Position);
         }
 
         public bool InAreaOfEffect(Point target) {
             bool found = false;
 
-            if (_fullAreaOfEffect.Contains(target - Owner.Position)) {
+            if (_fullAreaOfEffect.Contains(target - Pawn.Position)) {
                 for (int i = 0; !found && i < _transforms[Direction].Length; i++) {
                     Point aoePoint = _transforms[Direction][i];
-                    if (aoePoint.Equals(Owner.Position - target)) {
+                    if (aoePoint.Equals(Pawn.Position - target)) {
                         if (PierceWalls && PierceSolids) {
                             found = true;
                         } else {
-                            found = Owner.Board.LineCast(Owner.Position, aoePoint, null, PierceWalls, PierceSolids);
+                            found = Pawn.Board.LineCast(Pawn.Position, aoePoint, null, PierceWalls, PierceSolids);
                         }
                     }
                 }
@@ -75,7 +75,7 @@ namespace LostGen {
         }
 
         public bool InFullAreaOfEffect(Point point) {
-            Point offset = point - Owner.Position;
+            Point offset = point - Pawn.Position;
             return _fullAreaOfEffect.Contains(offset);
         }
 
@@ -83,11 +83,11 @@ namespace LostGen {
             bool canAttack = false;
             bool inFullAOE = _fullAreaOfEffect.Contains(point - from);
 
-            if (Owner.Board.InBounds(from)) {
+            if (Pawn.Board.InBounds(from)) {
                 if (PierceWalls && PierceSolids) {
                     canAttack = inFullAOE;
                 } else if (inFullAOE) {
-                    canAttack = !Owner.Board.LineCast(from, point, null, PierceWalls, PierceSolids);
+                    canAttack = !Pawn.Board.LineCast(from, point, null, PierceWalls, PierceSolids);
                 }
             }
 
@@ -95,7 +95,7 @@ namespace LostGen {
         }
 
         public override PawnAction Fire() {
-            AttackAction attack = new AttackAction(Owner, _transforms[Direction]);
+            AttackAction attack = new AttackAction(Pawn, _transforms[Direction]);
             return attack;
         }
     }

@@ -29,7 +29,7 @@ public class SkillController : MonoBehaviour
         if (_skillSet.HasSkill(skill))
         {
             _activeSkill = skill;
-            _timelines.TruncateToStep(skill.Owner);
+            _timelines.TruncateToStep(skill.Pawn);
             SkillActivated.Invoke(_activeSkill);
         }
     }
