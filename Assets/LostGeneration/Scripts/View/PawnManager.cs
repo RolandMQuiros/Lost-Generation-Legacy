@@ -56,9 +56,9 @@ public class PawnManager : MonoBehaviour
                 if (actionView != null)
                 {
                     actionView.Pawn = pawn;
-                    _timelines.ActionDone += actionView.OnActionDone;
-                    _timelines.ActionUndone += actionView.OnActionUndone;
-                    _timelines.ActionAdded += actionView.OnActionAdded;
+                    _timelines.ActionDone.AddListener(actionView.OnActionDone);
+                    _timelines.ActionUndone.AddListener(actionView.OnActionUndone);
+                    _timelines.ActionAdded.AddListener(actionView.OnActionAdded);
                 }
 
                 // Then, attach the MonoBehaviours to the MessageBuffer
@@ -78,8 +78,8 @@ public class PawnManager : MonoBehaviour
             CombatantActionView actionView = pawnView.GetComponent<CombatantActionView>();
             if (actionView != null)
             {
-                _timelines.ActionDone -= actionView.OnActionDone;
-                _timelines.ActionUndone -= actionView.OnActionUndone;
+                _timelines.ActionDone.RemoveListener(actionView.OnActionDone);
+                _timelines.ActionUndone.RemoveListener(actionView.OnActionUndone);
             }
         }
     }

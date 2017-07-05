@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using LostGen;
 
 public class PlayerTimelineController : MonoBehaviour {
@@ -10,12 +11,14 @@ public class PlayerTimelineController : MonoBehaviour {
 		get { return _step; }
 		set { SetStep(value); }
 	}
-	public event Action<PawnAction> ActionDone;
-	public event Action<PawnAction> ActionUndone;
-	public event Action<PawnAction> ActionAdded;
+	public PawnActionEvent ActionDone;
+	public PawnActionEvent ActionUndone;
+	public PawnActionEvent ActionAdded;
 
 	private Dictionary<Pawn, Timeline> _timelines = new Dictionary<Pawn, Timeline>();
 	private int _step = 0;
+
+	private SkillController _skillController;
 
 	[SerializeField]private int _debugStep;
 
@@ -44,28 +47,47 @@ public class PlayerTimelineController : MonoBehaviour {
 				maxStep = timeline.Count;
 			}
 		}
-		_step = Math.Min(Math.Max(0, step), maxStep);
+		step = Math.Min(Math.Max(0, step), maxStep);
 
-		foreach (Timeline timeline in _timelines.Values)
+		bool deactivateSkill = false;
+
+		if (_step != step)
 		{
-			if (!timeline.IsEmpty)
+			_step = step;
+			foreach (Timeline timeline in _timelines.Values)
 			{
-				while (timeline.Step > _step)
+				if (timeline.Count > 0)
 				{
-					PawnAction undone = timeline.CurrentAction;
-					undone.Undo();
-					if (ActionUndone != null) { ActionUndone(undone); }
-					if (!timeline.Back()) { break; }
-				}
+					while (timeline.Step > _step)
+					{
+						PawnAction undone = timeline.Back();
+						if (undone == null) { break; }
+						else
+						{
+							undone.Undo();
+							ActionUndone.Invoke(undone);
+							deactivateSkill = true;
+						}
+					}
 
-				while (timeline.Step < _step)
-				{
-					PawnAction done = timeline.CurrentAction;
-					done.Do();
-					if (ActionDone != null) { ActionDone(done); }
-					if (!timeline.Next()) { break; }
+					while (timeline.Step < _step)
+					{
+						PawnAction done = timeline.Next();
+						if (done == null) { break; }
+						else
+						{
+							done.Do();
+							ActionDone.Invoke(done);
+							deactivateSkill = true;
+						}
+					}
 				}
 			}
+		}
+
+		if (deactivateSkill)
+		{
+			_skillController.DeactivateSkill();
 		}
 	}
 
@@ -80,7 +102,7 @@ public class PlayerTimelineController : MonoBehaviour {
 			for (int i = 0; i < undone.Count; i++)
 			{
 				// Unwind the deleted actions
-				if (ActionUndone != null) { ActionUndone(undone[i]); }
+				ActionUndone.Invoke(undone[i]);
 			}
 		}
 	}
@@ -96,16 +118,16 @@ public class PlayerTimelineController : MonoBehaviour {
 			for (int i = 0; i < undone.Count; i++)
 			{
 				// Unwind the deleted actions
-				if (ActionUndone != null) { ActionUndone(undone[i]); }
+				ActionUndone.Invoke(undone[i]);
 			}
 
 			// Push the new action
 			timeline.PushAction(action);
 
 			// Do the new action
-			timeline.Next();
-			PawnAction done = timeline.CurrentAction;
-			if (ActionAdded != null) { ActionAdded(done); }
+			PawnAction done = timeline.Next();
+			done.Do();
+			ActionAdded.Invoke(done);
 			SetStep(_step + 1);
 		}
 	}
@@ -122,6 +144,12 @@ public class PlayerTimelineController : MonoBehaviour {
 		}
 	}
 
+	#region MonoBehaviour
+	private void Awake()
+	{
+		_skillController = GetComponent<SkillController>();
+	}
+
 	private void Update()
 	{
 		if (Input.GetKeyDown(KeyCode.LeftBracket))
@@ -134,4 +162,5 @@ public class PlayerTimelineController : MonoBehaviour {
 		}
 		_debugStep = _step;
 	}
+	#endregion MonoBehaviour
 }

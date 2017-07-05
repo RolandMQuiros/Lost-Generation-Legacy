@@ -50,12 +50,10 @@ public class SkillTray : MonoBehaviour
     }
 
     #region MonoBehaviour
-
     private void Awake()
     {
         _buttonRect = ((RectTransform)_buttonPrefab.transform).rect;
         _buttonPrefab.SetActive(false);
     }
-    
-    #endregion
+    #endregion MonoBehaviour
 }

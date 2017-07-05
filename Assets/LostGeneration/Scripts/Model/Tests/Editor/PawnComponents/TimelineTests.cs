@@ -30,9 +30,8 @@ namespace Tests.PawnComponents
 			Timeline timeline = new Timeline();
 			PawnAction action = new TestMoveAction(null, Point.Zero, Point.One);
 			
-			timeline.PushAction(action);	
-			timeline.Next();
-			Assert.AreEqual(action, timeline.CurrentAction);
+			timeline.PushAction(action);
+			Assert.AreEqual(action, timeline.Next());
 			
 			List<PawnAction> undone = new List<PawnAction>();
 			timeline.TruncateAt(0, undone);
@@ -59,8 +58,7 @@ namespace Tests.PawnComponents
 			{
 				PawnAction action = new TestMoveAction(null, Point.Zero, Point.One);
 				timeline.PushAction(action);
-				timeline.Next();
-				Assert.AreEqual(action, timeline.CurrentAction);
+				Assert.AreEqual(action, timeline.Next());
 			}
 			
 			List<PawnAction> undone = new List<PawnAction>();
@@ -77,8 +75,7 @@ namespace Tests.PawnComponents
 			{
 				PawnAction action = new TestMoveAction(null, Point.Zero, Point.One);
 				timeline.PushAction(action);
-				timeline.Next();
-				Assert.AreEqual(action, timeline.CurrentAction);
+				Assert.AreEqual(action, timeline.Next());
 			}
 			List<PawnAction> undone = new List<PawnAction>();
 			timeline.TruncateAt(5, undone);

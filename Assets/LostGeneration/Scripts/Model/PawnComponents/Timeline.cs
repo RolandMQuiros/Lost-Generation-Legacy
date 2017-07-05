@@ -24,10 +24,6 @@ namespace LostGen
         /// The total number of PawnActions in this timeline
         /// </summary>
         public int Count { get { return _count; } }
-        public PawnAction CurrentAction { get { return (_current != null) ? _current.Action : null; } }
-        public bool HasNext { get { return _current != null && _current.Next != null; } }
-        public bool HasPrevious { get { return _current != null && _current.Previous != null; } }
-        public bool IsEmpty { get { return _head == null; } }
 
         /// <summary>Front of the linked list. In lists with one element, the head and tail are the same.</summary>
         private Node _head = null;
@@ -37,6 +33,13 @@ namespace LostGen
         private Node _current = null;
         private int _count = 0;
         private int _step = 0;
+
+        public Timeline()
+        {
+            _head = new Node();
+            _tail = _head;
+            _current = _tail;
+        }
 
         /// <summary>
         /// Adds a new action to the end of this PawnActionTimeline
@@ -50,17 +53,9 @@ namespace LostGen
             }
             else
             {
-                if (_head == null)
-                {
-                    _head = new Node() { Action = action };
-                    _tail = _head;
-                    _current = _tail;
-                }
-                else
-                {
-                    _tail.Next = new Node() { Previous = _tail, Action = action };
-                    _tail = _tail.Next;
-                }
+                _tail.Action = action;
+                _tail.Next = new Node() { Previous = _tail };
+                _tail = _tail.Next;
                 _count++;
             }
         }
@@ -82,12 +77,15 @@ namespace LostGen
                 // Delete everything after the given step
                 while (_count > fromStep)
                 {
-                    while (_count - 1 <= _step)
+                    while (_count <= _step)
                     {
-                        PawnAction action = _current.Action; 
-                        action.Undo();
-                        if (undone != null) { undone.Add(action); }
-                        if (!Back()) { break; }
+                        PawnAction action = Back();
+                        if (action == null) { break; }
+                        else
+                        {
+                            action.Undo();
+                            if (undone != null) { undone.Add(action); }
+                        }
                     }
 
                     // Chop off the last node
@@ -95,15 +93,10 @@ namespace LostGen
                     if (previous != null)
                     {
                         _tail.Previous = null;
-                        _tail.Action = null;
                         _tail = previous;
+                        _tail.Action = null;
+                        _count--;
                     }
-                    else
-                    {
-                        _head = null;
-                        _tail = null;
-                    }
-                    _count--;
                 }
             }
         }
@@ -121,26 +114,27 @@ namespace LostGen
         /// Runs the Do() function on the currently observed PawnAction, then moves the pointer to the next.
         /// </summary>
         /// <returns>The action that was Done. null if before the beginning or past the end.</returns>
-        public bool Next()
+        public PawnAction Next()
         {
-            bool hasNext = HasNext;
-            if (hasNext)
+            PawnAction next = _current.Action;
+            if (_current.Next != null)
             {
                 _current = _current.Next;
                 _step++;
             }
-            return hasNext;
+            return next;
         }
 
-        public bool Back()
+        public PawnAction Back()
         {
-            bool hasPrevious = HasPrevious;
-            if (hasPrevious)
+            PawnAction previous = null;
+            if (_current.Previous != null)
             {
                 _current = _current.Previous;
+                previous = _current.Action;
                 _step--;
             }
-            return hasPrevious;
+            return previous;
         }
 
         public IEnumerable<PawnAction> GetPawnActions()

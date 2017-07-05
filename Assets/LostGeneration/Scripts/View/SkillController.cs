@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -22,6 +23,7 @@ public class SkillController : MonoBehaviour
     private PlayerTimelineController _timelines;
 
     private SkillSet _skillSet;
+    private Combatant _combatant;
     private ISkill _activeSkill;
 
     public void SetActiveSkill(ISkill skill)
@@ -29,7 +31,6 @@ public class SkillController : MonoBehaviour
         if (_skillSet.HasSkill(skill))
         {
             _activeSkill = skill;
-            _timelines.TruncateToStep(skill.Pawn);
             SkillActivated.Invoke(_activeSkill);
         }
     }
@@ -42,7 +43,8 @@ public class SkillController : MonoBehaviour
     
     public void OnCombatantActivated(Combatant combatant)
     {
-        _skillSet = combatant.Pawn.GetComponent<SkillSet>();
+        _combatant = combatant;
+        _skillSet = _combatant.Pawn.GetComponent<SkillSet>();
     }
 
     public void FireActiveSkill()
@@ -52,16 +54,25 @@ public class SkillController : MonoBehaviour
             PawnAction action = _activeSkill.Fire();
             if (action != null)
             {
-                _timelines.SetAction(action);
-                SkillFired.Invoke(_activeSkill);
-                DeactivateSkill();
+                if (action.Cost <= _combatant.ActionPoints)
+                {
+                    _timelines.SetAction(action);
+                    SkillFired.Invoke(_activeSkill);
+                    DeactivateSkill();
+                }
+                else
+                {
+                    // Play error noise
+                }
             }
         }
     }
 
+    #region MonoBehaviour
     private void Awake()
     {
         _playerController = GetComponent<PlayerCombatantController>();
         _timelines = GetComponent<PlayerTimelineController>();
     }
+    #endregion MonoBehaviour
 }

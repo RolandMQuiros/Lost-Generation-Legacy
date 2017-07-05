@@ -143,7 +143,6 @@ public class BoardCursor : MonoBehaviour,
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        Debug.Log("Click");
         Clicked.Invoke(BoardPoint);
     }
 

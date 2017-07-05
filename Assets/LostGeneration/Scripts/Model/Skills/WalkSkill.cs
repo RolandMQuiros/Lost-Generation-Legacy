@@ -8,12 +8,7 @@ namespace LostGen
     {
         public override int ActionPoints
         {
-            get
-            {
-                return Math.Abs(Target.X - Pawn.Position.X) +
-                       Math.Abs(Target.Z - Pawn.Position.Z) +
-                       Math.Max(Target.Y - Pawn.Position.Y, 0); 
-            }
+            get { return Math.Max(Target.Y - Pawn.Position.Y, 1); }
         }
 
         private WalkNode _walkNode;

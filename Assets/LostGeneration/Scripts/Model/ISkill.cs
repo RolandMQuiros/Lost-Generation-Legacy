@@ -19,6 +19,7 @@ namespace LostGen {
         Pawn Pawn { get; }
         /// <summary>The number of Action Points this Skill will consume when fired</summary>
         int ActionPoints { get; }
+        /// <summary></summary>
 
         /// <summary>
         /// Generates this Skill's Actions and pushes them onto the owning Combatant's Action queue,

@@ -10,8 +10,7 @@ namespace LostGen {
         private Point _target;
 
         public RangedSkill(Pawn owner, string name, string description)
-            : base(owner, name, description) {
-        }
+            : base(owner, name, description) { }
 
         public abstract IEnumerable<Point> GetRange();
         public abstract bool InRange(Point point);

@@ -24,7 +24,7 @@ namespace LostGen {
         
         public virtual bool IsUsable()
         {
-            return _combatant.ActionPoints >= ActionPoints;
+            return _combatant.ActionPoints >= 1;
         }
 
         protected void InvokeAreaOfEffectChange()
