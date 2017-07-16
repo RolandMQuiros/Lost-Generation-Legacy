@@ -27,6 +27,10 @@ public class BlockProperties : ScriptableObject {
 		Setup();
 	}
 
+	private void OnValidate() {
+		Setup();
+	}
+
 	private void Setup() {
 		for (int i = 0; i < _sideTiles.Length; i++) {
 			if (_sideTiles[i] != null)

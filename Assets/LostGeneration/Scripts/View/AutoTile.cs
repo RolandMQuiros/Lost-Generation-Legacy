@@ -65,10 +65,10 @@ public class AutoTile {
             _tileSet.rect.size.y / _tileSet.texture.height
         );
 
-        // Vector2 padding = new Vector2(
-        //     (float)_padding / _tileSet.texture.width,
-        //     (float)_padding / _tileSet.texture.height
-        // ); 
+        Vector2 padding = new Vector2(
+            (float)_padding / _tileSet.texture.width,
+            (float)_padding / _tileSet.texture.height
+        ); 
 
         Rect tileRect = new Rect(
             0f, 0f,
@@ -87,10 +87,10 @@ public class AutoTile {
             for (int m = 0; m < _MINITILE_COUNT; m++) {
                 Vector2 offset = _QUADRANT_OFFSETS[q, m];
                 _quadrants[q, m] = new Rect(
-                    spriteRect.x + slice.width * offset.x,
-                    spriteRect.y + slice.height * offset.y,
-                    slice.width,
-                    slice.height
+                    padding.x + spriteRect.x + slice.width * offset.x,
+                    padding.y + spriteRect.y + slice.height * offset.y,
+                    slice.width - (padding.x * 2f),
+                    slice.height - (padding.y * 2f)
                 );
             }
         }
