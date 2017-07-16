@@ -7,25 +7,32 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "BlockProperties", menuName = "Lost Generation/BlockProperties")]
 public class BlockProperties : ScriptableObject {
 	private const int _SIDE_COUNT = 6;
-	public AutoTile[] SideTiles = new AutoTile[_SIDE_COUNT];
-	
-	private void OnValidate() {
-		if (SideTiles.Length != _SIDE_COUNT) {
-			Array.Resize(ref SideTiles, _SIDE_COUNT);
-		}
-		SetupTiles();
+	public AutoTile Top;
+	public AutoTile Right;
+	public AutoTile Bottom;
+	public AutoTile Left;
+	public AutoTile Forward;
+	public AutoTile Backward;
+
+	public AutoTile[] SideTiles {
+		get { return _sideTiles; }
 	}
 
-	private void SetupTiles() {
-		for (int i = 0; i < SideTiles.Length; i++) {
-			if (SideTiles[i] != null)
+	private AutoTile[] _sideTiles;
+	
+	private void OnEnable() {
+		_sideTiles = new AutoTile[] {
+			Top, Right, Bottom, Left, Forward, Backward
+		};
+		Setup();
+	}
+
+	private void Setup() {
+		for (int i = 0; i < _sideTiles.Length; i++) {
+			if (_sideTiles[i] != null)
 			{
-				SideTiles[i].SetupTiles();
+				_sideTiles[i].Setup();
 			}
 		}
-	}
-
-	private void OnEnable() {
-		SetupTiles();
 	}
 }
