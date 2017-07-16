@@ -112,7 +112,7 @@ public class BlockMesh : MonoBehaviour
 						{
 							Point neighbor = point + Point.Neighbors[side];
 							
-							if (BlockProperties[blockType].SideSprites[side] != null &&
+							if (BlockProperties[blockType].SideTiles[side] != null &&
 								_blocks[neighbor.X + 1, neighbor.Y + 1, neighbor.Z + 1] != blockType)
 							{
 								// Get the vertex count before adding the new ones, which will act as the offset
@@ -129,7 +129,7 @@ public class BlockMesh : MonoBehaviour
 								// Push the triangle windings for the new quad onto the triangle list
 
 								// If side is marked with reversed normals, wind the tris in the opposite direction
-								if (BlockProperties[blockType].AreNormalsReversed[side])
+								if (BlockProperties[blockType].SideTiles[side].AreNormalsReversed)
 								{
 									for (int triIndex = _TRI_ORDER.Length - 1; triIndex >= 0; triIndex--)
 									{
@@ -162,18 +162,12 @@ public class BlockMesh : MonoBehaviour
 									}
 
 									// Apply that tile's UV coordinates to the quad
-									Sprite sprite = BlockProperties[blockType].SideSprites[side];
-									Vector2 boundsMin = new Vector2(sprite.rect.x / sprite.texture.width, sprite.rect.y / sprite.texture.height);
-									Vector2 boundsMax = boundsMin + new Vector2(sprite.rect.size.x / sprite.texture.width, sprite.rect.size.y / sprite.texture.height);
-
-									float tileWidth = (boundsMax.x - boundsMin.x) / _BLOCK_SIDE_TILE_COUNT;
-									float tileHeight = (boundsMax.y - boundsMin. y);
-									float tileX = tileWidth * tileAdjacency;
-									
-									uvs.Add(boundsMin + new Vector2(tileX, tileHeight));
-									uvs.Add(boundsMin + new Vector2(tileX + tileWidth, tileHeight));
-									uvs.Add(boundsMin + new Vector2(tileX + tileWidth, 0f));
-									uvs.Add(boundsMin + new Vector2(tileX, 0f));
+									AutoTile autoTile = BlockProperties[blockType].SideTiles[side];
+									Rect tile = autoTile.GetRect(tileAdjacency);
+									uvs.Add(new Vector2(tile.x, tile.yMax));
+									uvs.Add(new Vector2(tile.xMax, tile.yMax));
+									uvs.Add(new Vector2(tile.xMax, tile.y));
+									uvs.Add(new Vector2(tile.x, tile.y));
 								}
 								else 
 								{
@@ -192,6 +186,11 @@ public class BlockMesh : MonoBehaviour
 		_meshFilter.mesh.uv = uvs.ToArray();
 		_meshFilter.mesh.RecalculateNormals();
     }
+
+	private void CreateCornerFace()
+	{
+
+	}
 
     #region MonoBehaviour
     private void Awake()

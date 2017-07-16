@@ -41,7 +41,10 @@ public class SkillButton : MonoBehaviour,
     }
     private void OnEnable()
     {
-        _button.interactable = _skill.IsUsable();
+        Combatant combatant = _skill.Pawn.GetComponent<Combatant>();
+        if (combatant != null) {
+            _button.interactable = _skill.ActionPoints <= combatant.ActionPoints;
+        }
     }
     #endregion MonoBehaviour
 }
