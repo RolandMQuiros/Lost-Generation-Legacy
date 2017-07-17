@@ -1,12 +1,14 @@
 fileFormatVersion: 2
 guid: 310c567bd8ed0ba41bc3e4e126f6c4e2
-timeCreated: 1500195580
+timeCreated: 1500269460
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
     21300000: Tileset_Test_0
     21300002: Tileset_Test_1
     21300004: Tileset_Test_2
+    21300006: Tileset_Test_3
+    21300008: Tileset_Test_4
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -123,6 +125,34 @@ TextureImporter:
         height: 60
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Tileset_Test_3
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 8
+        width: 40
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Tileset_Test_4
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 8
+        width: 40
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
