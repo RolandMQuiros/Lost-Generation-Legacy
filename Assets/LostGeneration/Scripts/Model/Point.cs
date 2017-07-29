@@ -116,6 +116,10 @@ namespace LostGen
         public int Y;
         public int Z;
 
+        public Point XY { get { return new Point(X, Y, 0); } }
+        public Point XZ { get { return new Point(X, 0, Z); } }
+        public Point YZ { get { return new Point(0, Y, Z); } }
+
         public Point(int x = 0, int y = 0, int z = 0)
         {
             X = x;
@@ -174,9 +178,13 @@ namespace LostGen
 
         public static int TaxicabDistance(Point start, Point end)
         {
-            Point offset = end - start;
+            Point offset = Point.Abs(end - start);
+            return offset.X + offset.Y + offset.Z;
+        }
 
-            return Math.Abs(offset.X) + Math.Abs(offset.Y) + Math.Abs(offset.Z);
+        public static int ChebyshevDistance(Point start, Point end) {
+            Point offset = Point.Abs(end - start);
+            return Math.Max(Math.Max(offset.X, offset.Y), offset.Z);
         }
 
         public static Point operator +(Point p1, Point p2)

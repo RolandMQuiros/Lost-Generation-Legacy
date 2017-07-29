@@ -4,40 +4,14 @@ using System.Collections.Generic;
 namespace LostGen {
     public class Combatant : PawnComponent {
         #region Stats
-        public Stats BaseStats {
-            get { return _baseStats; }
-            set {
-                _baseStats = value;
-                _didStatsChange = true;
-            }
-        }
-
-        public Stats EffectiveStats {
-            get {
-                if (_didStatsChange) {
-                    Stats newStats = _baseStats;    
-                    for (int i = 0; i < _gear.Count; i++) {
-                        newStats += _gear[i].Modifier;
-                    }
-                    _effectiveStats = newStats;
-
-                    Pawn.Priority = _effectiveStats.Agility;
-                }
-
-                return _effectiveStats;
-            }
-        }
-        public int Health {
-            get { return _health; }
-            set {
-                _health = Math.Max(0, Math.Min(_effectiveStats.Health, value));
-            }
-        }
         public int ActionPoints {
             get { return _actionPoints; }
             set { _actionPoints = value; }
         }
         public int ActionQueueCost { get { return _queueCost; } }
+
+        public PawnStats Stats { get { return _stats; } }
+        public Health Health { get { return _health; } }
 
         public Team Team;
         #endregion Stats
@@ -49,11 +23,11 @@ namespace LostGen {
 
         #region PrivateMembers
         private bool _didStatsChange;
-        private Stats _baseStats;
-        private Stats _effectiveStats;
-        private int _health;
         private int _actionPoints;
         private int _queueCost;
+        
+        private PawnStats _stats;
+        private Health _health;
 
         private List<Gear> _gear = new List<Gear>();
         
@@ -68,6 +42,13 @@ namespace LostGen {
         }
 
         #region PawnOverrides
+        public override void Start() {
+            _health = Pawn.RequireComponent<Health>();
+            _stats = Pawn.RequireComponent<PawnStats>();
+            // _supplies = Pawn.RequireComponent<Supplies>();
+            // _loadout = Pawn.RequireComponent<Loadout>();
+        }
+
         public override void OnPushAction(PawnAction action) {
             _queueCost += action.Cost;
         }
@@ -77,13 +58,21 @@ namespace LostGen {
         }
 
         public override void BeginTurn() {
-            _actionPoints = EffectiveStats.Stamina;
+            _actionPoints = _stats.Effective.Stamina;
+        }
+
+        public override void PostAction(PawnAction action) {
+            _actionPoints -= action.Cost;
+        }
+
+        public override void PreStep() {
+            Pawn.Priority = _stats.Effective.Agility;
         }
         #endregion PawnOverrides
 
         private void WhenLandedUpon(Gravity by) {
-            int damage = Math.Max(by.Weight - EffectiveStats.Defense, 0);
-            Health -= damage;
+            int damage = Math.Max(by.Weight - _stats.Effective.Defense, 0);
+            _health.Current -= damage;
             Pawn.PushMessage(new DamageMessage(by.Pawn, Pawn, damage));
         }
     }

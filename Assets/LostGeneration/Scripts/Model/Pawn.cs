@@ -6,7 +6,6 @@ namespace LostGen {
     public class Pawn : IComparable<Pawn> {
         /// <summary>Counter used to generate unique Pawn ID</summary>
         private static ulong _idCounter;
-
         #region Properties
         /// <summary>Unique instance identifier number</summary>
         public ulong InstanceID { get; private set; }
@@ -202,6 +201,14 @@ namespace LostGen {
             PawnComponent component;
             _components.TryGetValue(componentType, out component);
             return component as T;
+        }
+
+        public T RequireComponent<T>() where T : PawnComponent {
+            T component = GetComponent<T>();
+            if (component == null) {
+                throw new MissingComponentException<T>();
+            }
+            return component;
         }
 
         public PawnComponent AddComponent(PawnComponent component) {

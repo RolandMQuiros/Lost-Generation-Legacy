@@ -49,6 +49,10 @@ public class SkillTray : MonoBehaviour
         }
     }
 
+    public void OnSkillFired(ISkill skill) {
+        
+    }
+
     #region MonoBehaviour
     private void Awake()
     {

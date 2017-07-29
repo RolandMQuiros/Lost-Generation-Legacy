@@ -12,10 +12,9 @@ namespace LostGen {
         }
 
         public override void Commit() {
-            Combatant target = Target.GetComponent<Combatant>();
+            Health target = Target.GetComponent<Health>();
             if (Amount > 0) {
-                target.Health -= Amount;
-
+                target.Current = target.Current - Amount;
                 Owner.PushMessage(new DamageMessage(Owner, Target, Amount));
             }
         }

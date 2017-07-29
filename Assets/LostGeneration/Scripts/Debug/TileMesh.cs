@@ -13,7 +13,6 @@ public class TileMesh : MonoBehaviour {
 	private void Awake() {
 		_meshFilter = GetComponent<MeshFilter>();
 		_autoTile.Setup();
-
 		Build();
 	}
 
@@ -45,5 +44,9 @@ public class TileMesh : MonoBehaviour {
 			_oldAdjacency = _adjacency;
 			Build();
 		}
+	}
+
+	private void OnValidate() {
+		_autoTile.Setup();
 	}
 }

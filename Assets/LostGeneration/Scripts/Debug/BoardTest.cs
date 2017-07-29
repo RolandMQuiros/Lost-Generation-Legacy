@@ -62,22 +62,18 @@ public class BoardTest : MonoBehaviour
     private void Start()
     {
         _pawn = new Pawn("Test Combatant", _boardRef.Board, _boardRef.Board.Size / 2);
-        Combatant combatant = (Combatant)_pawn.AddComponent
-        (
-            new Combatant()
-            {
-                BaseStats = new Stats()
-                {
-                    Health = 10,
-                    Attack = 6,
-                    Magic = 4,
-                    Agility = 7,
-                    Stamina = 5
-                },
-                Health = 10
+        _pawn.AddComponent(new Health(10));
+        _pawn.AddComponent(new PawnStats() {
+            Base = new Stats() {
+                Health = 10,
+                Attack = 6,
+                Magic = 4,
+                Agility = 7,
+                Stamina = 5
             }
-        );
+        });
 
+        Combatant combatant = (Combatant)_pawn.AddComponent(new Combatant());
         
         SkillSet skillSet = new SkillSet();
         _pawn.AddComponent(skillSet);

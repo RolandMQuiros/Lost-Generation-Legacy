@@ -184,5 +184,13 @@ public class BlockMesh : MonoBehaviour
         _blocks = new byte[_size.X + 2, _size.Y + 2, _size.Z + 2];
         _meshFilter = GetComponent<MeshFilter>();
     }
+
+    // private void OnEnable() {
+    //     for (int i = 0; i < BlockProperties.Length; i++) {
+    //         if (BlockProperties[i] != null) {
+    //             BlockProperties[i].Setup();
+    //         }
+    //     }
+    // }
     #endregion MonoBehaviour
 }
