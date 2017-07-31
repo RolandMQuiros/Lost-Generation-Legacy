@@ -54,8 +54,12 @@ public class PlayerTimelineController : MonoBehaviour {
 		if (_step != step)
 		{
 			_step = step;
-			foreach (Timeline timeline in _timelines.Values)
+			foreach (KeyValuePair<Pawn, Timeline> pair in _timelines)
 			{
+				Timeline timeline = pair.Value;
+				Pawn pawn = pair.Key;
+				ActionPoints actionPoints = pawn.RequireComponent<ActionPoints>();
+
 				if (timeline.Count > 0)
 				{
 					while (timeline.Step > _step)
@@ -65,6 +69,7 @@ public class PlayerTimelineController : MonoBehaviour {
 						else
 						{
 							undone.Undo();
+							actionPoints.Current += undone.Cost;
 							ActionUndone.Invoke(undone);
 							deactivateSkill = true;
 						}
@@ -77,6 +82,7 @@ public class PlayerTimelineController : MonoBehaviour {
 						else
 						{
 							done.Do();
+							actionPoints.Current -= done.Cost;
 							ActionDone.Invoke(done);
 							deactivateSkill = true;
 						}
@@ -101,6 +107,7 @@ public class PlayerTimelineController : MonoBehaviour {
 			timeline.TruncateAt(_step, undone);
 			for (int i = 0; i < undone.Count; i++)
 			{
+				pawn.RequireComponent<ActionPoints>().Current -= undone[i].Cost;
 				// Unwind the deleted actions
 				ActionUndone.Invoke(undone[i]);
 			}
@@ -127,6 +134,8 @@ public class PlayerTimelineController : MonoBehaviour {
 			// Do the new action
 			PawnAction done = timeline.Next();
 			done.Do();
+			action.Owner.RequireComponent<ActionPoints>().Current -= done.Cost;
+
 			ActionAdded.Invoke(done);
 			SetStep(_step + 1);
 		}
@@ -150,16 +159,7 @@ public class PlayerTimelineController : MonoBehaviour {
 		_skillController = GetComponent<SkillController>();
 	}
 
-	private void Update()
-	{
-		if (Input.GetKeyDown(KeyCode.LeftBracket))
-		{
-			SetStep(_step - 1);
-		}
-		if (Input.GetKeyDown(KeyCode.RightBracket))
-		{
-			SetStep(_step + 1);
-		}
+	private void Update() {
 		_debugStep = _step;
 	}
 	#endregion MonoBehaviour

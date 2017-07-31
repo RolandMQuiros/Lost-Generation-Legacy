@@ -59,45 +59,55 @@ public class BoardTest : MonoBehaviour
         _boardRef.Board.SetBlocks(blocks);
     }
 
-    private void Start()
-    {
-        _pawn = new Pawn("Test Combatant", _boardRef.Board, _boardRef.Board.Size / 2);
-        _pawn.AddComponent(new Health(10));
-        _pawn.AddComponent(new PawnStats() {
-            Base = new Stats() {
+    private void Start() {
+        Pawn combatant1 = MakeCombatant(new Pawn("Test Combatant 1", _boardRef.Board, _boardRef.Board.Size / 2 + Point.Right));
+        Pawn combatant2 = MakeCombatant(new Pawn("Test Combatant 2", _boardRef.Board, _boardRef.Board.Size / 2 + Point.Left));
+
+        _boardRef.Board.AddPawn(combatant1);
+        _boardRef.Board.AddPawn(combatant2);
+
+        _playerController.AddCombatant(combatant1.GetComponent<Combatant>());
+        _playerController.AddCombatant(combatant2.GetComponent<Combatant>());
+        _playerController.CycleForward();
+    }
+
+    private void Update() {   
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            _boardRef.Step();
+            _pawnManager.DistributeMessages();   
+        }   
+    }
+    #endregion MonoBehaviour
+
+    private Pawn MakeCombatant(Pawn pawn) {
+        pawn.IsSolid = true;
+
+        pawn.AddComponent(new Health(10));
+        pawn.AddComponent(new PawnStats(
+            new Stats() {
                 Health = 10,
                 Attack = 6,
                 Magic = 4,
                 Agility = 7,
                 Stamina = 5
             }
-        });
+        ));
+        pawn.AddComponent(new ActionPoints(5));
 
-        Combatant combatant = (Combatant)_pawn.AddComponent(new Combatant());
+        Combatant combatant = (Combatant)pawn.AddComponent(new Combatant());
         
         SkillSet skillSet = new SkillSet();
-        _pawn.AddComponent(skillSet);
-        for (int i = 0; i < 5; i++)
-            skillSet.AddSkill(new WalkSkill(_pawn));
+        pawn.AddComponent(skillSet);
+        for (int i = 0; i < 5; i++) {
+            skillSet.AddSkill(new WalkSkill(pawn));
+        }
 
-        for (int i = 0; i < 5; i++)
-            skillSet.AddSkill(new MeleeAttackSkill(_pawn, new Point[] { Point.Right, Point.Right * 2}));
+        for (int i = 0; i < 5; i++) {
+            skillSet.AddSkill(new MeleeAttackSkill(pawn, new Point[] { Point.Right, Point.Right * 2}));
+        }
 
-        _pawn.AddComponent(new Timeline());
+        pawn.AddComponent(new Timeline());
 
-        _boardRef.Board.AddPawn(_pawn);
-        _pawn.BeginTurn();
-        _playerController.AddCombatant(combatant);
-        Debug.Log(_playerController.CycleForward());
+        return pawn;
     }
-
-    private void Update()
-    {   
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            _boardRef.Step();
-            _pawnManager.DistributeMessages();   
-        }   
-    }
-    #endregion MonoBehaviour
 }

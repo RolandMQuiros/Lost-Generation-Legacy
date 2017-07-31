@@ -216,6 +216,7 @@ namespace LostGen {
                     if (!_pawnOrder.Contains(pawn)) {
                         _pawnOrder.Add(pawn);
                     }
+                    pawn.Start();
                 }
             }
 

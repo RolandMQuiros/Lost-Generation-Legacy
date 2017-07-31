@@ -68,6 +68,7 @@ namespace LostGen {
         public bool IsOpaque;
         #endregion Fields
 
+        private bool _isStarted = false;
         private LinkedList<PawnAction> _actions = new LinkedList<PawnAction>();
         /// <summary>
         /// List of offsets that describe the space this Pawn takes up on the Board. For example, a very large door may take
@@ -109,6 +110,11 @@ namespace LostGen {
             IsOpaque = isOpaque;
 
             _position = position;
+        }
+
+        public void Start() {
+            _isStarted = true;
+            CallComponents(c => c.Start());
         }
 
         ///<summary>Used by internally by Board. Do not use.</summary>
@@ -206,7 +212,7 @@ namespace LostGen {
         public T RequireComponent<T>() where T : PawnComponent {
             T component = GetComponent<T>();
             if (component == null) {
-                throw new MissingComponentException<T>();
+                throw new MissingComponentException<T>(this);
             }
             return component;
         }
@@ -236,11 +242,19 @@ namespace LostGen {
         }
 
         private void CallComponents(ComponentCall call) {
+            if (!_isStarted) {
+                throw new NotStartedException(this);
+            }
+
             for (int i = 0; i < _componentOrder.Count; i++) {
                 if (_componentOrder[i].IsEnabled) {
                     call(_componentOrder[i]);
                 }
             }
+        }
+
+        public override string ToString() {
+            return "{ name: \"" + Name + "\", id: " + InstanceID + " }";
         }
     }
 }

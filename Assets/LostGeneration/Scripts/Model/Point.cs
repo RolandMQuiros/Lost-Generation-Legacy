@@ -119,7 +119,7 @@ namespace LostGen
         public Point XY { get { return new Point(X, Y, 0); } }
         public Point XZ { get { return new Point(X, 0, Z); } }
         public Point YZ { get { return new Point(0, Y, Z); } }
-
+        
         public Point(int x = 0, int y = 0, int z = 0)
         {
             X = x;

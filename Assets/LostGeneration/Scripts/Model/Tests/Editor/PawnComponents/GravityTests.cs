@@ -45,7 +45,7 @@ namespace Tests.PawnComponents {
             faller.AddComponent<Gravity>();
             board.AddPawn(faller);
             
-            faller.PushAction(new MoveAction(faller, faller.Position, faller.Position + Point.Right, true));
+            faller.PushAction(new MoveAction(faller, faller.Position, faller.Position + Point.Right, 0, true));
 
             Queue<IPawnMessage> messages = new Queue<IPawnMessage>();
             board.Step(messages);
@@ -68,7 +68,7 @@ namespace Tests.PawnComponents {
             board.AddPawn(faller);
             board.AddPawn(squashed);
             
-            faller.PushAction(new MoveAction(faller, faller.Position, faller.Position + Point.Right, true));
+            faller.PushAction(new MoveAction(faller, faller.Position, faller.Position + Point.Right, 0, true));
 
             Queue<IPawnMessage> messages = new Queue<IPawnMessage>();
             board.Step(messages);

@@ -9,33 +9,21 @@ public class SkillTray : MonoBehaviour
     [SerializeField]private SkillController _skillController;
     [SerializeField]private GameObject _buttonPrefab;
     [SerializeField]private Transform _buttonParent;
-    [SerializeField]private float _buttonPadding = 8f;
-    [SerializeField]private int _buttonsPerRow = 8;
     private List<SkillButton> _buttons = new List<SkillButton>();
-    private Rect _buttonRect;
 
     public void SetupButtons(Combatant combatant)
     {
         SkillSet skillSet = combatant.Pawn.GetComponent<SkillSet>();
-        if (skillSet == null)
-        {
-            for (int i = 0; i < _buttons.Count; i++)
-            {
-                _buttons[i].gameObject.SetActive(false);
-            }
+        if (skillSet == null) {
+            _buttons.ForEach(button => button.gameObject.SetActive(false));
         }
-        else
-        {
+        else {
             int buttonIdx = 0;
-            foreach (ISkill skill in skillSet.Skills)
-            {
+            foreach (ISkill skill in skillSet.Skills) {
                 SkillButton skillButton;
-                if (buttonIdx < _buttons.Count)
-                {
+                if (buttonIdx < _buttons.Count) {
                     skillButton = _buttons[buttonIdx];
-                }
-                else
-                {
+                } else {
                     GameObject buttonObj = GameObject.Instantiate(_buttonPrefab, _buttonParent);
                     skillButton = buttonObj.GetComponent<SkillButton>();
                     skillButton.SkillActivated += _skillController.SetActiveSkill;
@@ -46,17 +34,17 @@ public class SkillTray : MonoBehaviour
                 skillButton.gameObject.SetActive(true);
                 buttonIdx++;
             }
+
+            _buttons.ForEach(button => button.CheckActionPoints());
         }
     }
 
-    public void OnSkillFired(ISkill skill) {
-        
+    public void CheckActionPoints() {
+        _buttons.ForEach(button => button.CheckActionPoints());
     }
 
     #region MonoBehaviour
-    private void Awake()
-    {
-        _buttonRect = ((RectTransform)_buttonPrefab.transform).rect;
+    private void Awake() {
         _buttonPrefab.SetActive(false);
     }
     #endregion MonoBehaviour

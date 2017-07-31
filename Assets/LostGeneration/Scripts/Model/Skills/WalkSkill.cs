@@ -46,22 +46,29 @@ namespace LostGen
             PawnAction move = null;
             if (InRange(Target))
             {
-                move = new MoveAction(Pawn, Pawn.Position, Target, true);
+                move = new MoveAction(Pawn, Pawn.Position, Target, MoveCost(Pawn.Position, Target), true);
             }
             return move;
+        }
+
+        public static int MoveCost(Point from, Point to) {
+            return Point.ChebyshevDistance(from.XZ, to.XZ) + Math.Abs(to.Y - from.Y);
         }
 
         private void BuildRange()
         {
             if (_walkNode == null || _walkNode.Point != Pawn.Position)
             {
-                _walkNode = new WalkNode(Pawn.Board, Pawn.Position, true);
-                Combatant combatant = Pawn.GetComponent<Combatant>();
-                
+                _walkNode = new WalkNode(Pawn.Board, Pawn.Position, false);
+                ActionPoints actionPoints = Pawn.GetComponent<ActionPoints>();
                 _neighbors = new HashSet<Point>
                 (
                     _walkNode.GetNeighbors().Cast<WalkNode>()
                                             .Select(x => x.Point)
+                                            .Where(point => // Filter out nodes that cost too much to move to
+                                                actionPoints == null ||
+                                                MoveCost(Pawn.Position, point) <= actionPoints.Current
+                                            )
                 );
             }
         }

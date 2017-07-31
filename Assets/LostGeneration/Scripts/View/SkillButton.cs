@@ -26,6 +26,14 @@ public class SkillButton : MonoBehaviour,
         }
     }
 
+    public void CheckActionPoints()
+    {
+        ActionPoints actionPoints = _skill.Pawn.GetComponent<ActionPoints>();
+        if (actionPoints != null) {
+            _button.interactable = _skill.ActionPoints <= actionPoints.Current;
+        }
+    }
+
     #region MonoBehaviour
     private void Awake()
     {
@@ -39,12 +47,9 @@ public class SkillButton : MonoBehaviour,
             buttonText.text = Skill.Name;
         }
     }
-    private void OnEnable()
-    {
-        Combatant combatant = _skill.Pawn.GetComponent<Combatant>();
-        if (combatant != null) {
-            _button.interactable = _skill.ActionPoints <= combatant.ActionPoints;
-        }
+
+    private void OnEnable() {
+        CheckActionPoints();
     }
     #endregion MonoBehaviour
 }

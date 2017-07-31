@@ -15,6 +15,9 @@ public class SkillController : MonoBehaviour
     {
         get { return _skillSet; }
     }
+    public ISkill ActiveSkill {
+        get { return _activeSkill; }
+    }
 
     public SkillEvent SkillActivated;
     public SkillEvent SkillFired;
@@ -54,7 +57,7 @@ public class SkillController : MonoBehaviour
             PawnAction action = _activeSkill.Fire();
             if (action != null)
             {
-                if (action.Cost <= _combatant.ActionPoints)
+                if (action.Cost <= _combatant.ActionPoints.Current)
                 {
                     _timelines.SetAction(action);
                     SkillFired.Invoke(_activeSkill);

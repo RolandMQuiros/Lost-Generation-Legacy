@@ -28,6 +28,10 @@ namespace LostGen {
         private bool _didStatsChange = false;
         private List<Stats> _modifiers = new List<Stats>();
 
+        public PawnStats(Stats? baseStats) {
+            _baseStats = baseStats ?? new Stats();
+        }
+
         public void AddModifier(Stats modifier) {
             _modifiers.Add(modifier);
             _didStatsChange = true;

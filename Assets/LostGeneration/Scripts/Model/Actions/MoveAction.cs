@@ -1,23 +1,23 @@
-﻿namespace LostGen {
+﻿using System;
+
+namespace LostGen {
     public class MoveAction : PawnAction {
-        public override int Cost {
-            get {
-                return Point.ChebyshevDistance(_start.XZ, _end.XZ) + _end.Y - _start.Y;
-            }
-        }
+        public override int Cost { get { return _cost; } }
         public Point Start { get { return _start; } }
         public Point End { get { return _end; } }
         public bool IsContinuous{ get { return _isContinuous; } }
         
         private Point _start;
         private Point _end;
+        private int _cost;
         private bool _isContinuous;
         private bool _moveSuccess;
 
-        public MoveAction(Pawn owner, Point start, Point end, bool isContinuous) 
+        public MoveAction(Pawn owner, Point start, Point end, int cost, bool isContinuous) 
             : base(owner) {
             _start = start;
             _end = end;
+            _cost = cost;
             _isContinuous = isContinuous;
         }
 

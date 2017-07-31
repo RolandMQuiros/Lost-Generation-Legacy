@@ -9,7 +9,15 @@ namespace LostGen
             get { return _skills; }
         }
 
-        private HashSet<ISkill> _skills = new HashSet<ISkill>();
+        private HashSet<ISkill> _skills;
+
+        public SkillSet(IEnumerable<ISkill> skills = null) {
+            if (skills != null) {
+                _skills = new HashSet<ISkill>(skills);
+            } else {
+                _skills = new HashSet<ISkill>();
+            }
+        }
 
         public void AddSkill(ISkill skill)
         {

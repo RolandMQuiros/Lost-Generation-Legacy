@@ -6,7 +6,13 @@ namespace LostGen {
     /// </summary>
     [Serializable]
     public class MissingComponentException<T> : Exception where T : PawnComponent {
-        public MissingComponentException()
-            : base("Pawn is missing a required " + typeof(T).FullName) { }
+        public MissingComponentException(Pawn pawn)
+            : base("Pawn " + pawn + " is missing a required " + typeof(T).FullName) { }
+    }
+
+    [Serializable]
+    public class NotStartedException : Exception {
+        public NotStartedException(Pawn pawn)
+            : base("Pawn " + pawn + " was not Start()ed before trying to access one of its components") { }
     }
 }
