@@ -82,10 +82,7 @@ public class PlayerCombatantController : MonoBehaviour {
 		}
         
 		if (Input.GetKeyDown(KeyCode.RightBracket)) {
-            Timeline timeline = _activeCombatant.Pawn.GetComponent<Timeline>();
-            if (timeline != null) {
-			    _timelines.SetStep(_timelines.Step + 1);
-            }
+            _timelines.SetStep(_timelines.Step + 1);
 		}
     }
 }

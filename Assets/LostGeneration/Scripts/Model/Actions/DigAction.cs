@@ -11,7 +11,7 @@ namespace LostGen {
             _blocksDug = new List<BoardBlock>();
         }
         
-        public override void Do() {
+        public override bool Do() {
             Board board = Owner.Board;
             for (int i = 0; i < _pointsToDig.Count; i++) {
                 if (board.InBounds(_pointsToDig[i])) {
@@ -24,6 +24,8 @@ namespace LostGen {
                     }
                 }
             }
+
+            return true;
         }
 
         public override void Undo() {

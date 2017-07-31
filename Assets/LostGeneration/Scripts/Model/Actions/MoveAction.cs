@@ -21,8 +21,9 @@ namespace LostGen {
             _isContinuous = isContinuous;
         }
 
-        public override void Do() {
+        public override bool Do() {
             _moveSuccess = Owner.SetPosition(_end);
+            return _moveSuccess;
         }
 
         public override void Undo() {
