@@ -60,8 +60,8 @@ public class BoardTest : MonoBehaviour
     }
 
     private void Start() {
-        Pawn combatant1 = MakeCombatant(new Pawn("Test Combatant 1", _boardRef.Board, _boardRef.Board.Size / 2 + Point.Right));
-        Pawn combatant2 = MakeCombatant(new Pawn("Test Combatant 2", _boardRef.Board, _boardRef.Board.Size / 2 + Point.Left));
+        Pawn combatant1 = MakeCombatant(new Pawn("Test Combatant 1", _boardRef.Board, _boardRef.Board.Size / 2 + Point.Right), 5);
+        Pawn combatant2 = MakeCombatant(new Pawn("Test Combatant 2", _boardRef.Board, _boardRef.Board.Size / 2 + Point.Left), 6);
 
         _boardRef.Board.AddPawn(combatant1);
         _boardRef.Board.AddPawn(combatant2);
@@ -79,7 +79,7 @@ public class BoardTest : MonoBehaviour
     }
     #endregion MonoBehaviour
 
-    private Pawn MakeCombatant(Pawn pawn) {
+    private Pawn MakeCombatant(Pawn pawn, int agility) {
         pawn.IsSolid = true;
 
         pawn.AddComponent(new Health(10));
@@ -88,7 +88,7 @@ public class BoardTest : MonoBehaviour
                 Health = 10,
                 Attack = 6,
                 Magic = 4,
-                Agility = 7,
+                Agility = agility,
                 Stamina = 5
             }
         ));

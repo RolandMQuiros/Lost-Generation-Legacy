@@ -6,7 +6,7 @@ using LostGen;
 
 public class SkillTray : MonoBehaviour
 {
-    [SerializeField]private SkillController _skillController;
+    [SerializeField]private PlayerSkillController _skillController;
     [SerializeField]private GameObject _buttonPrefab;
     [SerializeField]private Transform _buttonParent;
     private List<SkillButton> _buttons = new List<SkillButton>();

@@ -4,15 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace LostGen {
-    public struct BoardBlock {
-        public Point Point;
-        public bool IsSolid;
-        public bool IsOpaque;
-        public bool IsDiggable;
-        public byte BlockType;
-    }
-
-    public class Board {
+    public class Board : IBoard {
         private BoardBlock[,,] _blocks;
 
         public Point Size {
@@ -148,7 +140,7 @@ namespace LostGen {
             if (InBounds(point)) {
                 isSolid = GetBlock(point).IsSolid;
                 if (!isSolid) {
-                    HashSet<Pawn> pawns = PawnsAt(point);
+                    HashSet<Pawn> pawns = BucketAt(point);
                     foreach (Pawn pawn in pawns) {
                         if (pawn.IsCollidable && pawn.IsSolid) {
                             isSolid = true;
@@ -188,15 +180,19 @@ namespace LostGen {
 
             return bucket;
         }
+        
+        public IEnumerable<Pawn> PawnsAt(Point point) {
+            return GetBucket(point, true);
+        }
 
-        public HashSet<Pawn> PawnsAt(Point point) {
+        private HashSet<Pawn> BucketAt(Point point) {
             return GetBucket(point, true);
         }
 
         public HashSet<Pawn> PawnsAt(IEnumerable<Point> points) {
             HashSet<Pawn> pawns = new HashSet<Pawn>();
             foreach (Point point in points) {
-                pawns.UnionWith(PawnsAt(point));
+                pawns.UnionWith(BucketAt(point));
             }
 
             return pawns;
@@ -407,7 +403,7 @@ namespace LostGen {
                     if (!passThroughWalls && GetBlock(point).IsSolid) {
                         stopped = true;
                     } else {
-                        HashSet<Pawn> pawnsAt = PawnsAt(point);
+                        HashSet<Pawn> pawnsAt = BucketAt(point);
                         if (pawns != null) {
                             pawns.UnionWith(pawnsAt);
                         }

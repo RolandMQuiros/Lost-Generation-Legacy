@@ -6,7 +6,7 @@ using LostGen;
 
 [RequireComponent(typeof(PlayerCombatantController))]
 [RequireComponent(typeof(PlayerTimelineController))]
-public class SkillController : MonoBehaviour
+public class PlayerSkillController : MonoBehaviour
 {
 
     [System.Serializable]
@@ -23,23 +23,39 @@ public class SkillController : MonoBehaviour
     public SkillEvent SkillFired;
 
     private PlayerCombatantController _playerController;
-    private PlayerTimelineController _timelines;
+    private PlayerTimelineController _timelineController;
 
     private SkillSet _skillSet;
     private Combatant _combatant;
+    private Timeline _timeline;
     private ISkill _activeSkill;
+    [SerializeField]
+    private int _activationStep;
 
     public void SetActiveSkill(ISkill skill)
     {
         if (_skillSet.HasSkill(skill))
         {
             _activeSkill = skill;
+            
+            // Save the timeline step when skill was activated
+            _activationStep = Math.Min(Math.Max(0, _timeline.Count), _timelineController.Step);
+            // Move forward all timelines for Combatants that are slower than the active Combatant
+            _timelineController.SetSlowerStep(_activationStep + 1, _activeSkill.Pawn);
+
             SkillActivated.Invoke(_activeSkill);
         }
     }
 
-    public void DeactivateSkill()
-    {
+    public void CancelSkill() {
+        if (_activeSkill != null) {
+            // Rewind timeline back to when skill was activated
+            _timelineController.SetAllStep(_activationStep);
+            DeactivateSkill();
+        }
+    }
+
+    public void DeactivateSkill() {
         _activeSkill = null;
         SkillActivated.Invoke(null);
     }
@@ -48,6 +64,7 @@ public class SkillController : MonoBehaviour
     {
         _combatant = combatant;
         _skillSet = _combatant.Pawn.GetComponent<SkillSet>();
+        _timeline = _combatant.Pawn.GetComponent<Timeline>();
     }
 
     public void FireActiveSkill()
@@ -59,7 +76,10 @@ public class SkillController : MonoBehaviour
             {
                 if (action.Cost <= _combatant.ActionPoints.Current)
                 {
-                    _timelines.SetAction(action);
+                    // Move timeline back to the current Pawn's latest step
+                    _timelineController.SetAllStep(Math.Min(Math.Min(_timelineController.Step, _timeline.Count), _activationStep));
+                    // Push the new action and step forward
+                    _timelineController.SetStepAction(action);
                     SkillFired.Invoke(_activeSkill);
                     DeactivateSkill();
                 }
@@ -72,10 +92,9 @@ public class SkillController : MonoBehaviour
     }
 
     #region MonoBehaviour
-    private void Awake()
-    {
+    private void Awake() {
         _playerController = GetComponent<PlayerCombatantController>();
-        _timelines = GetComponent<PlayerTimelineController>();
+        _timelineController = GetComponent<PlayerTimelineController>();
     }
     #endregion MonoBehaviour
 }

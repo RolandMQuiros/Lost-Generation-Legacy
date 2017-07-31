@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using LostGen;
 
-[RequireComponent(typeof(SkillController))]
+[RequireComponent(typeof(PlayerSkillController))]
 [RequireComponent(typeof(PlayerTimelineController))]
 public class PlayerCombatantController : MonoBehaviour {
     [Serializable]
@@ -13,7 +13,7 @@ public class PlayerCombatantController : MonoBehaviour {
 
     public CombatantEvent CombatantActivated;
     
-    private SkillController _skillController;
+    private PlayerSkillController _skillController;
     private PlayerTimelineController _timelines;
 
     private List<Combatant> _combatants = new List<Combatant>();
@@ -33,25 +33,20 @@ public class PlayerCombatantController : MonoBehaviour {
     public Combatant CycleForward() {
         if (_combatants.Count > 0)
         {
-            if (_activeIdx < _combatants.Count &&
-                _combatants[_activeIdx] != _activeCombatant)
-            {
+            if (_activeIdx < _combatants.Count && _combatants[_activeIdx] != _activeCombatant) {
                 _activeIdx = 0;
-            }
-            else
-            {
+            } else {
                 _activeIdx = (_activeIdx + 1) % _combatants.Count;
             }
 
-            if (_activeCombatant != _combatants[_activeIdx])
-            {
+            if (_activeCombatant != _combatants[_activeIdx]) {
                 _activeCombatant = _combatants[_activeIdx];
                 _skillController.OnCombatantActivated(_activeCombatant);
                 
                 Timeline timeline = _activeCombatant.Pawn.GetComponent<Timeline>();
                 if (timeline != null) {
                     int step = Math.Min(_timelines.Step, timeline.Count);
-                    _timelines.SetStep(step);
+                    _timelines.SetAllStep(step);
                 }
 
                 CombatantActivated.Invoke(_activeCombatant);
@@ -67,22 +62,29 @@ public class PlayerCombatantController : MonoBehaviour {
     }
 
     private void Awake() {
-        _skillController = GetComponent<SkillController>();
+        _skillController = GetComponent<PlayerSkillController>();
         _timelines = GetComponent<PlayerTimelineController>();
     }
 
     private void Update() {
         _debugActionPoints = _activeCombatant.ActionPoints.Current;
         if (Input.GetKeyUp(KeyCode.Tab)) {
+            _skillController.CancelSkill();
             CycleForward();
         }
 
+        if (Input.GetKeyUp(KeyCode.Escape)) {
+            _skillController.CancelSkill();
+        }
+
         if (Input.GetKeyDown(KeyCode.LeftBracket)) {
-            _timelines.SetStep(_timelines.Step - 1);
+            _skillController.CancelSkill();
+            _timelines.SetAllStep(_timelines.Step - 1);
 		}
         
 		if (Input.GetKeyDown(KeyCode.RightBracket)) {
-            _timelines.SetStep(_timelines.Step + 1);
+            _skillController.CancelSkill();
+            _timelines.SetAllStep(_timelines.Step + 1);
 		}
     }
 }
