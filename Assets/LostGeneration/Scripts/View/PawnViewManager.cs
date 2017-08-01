@@ -9,7 +9,7 @@ using LostGen;
 /// Generates GameObjects based on Pawn composition.
 /// Currently everything's hardcoded. Make it dynamic one of these days.
 /// </summary>
-public class PawnManager : MonoBehaviour
+public class PawnViewManager : MonoBehaviour
 {
     [Serializable]
     public class PawnViewEvent : UnityEvent<PawnView> { }
