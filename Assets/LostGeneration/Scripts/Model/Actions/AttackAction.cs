@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LostGen {
     public class AttackAction : PawnAction {
-        public override int Cost { get { return 3; } } // TODO: Change this shit when Inventory is implemented
+        public override int Cost { get { return 2; } } // TODO: Change this shit when Inventory is implemented
         private List<Point> _areaOfEffect;
 
         public AttackAction(Pawn source, Point point)
@@ -23,7 +23,7 @@ namespace LostGen {
 
                 // Apply damage to all Pawns in the area of effect
                 // Friendly fire is always on!
-                foreach (Pawn pawn in Owner.Board.PawnsAt(_areaOfEffect[i])) {
+                foreach (Pawn pawn in Owner.Board.Pawns.At(_areaOfEffect[i])) {
                     Health targetHealth = pawn.GetComponent<Health>();
                     if (targetHealth != null) {
                         targetHealth.Current -= damage;

@@ -22,7 +22,7 @@ namespace Tests.Integration {
             Board board = BoardCommon.ArrayToBoard(grid);
             Pawn pawn = new Pawn("Mover", board, Point.One, null, true, true);
 
-            board.AddPawn(pawn);
+            board.Pawns.Add(pawn);
 
             Point expectedPosition = new Point(2, 1, 1);
 
@@ -43,16 +43,16 @@ namespace Tests.Integration {
         public void MoveSolidPawnIntoSolidPawn() {
             Board board = BoardCommon.ArrayToBoard(BoardCommon.GRID_12X1X9);
 
-            Point pos1 = new Point(6, 4);
-            Point pos2 = new Point(8, 4);
+            Point pos1 = new Point(6, 0, 4);
+            Point pos2 = new Point(8, 0, 4);
 
             Pawn pawn1 = new Pawn("First", board, pos1, null, true, true, true);
             Pawn pawn2 = new Pawn("Second", board, pos2, null, true, true, true);
 
-            board.AddPawn(pawn1);
-            board.AddPawn(pawn2);
+            board.Pawns.Add(pawn1);
+            board.Pawns.Add(pawn2);
 
-            Point expectedPosition = new Point(7, 4);
+            Point expectedPosition = new Point(7, 0, 4);
 
             bool firstMove = pawn2.Offset(Point.Left);
             Point firstPosition = pawn2.Position;
@@ -71,14 +71,14 @@ namespace Tests.Integration {
         public void SolidPawnsMoveIntoEachOther() {
             Board board = BoardCommon.ArrayToBoard(BoardCommon.GRID_12X1X9);
 
-            Point pos1 = new Point(6, 4);
-            Point pos2 = new Point(7, 4);
+            Point pos1 = new Point(6, 0, 4);
+            Point pos2 = new Point(7, 0, 4);
 
             Pawn pawn1 = new Pawn("First", board, pos1, null, true, true, true);
             Pawn pawn2 = new Pawn("Second", board, pos2, null, true, true, true);
 
-            board.AddPawn(pawn1);
-            board.AddPawn(pawn2);
+            board.Pawns.Add(pawn1);
+            board.Pawns.Add(pawn2);
 
             Assert.IsFalse(pawn1.Offset(Point.Right));
             Assert.IsFalse(pawn2.Offset(Point.Left));
@@ -91,16 +91,16 @@ namespace Tests.Integration {
         public void SolidPawnsMoveIntoSharedCell() {
             Board board = BoardCommon.ArrayToBoard(BoardCommon.GRID_12X1X9);
 
-            Point pos1 = new Point(6, 4);
-            Point pos2 = new Point(8, 4);
+            Point pos1 = new Point(6, 0, 4);
+            Point pos2 = new Point(8, 0, 4);
 
-            Point pos3 = new Point(7, 4);
+            Point pos3 = new Point(7, 0, 4);
 
             Pawn pawn1 = new Pawn("First", board, pos1, null, true, true, true);
             Pawn pawn2 = new Pawn("Second", board, pos2, null, true, true, true);
 
-            board.AddPawn(pawn1);
-            board.AddPawn(pawn2);
+            board.Pawns.Add(pawn1);
+            board.Pawns.Add(pawn2);
 
             Assert.IsTrue(pawn1.Offset(Point.Right),"Pawn tried to move from " + pos1 + " to " + pos3 + " but was blocked by something");
             Assert.IsFalse(pawn2.Offset(Point.Left), "Pawn moved from " + pos2 + " to " + pos3 + " when it should've been blocked");
@@ -131,7 +131,7 @@ namespace Tests.Integration {
             // Arrange
             Board board = BoardCommon.ArrayToBoard(BoardCommon.GRID_12X1X9);
 
-            Point pos1 = board.Size / 2; // Center of board
+            Point pos1 = board.Blocks.Size / 2; // Center of board
             Point pos2 = pos1 + (3 * Point.Right); // Two tiles to the right of center
 
             List<Point> footprint = new List<Point>(new Point[] {
@@ -144,8 +144,8 @@ namespace Tests.Integration {
             Pawn pawn2 = new Pawn("Second", board, pos2, footprint, true, true, true);
             TestComponent test2 = pawn2.AddComponent<TestComponent>();
 
-            board.AddPawn(pawn1);
-            board.AddPawn(pawn2);
+            board.Pawns.Add(pawn1);
+            board.Pawns.Add(pawn2);
 
             bool p1Triggered = false;
             bool p2Triggered = false;

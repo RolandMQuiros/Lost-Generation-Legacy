@@ -57,9 +57,9 @@ public class BoardMesh : MonoBehaviour {
                 for (blockCoords.Z = -1; blockCoords.Z <= CellSize.Z; blockCoords.Z++)
                 {   
                     Point point = blockCoords + start;
-                    if (BoardRef.Board.InBounds(point))
+                    if (BoardRef.Board.Blocks.InBounds(point))
                     {
-                        BoardBlock block = BoardRef.Board.GetBlock(point);
+                        BoardBlock block = BoardRef.Board.Blocks.At(point);
                         cell.SetBlock(blockCoords, block.BlockType);
                     }
                 }   
@@ -98,12 +98,12 @@ public class BoardMesh : MonoBehaviour {
     {   
         _cells = new BlockMesh
         [
-            Mathf.CeilToInt((float)BoardRef.Board.Size.X / CellSize.X),
-            Mathf.CeilToInt((float)BoardRef.Board.Size.Y / CellSize.Y),
-            Mathf.CeilToInt((float)BoardRef.Board.Size.Z / CellSize.Z)
+            Mathf.CeilToInt((float)BoardRef.Board.Blocks.Size.X / CellSize.X),
+            Mathf.CeilToInt((float)BoardRef.Board.Blocks.Size.Y / CellSize.Y),
+            Mathf.CeilToInt((float)BoardRef.Board.Blocks.Size.Z / CellSize.Z)
         ];
 
-        BoardRef.Board.BlocksChanged += OnBlocksChanged;
+        BoardRef.Board.Blocks.Changed += OnBlocksChanged;
 
         for (int x = 0; x < _cells.GetLength(0); x++)
         {

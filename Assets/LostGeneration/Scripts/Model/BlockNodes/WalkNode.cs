@@ -38,28 +38,28 @@ namespace LostGen {
 
                 foreach (Point offset in neighborPoints) {
                     Point neighbor = offset + Point;
-                    if (Board.InBounds(neighbor)) {
+                    if (Board.Blocks.InBounds(neighbor)) {
                         open.Push(neighbor);
                     }
                 }
 
                 while (open.Count > 0) {
                     Point adjacent = open.Pop();
-                    BoardBlock block = Board.GetBlock(adjacent);
+                    BoardBlock block = Board.Blocks.At(adjacent);
 
                     if (!_neighbors.ContainsKey(adjacent)) {
                         // Check if there is either a solid Pawn at the latest location, or if there's a solid block
                         if (Board.IsSolid(adjacent)) {
                             // If there is a solid block, then push the point above the solid one onto the stack
                             Point above = adjacent + Point.Up;
-                            if (block.IsSolid && Board.InBounds(above)) {
+                            if (block.IsSolid && Board.Blocks.InBounds(above)) {
                                 open.Push(above);
                             }
                         } else {
                             // If the space is clear, check if it's on top of a solid block
                             Point below = adjacent + Point.Down;
-                            if (Board.InBounds(below)) {
-                                BoardBlock blockBelow = Board.GetBlock(below);
+                            if (Board.Blocks.InBounds(below)) {
+                                BoardBlock blockBelow = Board.Blocks.At(below);
                                 if (blockBelow.IsSolid) {
                                     WalkNode neighborNode = new WalkNode(Board, adjacent, CanWalkDiagonally);
                                     neighborNode._neighbors.Add(Point, this);

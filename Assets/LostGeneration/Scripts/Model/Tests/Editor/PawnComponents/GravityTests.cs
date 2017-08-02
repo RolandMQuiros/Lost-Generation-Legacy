@@ -43,7 +43,7 @@ namespace Tests.PawnComponents {
             Board board = BoardCommon.ArrayToBoard(_chuteGrid);
             Pawn faller = new Pawn("Faller", board, new Point(1, 3, 2), null, true, true, true);
             faller.AddComponent<Gravity>();
-            board.AddPawn(faller);
+            board.Pawns.Add(faller);
             
             faller.PushAction(new MoveAction(faller, faller.Position, faller.Position + Point.Right, 0, true));
 
@@ -65,8 +65,8 @@ namespace Tests.PawnComponents {
             Pawn squashed = new Pawn("Squashed", board, new Point(2, 1, 2), null, true, true, true);
             squashed.AddComponent<Gravity>();
 
-            board.AddPawn(faller);
-            board.AddPawn(squashed);
+            board.Pawns.Add(faller);
+            board.Pawns.Add(squashed);
             
             faller.PushAction(new MoveAction(faller, faller.Position, faller.Position + Point.Right, 0, true));
 

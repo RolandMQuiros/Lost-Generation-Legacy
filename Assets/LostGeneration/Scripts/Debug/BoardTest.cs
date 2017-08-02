@@ -4,7 +4,7 @@ using LostGen;
 public class BoardTest : MonoBehaviour
 {   
     public Point BoardSize;
-    [SerializeField]private PawnManager _pawnManager;
+    [SerializeField]private PawnViewManager _pawnManager;
     [SerializeField]private PlayerCombatantController _playerController;
     [SerializeField]private int _boardTypes = 1;
     private BoardRef _boardRef;
@@ -14,15 +14,15 @@ public class BoardTest : MonoBehaviour
     private void Awake()
     {
         _boardRef = GetComponent<BoardRef>();
-        _boardRef.Board = new Board(new Point(BoardSize.X, BoardSize.Y, BoardSize.Z));
+        _boardRef.Board = new Board(new StandardBlockManager(BoardSize), new BucketPawnManager(BoardSize, 8));
 
         List<BoardBlock> blocks = new List<BoardBlock>();
         int y = 0;
-        for (int x = 0; x < _boardRef.Board.Size.X; x++)
+        for (int x = 0; x < _boardRef.Board.Blocks.Size.X; x++)
         {
-            for (y = 0; y < _boardRef.Board.Size.Y / 2; y++)
+            for (y = 0; y < _boardRef.Board.Blocks.Size.Y / 2; y++)
             {
-                for (int z = 0; z < _boardRef.Board.Size.Z; z++)
+                for (int z = 0; z < _boardRef.Board.Blocks.Size.Z; z++)
                 {
                     blocks.Add
                     (
@@ -38,8 +38,8 @@ public class BoardTest : MonoBehaviour
                 }
             }
 
-            y = _boardRef.Board.Size.Y / 2;
-            for (int z = 0; z < _boardRef.Board.Size.Z; z++)
+            y = _boardRef.Board.Blocks.Size.Y / 2;
+            for (int z = 0; z < _boardRef.Board.Blocks.Size.Z; z++)
             {
                 byte blockType = (byte)Mathf.RoundToInt(Random.value * _boardTypes);
                 blocks.Add
@@ -56,18 +56,18 @@ public class BoardTest : MonoBehaviour
             }
         }
 
-        _boardRef.Board.SetBlocks(blocks);
+        _boardRef.Board.Blocks.Set(blocks);
     }
 
     private void Start() {
-        Pawn combatant1 = MakeCombatant(new Pawn("Test Combatant 1", _boardRef.Board, _boardRef.Board.Size / 2 + Point.Right), 5);
-        Pawn combatant2 = MakeCombatant(new Pawn("Test Combatant 2", _boardRef.Board, _boardRef.Board.Size / 2 + Point.Left), 6);
+        Pawn combatant1 = MakeCombatant(new Pawn("Test Combatant 1", _boardRef.Board, _boardRef.Board.Blocks.Size / 2 + Point.Right), 5);
+        Pawn combatant2 = MakeCombatant(new Pawn("Test Combatant 2", _boardRef.Board, _boardRef.Board.Blocks.Size / 2 + Point.Left), 6);
 
-        _boardRef.Board.AddPawn(combatant1);
-        _boardRef.Board.AddPawn(combatant2);
+        _boardRef.Board.Pawns.Add(combatant1);
+        _boardRef.Board.Pawns.Add(combatant2);
 
-        _playerController.AddCombatant(combatant1.GetComponent<Combatant>());
-        _playerController.AddCombatant(combatant2.GetComponent<Combatant>());
+        _playerController.AddCombatant(combatant1.RequireComponent<Combatant>());
+        _playerController.AddCombatant(combatant2.RequireComponent<Combatant>());
         _playerController.CycleForward();
     }
 
@@ -93,8 +93,7 @@ public class BoardTest : MonoBehaviour
             }
         ));
         pawn.AddComponent(new ActionPoints(5));
-
-        Combatant combatant = (Combatant)pawn.AddComponent(new Combatant());
+        pawn.AddComponent(new Combatant());
         
         SkillSet skillSet = new SkillSet();
         pawn.AddComponent(skillSet);
@@ -103,7 +102,7 @@ public class BoardTest : MonoBehaviour
         }
 
         for (int i = 0; i < 5; i++) {
-            skillSet.AddSkill(new MeleeAttackSkill(pawn, new Point[] { Point.Right, Point.Right * 2}));
+            skillSet.AddSkill(new MeleeAttackSkill(pawn, 2, new Point[] { Point.Right, Point.Right * 2}));
         }
 
         pawn.AddComponent(new Timeline());

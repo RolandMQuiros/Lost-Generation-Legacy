@@ -14,13 +14,13 @@ namespace LostGen {
         public override bool Do() {
             Board board = Owner.Board;
             for (int i = 0; i < _pointsToDig.Count; i++) {
-                if (board.InBounds(_pointsToDig[i])) {
-                    BoardBlock block = board.GetBlock(_pointsToDig[i]);
+                if (board.Blocks.InBounds(_pointsToDig[i])) {
+                    BoardBlock block = board.Blocks.At(_pointsToDig[i]);
                     if (block.IsDiggable) {
                         _blocksDug.Add(block);
                         block.IsOpaque = false;
                         block.IsSolid = false;
-                        board.SetBlock(block);
+                        board.Blocks.Set(block);
                     }
                 }
             }
@@ -31,7 +31,7 @@ namespace LostGen {
         public override void Undo() {
             Board board = Owner.Board;
             for (int i = 0; i < _blocksDug.Count; i++) {
-                board.SetBlock(_blocksDug[i]);
+                board.Blocks.Set(_blocksDug[i]);
             }
         }
 

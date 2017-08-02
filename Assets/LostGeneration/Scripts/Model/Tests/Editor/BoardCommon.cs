@@ -24,17 +24,17 @@ namespace Tests {
             string str = string.Empty;
             HashSet<Point> pathPoints = new HashSet<Point>(path);
             
-            for (int y = 0; y < board.Size.Y; y++) {
+            for (int y = 0; y < board.Blocks.Size.Y; y++) {
                 str += "y = " + y + "\n";
-                for (int z = 0; z < board.Size.Z; z++) {
-                    for (int x = 0; x < board.Size.X; x++) {
+                for (int z = 0; z < board.Blocks.Size.Z; z++) {
+                    for (int x = 0; x < board.Blocks.Size.X; x++) {
                         Point point = new Point(x, y, z);
                         if (pawns != null && pawns.Contains(point)) {
                             str += "╬";
                         } else if (path != null && pathPoints.Contains(point)) {
                             str += "┼";
                         } else {
-                            BoardBlock block = board.GetBlock(point);
+                            BoardBlock block = board.Blocks.At(point);
                             if (block.IsSolid) { str += "█"; }
                             else { str += "░"; }
                         }
@@ -47,8 +47,15 @@ namespace Tests {
             return str;
         }
 
+        public static Board StandardBoard(Point size) {
+            StandardBlockManager blocks = new StandardBlockManager(size);
+            BucketPawnManager pawns = new BucketPawnManager(size, 1);
+            Board board = new Board(blocks, pawns);
+            return board;
+        }
+
         public static Board ArrayToBoard(int[,,] array) {
-            Board board = new Board(array.GetLength(2), array.GetLength(0), array.GetLength(1));
+            Board board = StandardBoard(new Point(array.GetLength(2), array.GetLength(0), array.GetLength(1)));
             for (int z = 0; z < array.GetLength(1); z++) {
                 for (int y = 0; y < array.GetLength(0); y++) {
                     for (int x = 0; x < array.GetLength(2); x++) {
@@ -57,7 +64,7 @@ namespace Tests {
                             IsSolid = array[y, z, x] == 0,
                             IsOpaque = array[y, z, x] == 0
                         };
-                        board.SetBlock(block);
+                        board.Blocks.Set(block);
                     }
                 }
             }

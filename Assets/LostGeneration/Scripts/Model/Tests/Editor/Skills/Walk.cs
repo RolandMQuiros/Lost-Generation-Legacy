@@ -15,7 +15,7 @@
 //             Stats stats = new Stats() { Stamina = 100 };
 //             combatant.BaseStats = stats;
 
-//             board.AddPawn(pawn);
+//             board.Pawns.Add(pawn);
 
 //             WalkSkill walk = new WalkSkill(combatant);
 //             combatant.AddSkill(walk);

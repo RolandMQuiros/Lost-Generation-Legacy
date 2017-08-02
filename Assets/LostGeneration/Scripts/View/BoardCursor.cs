@@ -42,7 +42,7 @@ public class BoardCursor : MonoBehaviour,
     private void Start()
     {
         Bounds clickBounds = _clickCollider.bounds;
-        Vector3 size = PointVector.ToVector(_boardRef.Board.Size);
+        Vector3 size = PointVector.ToVector(_boardRef.Board.Blocks.Size);
         size.y = 1f;
         clickBounds.SetMinMax(_boardRef.transform.position, size);
 
@@ -66,9 +66,9 @@ public class BoardCursor : MonoBehaviour,
             Point snapped = PointVector.ToPoint(WorldPoint);
             snapped = new Point
             (
-                Math.Min(Math.Max(snapped.X, 0), _boardRef.Board.Size.X - 1),
-                Math.Min(Math.Max(snapped.Y, 0), _boardRef.Board.Size.Y - 1),
-                Math.Min(Math.Max(snapped.Z, 0), _boardRef.Board.Size.Z - 1)
+                Math.Min(Math.Max(snapped.X, 0), _boardRef.Board.Blocks.Size.X - 1),
+                Math.Min(Math.Max(snapped.Y, 0), _boardRef.Board.Blocks.Size.Y - 1),
+                Math.Min(Math.Max(snapped.Z, 0), _boardRef.Board.Blocks.Size.Z - 1)
             );
 
             Point? boardPoint = null;
@@ -80,12 +80,12 @@ public class BoardCursor : MonoBehaviour,
             else
             {
                 // Move up until a non-solid block is found
-                BoardBlock block = _boardRef.Board.GetBlock(snapped);
+                BoardBlock block = _boardRef.Board.Blocks.At(snapped);
                 if (block.IsSolid)
                 {
-                    while (block.IsSolid && _boardRef.Board.InBounds(block.Point + Point.Up))
+                    while (block.IsSolid && _boardRef.Board.Blocks.InBounds(block.Point + Point.Up))
                     {
-                        block = _boardRef.Board.GetBlock(block.Point + Point.Up);
+                        block = _boardRef.Board.Blocks.At(block.Point + Point.Up);
                         if (!block.IsSolid)
                         {
                             boardPoint = block.Point;
@@ -97,9 +97,9 @@ public class BoardCursor : MonoBehaviour,
                     // Move down until a solid block is found
                     if (StickToGround)
                     {
-                        while (!block.IsSolid && _boardRef.Board.InBounds(block.Point + Point.Down))
+                        while (!block.IsSolid && _boardRef.Board.Blocks.InBounds(block.Point + Point.Down))
                         {
-                            BoardBlock below = _boardRef.Board.GetBlock(block.Point + Point.Down);
+                            BoardBlock below = _boardRef.Board.Blocks.At(block.Point + Point.Down);
                             if (below.IsSolid)
                             {
                                 boardPoint = below.Point;

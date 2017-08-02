@@ -27,7 +27,7 @@ namespace LostGen {
         }
 
         public override void Undo() {
-            Owner.SetPositionInternal(_start);
+            Owner.Board.Pawns.Move(Owner, _start);
         }
 
         public override void Commit() {

@@ -60,9 +60,9 @@ namespace LostGen.Decision {
                 foreach (Point aoeOffset in _melee.GetAreaOfEffect()) {
                     // For each point in the area of effect, see where we would need to be
                     Point strikePosition = _target.Pawn.Position - aoeOffset;
-                    if (_source.Pawn.Board.InBounds(strikePosition) && // Make sure new standing position is on the Board
-                        _source.Pawn.Board.GetBlock(strikePosition).IsSolid && // and that it's not inside a wall
-                        _source.Pawn.Board.PawnsAt(strikePosition).FirstOrDefault(pawn => pawn.IsCollidable && pawn.IsSolid) == null && // and not inside another solid Pawn
+                    if (_source.Pawn.Board.Blocks.InBounds(strikePosition) && // Make sure new standing position is on the Board
+                        _source.Pawn.board.Blocks.At(strikePosition).IsSolid && // and that it's not inside a wall
+                        _source.Pawn.Board.Pawns.At(strikePosition).FirstOrDefault(pawn => pawn.IsCollidable && pawn.IsSolid) == null && // and not inside another solid Pawn
                         _melee.CanAttackFrom(strikePosition, _target.Pawn.Position)) { // and there's nothing in the way
 
                         possibleDestinations.Add(new KeyValuePair<CardinalDirection, Point>(direction, strikePosition));

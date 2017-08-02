@@ -4,12 +4,14 @@ using System.Collections.Generic;
 
 namespace LostGen {
     public class MeleeAttackSkill : DirectionalSkill {
-        public bool PierceSolids { get; set; }
-        public bool PierceWalls { get; set; }
-
         private List<Point> _areaOfEffect;
         private Dictionary<CardinalDirection, Point[]> _transforms = new Dictionary<CardinalDirection, Point[]>();
         private HashSet<Point> _fullAreaOfEffect = new HashSet<Point>();
+        private int _actionPoints = 0;
+
+        public bool PierceSolids { get; set; }
+        public bool PierceWalls { get; set; }
+        public override int ActionPoints{ get { return _actionPoints; } }
 
         /// <summary>
         /// Contruct a new MeleeAttackSkill.
@@ -20,8 +22,10 @@ namespace LostGen {
         /// These offsets are rotated based on this skill's Direction attribute, and are defined based on the
         /// attacker facing east.
         /// </param>
-        public MeleeAttackSkill(Pawn attacker, IEnumerable<Point> areaOfEffect = null)
-            : base(attacker, "Melee Attack", "Attack an adjacent space") {
+        public MeleeAttackSkill(Pawn attacker, int actionPoints, IEnumerable<Point> areaOfEffect = null)
+        : base(attacker, "Melee Attack", "Attack an adjacent space") {
+            
+            _actionPoints = actionPoints;
 
             if (areaOfEffect == null) {
                 _areaOfEffect = new List<Point>();
@@ -83,7 +87,7 @@ namespace LostGen {
             bool canAttack = false;
             bool inFullAOE = _fullAreaOfEffect.Contains(point - from);
 
-            if (Pawn.Board.InBounds(from)) {
+            if (Pawn.Board.Blocks.InBounds(from)) {
                 if (PierceWalls && PierceSolids) {
                     canAttack = inFullAOE;
                 } else if (inFullAOE) {

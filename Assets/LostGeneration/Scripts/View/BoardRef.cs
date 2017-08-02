@@ -24,14 +24,14 @@ public class BoardRef : MonoBehaviour {
         {
             if (_board != null)
             {
-                _board.BlocksChanged -= OnBlocksChanged;
-                _board.PawnAdded -= OnPawnAdded;
-                _board.PawnRemoved -= OnPawnRemoved;
+                _board.Blocks.Changed -= OnBlocksChanged;
+                _board.Pawns.Added -= OnPawnAdded;
+                _board.Pawns.Removed -= OnPawnRemoved;
             }
             _board = value;
-            _board.BlocksChanged += OnBlocksChanged;
-            _board.PawnAdded += OnPawnAdded;
-            _board.PawnRemoved += OnPawnRemoved;
+            _board.Blocks.Changed += OnBlocksChanged;
+            _board.Pawns.Added += OnPawnAdded;
+            _board.Pawns.Removed += OnPawnRemoved;
         }
     }
 

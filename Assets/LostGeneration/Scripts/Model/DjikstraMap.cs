@@ -9,7 +9,7 @@ namespace LostGen {
 
 		public DjikstraMap(Board board, Predicate<Point> filter = null) {
 			Board = board;
-			_values = new int[board.Size.X, board.Size.Y, board.Size.Z];			
+			_values = new int[board.Blocks.Size.X, board.Blocks.Size.Y, board.Blocks.Size.Z];			
 			_filter = filter ?? DefaultFilter;
 			
 			Clear();
@@ -17,9 +17,9 @@ namespace LostGen {
 
 		public void Clear() {
 			// Initialize values cell to max
-			for (int x = 0; x < Board.Size.X; x++) {
-				for (int y = 0; y < Board.Size.Y; y++) {
-					for (int z = 0; z < Board.Size.Z; z++) {
+			for (int x = 0; x < Board.Blocks.Size.X; x++) {
+				for (int y = 0; y < Board.Blocks.Size.Y; y++) {
+					for (int z = 0; z < Board.Blocks.Size.Z; z++) {
 						_values[x, y, z] = Int32.MaxValue;
 					}
 				}
@@ -27,7 +27,7 @@ namespace LostGen {
 		}
 
 		public void SetValue(Point point, int value) {
-			if (Board.InBounds(point)) {
+			if (Board.Blocks.InBounds(point)) {
 				_values[point.X, point.Y, point.Z] = value;
 			} else {
 				throw new ArgumentOutOfRangeException("blockPoint", "Given point is outside the board");
@@ -36,7 +36,7 @@ namespace LostGen {
 
 		public int GetValue(Point point) {
 			int value;
-			if (Board.InBounds(point)) {
+			if (Board.Blocks.InBounds(point)) {
 				value = _values[point.X, point.Y, point.Z];
 			} else {
 				throw new ArgumentOutOfRangeException("blockPoint", "Given point is outside the board");
@@ -51,9 +51,9 @@ namespace LostGen {
 			
 			while (changed || (maxPasses > 0 && passes < maxPasses)) {
 				changed = false;
-				for (int x = 0; x < Board.Size.X; x++) {
-					for (int y = 0; y < Board.Size.Y; y++) {
-						for (int z = 0; z < Board.Size.Z; z++) {
+				for (int x = 0; x < Board.Blocks.Size.X; x++) {
+					for (int y = 0; y < Board.Blocks.Size.Y; y++) {
+						for (int z = 0; z < Board.Blocks.Size.Z; z++) {
 							Point point = new Point(x, y, z);
 							int value = _values[x, y, z];
 
@@ -62,7 +62,7 @@ namespace LostGen {
 								int min = Int32.MaxValue;
 								for (int i = 0; i < Point.Neighbors.Length; i++) {
 									Point neighbor = point + Point.Neighbors[i];
-									if (Board.InBounds(neighbor)) {
+									if (Board.Blocks.InBounds(neighbor)) {
 										int neighborVal = _values[neighbor.X, neighbor.Y, neighbor.Z];
 										if (neighborVal < min) {
 											min = neighborVal;
@@ -88,11 +88,11 @@ namespace LostGen {
 
 			// Skip only if the current block is solid, or the block below it is not solid.
 			// This limits the scan to blocks that have ground to stand on.
-			if (Board.InBounds(point)) {
-				BoardBlock block = Board.GetBlock(point);
+			if (Board.Blocks.InBounds(point)) {
+				BoardBlock block = Board.Blocks.At(point);
 				skip = block.IsSolid;
-				if (!skip && Board.InBounds(point + Point.Down)) {
-					BoardBlock below = Board.GetBlock(point + Point.Down);
+				if (!skip && Board.Blocks.InBounds(point + Point.Down)) {
+					BoardBlock below = Board.Blocks.At(point + Point.Down);
 					skip = !below.IsSolid;
 				}
 			}
@@ -106,9 +106,9 @@ namespace LostGen {
 			DjikstraMap sum = new DjikstraMap(map.Board, map._filter);
 			Array.Copy(map._values, sum._values, map._values.Length);
 
-			for (int x = 0; x < sum.Board.Size.X; x++) {
-				for (int y = 0; y < sum.Board.Size.Y; y++) {
-					for (int z = 0; z < sum.Board.Size.Z; z++) {
+			for (int x = 0; x < sum.Board.Blocks.Size.X; x++) {
+				for (int y = 0; y < sum.Board.Blocks.Size.Y; y++) {
+					for (int z = 0; z < sum.Board.Blocks.Size.Z; z++) {
 						sum._values[x, y, z] += amount;
 					}
 				}
@@ -121,9 +121,9 @@ namespace LostGen {
 			DjikstraMap sum = new DjikstraMap(map.Board, map._filter);
 			Array.Copy(map._values, sum._values, map._values.Length);
 
-			for (int x = 0; x < sum.Board.Size.X; x++) {
-				for (int y = 0; y < sum.Board.Size.Y; y++) {
-					for (int z = 0; z < sum.Board.Size.Z; z++) {
+			for (int x = 0; x < sum.Board.Blocks.Size.X; x++) {
+				for (int y = 0; y < sum.Board.Blocks.Size.Y; y++) {
+					for (int z = 0; z < sum.Board.Blocks.Size.Z; z++) {
 						int value = sum._values[x, y, z];
 						sum._values[x, y, z] = (int)(multiplier * value + 0.5f);
 					}

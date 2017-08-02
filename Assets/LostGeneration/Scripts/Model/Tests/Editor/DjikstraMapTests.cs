@@ -8,11 +8,11 @@ namespace Tests {
 
 		private void PrintMap(DjikstraMap map) {
 			string display = string.Empty;
-			for (int y = 0; y < map.Board.Size.Y; y++) {
-				for (int z = 0; z < map.Board.Size.Z; z++) {
-					for (int x = 0; x < map.Board.Size.X; x++) {
+			for (int y = 0; y < map.Board.Blocks.Size.Y; y++) {
+				for (int z = 0; z < map.Board.Blocks.Size.Z; z++) {
+					for (int x = 0; x < map.Board.Blocks.Size.X; x++) {
 						Point point = new Point(x, y, z);
-						if (map.Board.GetBlock(point).IsSolid) {
+						if (map.Board.Blocks.At(point).IsSolid) {
 							display += '#';
 						} else {
 							display += map.GetValue(point).ToString("X");

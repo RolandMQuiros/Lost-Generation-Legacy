@@ -25,7 +25,7 @@ namespace Tests {
         public void AddPawn() {
             Point boardSize = new Point(32, 32, 32);
             BucketPawnManager pawnManager = new BucketPawnManager(boardSize, 1);
-            Board board = new Board(boardSize);
+            Board board = BoardCommon.StandardBoard(boardSize);
 
             Pawn pawn = new Pawn("Test Pawn", board, boardSize / 2);
             
@@ -42,7 +42,7 @@ namespace Tests {
             Assert.AreEqual(bucketSize, pawnManager.BucketSize);
             
             // Create a pawn with a footprint that steps in both buckets
-            Board board = new Board(boardSize);
+            Board board = BoardCommon.StandardBoard(boardSize);
             Point position = boardSize / 2;
             Pawn pawn = new Pawn("Test Pawn", board, position, new Point[] { Point.Left, Point.Zero, Point.Right });
             

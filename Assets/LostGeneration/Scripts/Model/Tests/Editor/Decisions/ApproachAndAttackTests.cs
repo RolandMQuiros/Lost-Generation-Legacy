@@ -13,8 +13,8 @@
 //             Pawn defenderPawn = new Pawn("Defender", board, new Point(7, 4));
 //             Combatant defender = defenderPawn.AddComponent<Combatant>();
 
-//             board.AddPawn(attackerPawn);
-//             board.AddPawn(defenderPawn);
+//             board.Pawns.Add(attackerPawn);
+//             board.Pawns.Add(defenderPawn);
 
 //             attacker.Health = 10;
 //             defender.Health = 10;
@@ -60,8 +60,8 @@
 //             Pawn defenderPawn = new Pawn("Defender", board, new Point(10, 1));
 //             Combatant defender = defenderPawn.AddComponent<Combatant>();
 
-//             board.AddPawn(attackerPawn);
-//             board.AddPawn(defenderPawn);
+//             board.Pawns.Add(attackerPawn);
+//             board.Pawns.Add(defenderPawn);
 
 //             attacker.Health = 10;
 //             defender.Health = 10;

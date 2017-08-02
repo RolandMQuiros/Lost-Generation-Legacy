@@ -5,19 +5,22 @@ using System.Collections.Generic;
 namespace LostGen {
     public class BucketPawnManager : IPawnManager {
         private class Bucket {
-            public Point Corner { get; private set; }
-            public Point Size { get; private set; }
             private HashSet<Pawn> _pawns = new HashSet<Pawn>();
+            private Point _corner;
+            private Point _size;
+
+            public Point Corner { get { return _corner; } }
+            public Point Size { get { return _size; } }
 
             public Bucket(Point corner, Point size) {
-                Corner = corner;
-                Size = size;
+                _corner = corner;
+                _size = size;
             }
 
             public bool InBounds(Point point) {
-                return  point.X >= Corner.X && point.X < Corner.X + Size.X &&
-                        point.Y >= Corner.Y && point.Y < Corner.Y + Size.Y &&
-                        point.Z >= Corner.Z && point.Z < Corner.Z + Size.Z;                     
+                return  point.X >= _corner.X && point.X < _corner.X + _size.X &&
+                        point.Y >= _corner.Y && point.Y < _corner.Y + _size.Y &&
+                        point.Z >= _corner.Z && point.Z < _corner.Z + _size.Z;                     
             }
 
             public bool AddPawn(Pawn pawn) {
@@ -52,13 +55,17 @@ namespace LostGen {
         private Point _bucketSize;
 
         public Point BucketSize { get { return _bucketSize; } }
-        public event Action<Pawn> PawnAdded;
-        public event Action<Pawn> PawnRemoved;
+        public event Action<Pawn> Added;
+        public event Action<Pawn> Removed;
         public IEnumerable<Pawn> Ordered {
             get { return _pawns.OrderBy(pawn => pawn.Priority); }
         }
 
         public BucketPawnManager(Point boardSize, Point bucketSize) {
+            if (boardSize.X <= 0 || boardSize.Y <= 0 || boardSize.Z <= 0) {
+                throw new ArgumentException("Board dimensions given were " + boardSize + ". They must be at least " + Point.One, "boardSize");
+            }
+
             _bucketSize.X = Math.Min(boardSize.X, bucketSize.X);
             _bucketSize.Y = Math.Min(boardSize.Y, bucketSize.Y);
             _bucketSize.Z = Math.Min(boardSize.Z, bucketSize.Z);
@@ -79,7 +86,18 @@ namespace LostGen {
         }
 
         public BucketPawnManager(Point boardSize, int subdivisions) {
-            _bucketSize = boardSize / subdivisions;
+            if (boardSize.X <= 0 || boardSize.Y <= 0 || boardSize.Z <= 0) {
+                throw new ArgumentException("Board dimensions given were " + boardSize + ". They must be at least " + Point.One, "boardSize");
+            }
+            if (subdivisions <= 0) {
+                throw new ArgumentException("Board must have at least one subdivision. You gave me " + subdivisions + ". The hell.", "subdivisions");
+            }
+
+            _bucketSize = new Point(
+                Math.Max(boardSize.X / subdivisions, 1),
+                Math.Max(boardSize.Y / subdivisions, 1),
+                Math.Max(boardSize.Z / subdivisions, 1)
+            );
 
             for (int x = 0; x < boardSize.X; x += _bucketSize.X) {
                 for (int y = 0; y < boardSize.Y; y += _bucketSize.Y) {
@@ -115,26 +133,53 @@ namespace LostGen {
                         Point footprint = pawn.Footprint[f] + pawn.Position;
                         if (bucket.InBounds(footprint)) {
                             addedToBucket |= bucket.AddPawn(pawn);
+                            pawn.Start();
                         }
                     }
                 }
             }
 
-            return addedToSet && addedToBucket;
+            bool added = addedToSet && addedToBucket;
+            if (added && Added != null) {
+                Added(pawn);
+            }
+
+            return added;
         }
         
         public bool Remove(Pawn pawn) {
-            bool removedFromSet = _pawns.Remove(pawn);
             bool removedFromBucket = false;
 
-            if (removedFromSet) {
+            if (_pawns.Remove(pawn)) {
                 for (int b = 0; b < _buckets.Count; b++) {
                     Bucket bucket = _buckets[b];
                     removedFromBucket |= bucket.RemovePawn(pawn);
                 }
             }
 
+            if (removedFromBucket && Removed != null) {
+                Removed(pawn);
+            }
+
             return removedFromBucket;
+        }
+
+        public void Move(Pawn pawn, Point newPosition) {
+            IEnumerable<Bucket> oldBuckets = _buckets.Where(b => b.HasPawn(pawn));
+            IEnumerable<Bucket> newBuckets = pawn.Footprint.SelectMany(f => _buckets.Where(b => b.InBounds(f + newPosition))).Distinct();
+
+            IEnumerable<Bucket> exitBuckets = oldBuckets.Except(newBuckets);
+            IEnumerable<Bucket> enterBuckets = newBuckets.Except(oldBuckets);
+            
+            foreach (Bucket bucket in exitBuckets) {
+                bucket.RemovePawn(pawn);
+            }
+
+            foreach (Bucket bucket in enterBuckets) {
+                bucket.AddPawn(pawn);
+            }
+
+            pawn.SetPositionInternal(newPosition);
         }
     }
 }
