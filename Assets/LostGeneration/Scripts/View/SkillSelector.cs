@@ -4,13 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LostGen;
 
-public class SkillSelector : MonoBehaviour
-{
-    public ISkill Skill
-    {
-        get { return _skill; }
-        set { SetSkill(value); }
-    }
+public class SkillSelector : MonoBehaviour {
     
 	private ISkill _skill;
 	private AreaOfEffectSkill _aoe;
@@ -20,6 +14,11 @@ public class SkillSelector : MonoBehaviour
     [SerializeField]private BlockMesh _areaOfEffectMesh;
     [SerializeField]private BlockMesh _rangeMesh;
     [SerializeField]private BlockMesh _pathMesh;
+
+	public ISkill Skill {
+        get { return _skill; }
+        set { SetSkill(value); }
+    }
 
 	public void SetSkill(ISkill skill)
 	{

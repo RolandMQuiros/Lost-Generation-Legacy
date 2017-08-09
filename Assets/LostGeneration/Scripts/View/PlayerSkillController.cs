@@ -39,9 +39,9 @@ public class PlayerSkillController : MonoBehaviour
             _activeSkill = skill;
             
             // Save the timeline step when skill was activated
-            _activationStep = Math.Min(Math.Max(0, _timeline.Count), _timelineController.Step);
+            //_activationStep = Math.Min(Math.Max(0, _timeline.Count), _timelineController.Step);
             // Move forward all timelines for Combatants that are slower than the active Combatant
-            _timelineController.SetSlowerStep(_activationStep + 1, _activeSkill.Pawn);
+            //_timelineController.SetSlowerStep(_activationStep + 1, _activeSkill.Pawn);
 
             SkillActivated.Invoke(_activeSkill);
         }
@@ -50,7 +50,7 @@ public class PlayerSkillController : MonoBehaviour
     public void CancelSkill() {
         if (_activeSkill != null) {
             // Rewind timeline back to when skill was activated
-            _timelineController.SetAllStep(_activationStep);
+            //_timelineController.SetAllStep(_activationStep);
             DeactivateSkill();
         }
     }
@@ -77,7 +77,7 @@ public class PlayerSkillController : MonoBehaviour
                 if (action.Cost <= _combatant.ActionPoints.Current)
                 {
                     // Move timeline back to the current Pawn's latest step
-                    _timelineController.SetAllStep(Math.Min(Math.Min(_timelineController.Step, _timeline.Count), _activationStep));
+                    //_timelineController.SetAllStep(Math.Min(Math.Min(_timelineController.Step, _timeline.Count), _activationStep));
                     // Push the new action and step forward
                     _timelineController.SetStepAction(action);
                     SkillFired.Invoke(_activeSkill);

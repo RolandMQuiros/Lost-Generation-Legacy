@@ -59,7 +59,7 @@ namespace LostGen
         {
             if (_walkNode == null || _walkNode.Point != Pawn.Position)
             {
-                _walkNode = new WalkNode(Pawn.Board, Pawn.Position, false);
+                _walkNode = new WalkNode(Pawn.Board, Pawn.Position, false, true);
                 ActionPoints actionPoints = Pawn.GetComponent<ActionPoints>();
                 _neighbors = new HashSet<Point>
                 (

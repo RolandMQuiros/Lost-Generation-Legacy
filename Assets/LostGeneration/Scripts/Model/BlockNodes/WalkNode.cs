@@ -3,14 +3,16 @@ using System.Collections.Generic;
 
 namespace LostGen {
     public class WalkNode : BlockNode {
-        public bool CanWalkDiagonally;
+        private bool _canWalkDiagonally;
         private Dictionary<Point, WalkNode> _neighbors = new Dictionary<Point, WalkNode>();
         private bool _neighborsBuilt = false;
-        
-        public WalkNode(Board board, Point point, bool canWalkDiagonally)
-            : base(board, point) {
-                CanWalkDiagonally = canWalkDiagonally;
-            }
+        private bool _ignorePawns = false;
+        public bool CanWalkDiagonally { get { return _canWalkDiagonally; } }
+        public WalkNode(Board board, Point point, bool canWalkDiagonally, bool ignorePawns)
+        : base(board, point) {
+            _canWalkDiagonally = canWalkDiagonally;
+            _ignorePawns = ignorePawns;
+        }
         
         public override int GetEdgeCost(BlockNode neighbor) {
             // Moving to adjacent tiles on the same plane or lower costs 1 point
@@ -30,7 +32,7 @@ namespace LostGen {
                 Stack<Point> open = new Stack<Point>();
                 
                 Point[] neighborPoints;
-                if (CanWalkDiagonally) {
+                if (_canWalkDiagonally) {
                     neighborPoints = Point.NeighborsFullXZ; 
                 } else {
                     neighborPoints = Point.NeighborsXZ;
@@ -49,7 +51,7 @@ namespace LostGen {
 
                     if (!_neighbors.ContainsKey(adjacent)) {
                         // Check if there is either a solid Pawn at the latest location, or if there's a solid block
-                        if (Board.IsSolid(adjacent)) {
+                        if ((_ignorePawns && block.IsSolid) || (!_ignorePawns && Board.IsSolid(adjacent))) {
                             // If there is a solid block, then push the point above the solid one onto the stack
                             Point above = adjacent + Point.Up;
                             if (block.IsSolid && Board.Blocks.InBounds(above)) {
@@ -61,7 +63,7 @@ namespace LostGen {
                             if (Board.Blocks.InBounds(below)) {
                                 BoardBlock blockBelow = Board.Blocks.At(below);
                                 if (blockBelow.IsSolid) {
-                                    WalkNode neighborNode = new WalkNode(Board, adjacent, CanWalkDiagonally);
+                                    WalkNode neighborNode = new WalkNode(Board, adjacent, _canWalkDiagonally, _ignorePawns);
                                     neighborNode._neighbors.Add(Point, this);
                                     _neighbors.Add(adjacent, neighborNode);
                                 } else {

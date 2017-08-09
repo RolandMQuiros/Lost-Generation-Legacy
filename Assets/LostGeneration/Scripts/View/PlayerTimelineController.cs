@@ -25,6 +25,7 @@ public class PlayerTimelineController : MonoBehaviour {
 	public PawnActionEvent ActionDone;
 	public PawnActionEvent ActionUndone;
 	public PawnActionEvent ActionAdded;
+	public PawnActionEvent ActionInterrupted;
 
 	private Dictionary<Pawn, Timeline> _timelines = new Dictionary<Pawn, Timeline>();
 	private int _step = 0;
