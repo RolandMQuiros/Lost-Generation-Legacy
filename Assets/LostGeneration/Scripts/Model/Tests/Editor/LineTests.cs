@@ -60,5 +60,41 @@ namespace Tests {
                 Assert.AreEqual(expected[i++], linePoint);
             }
         }
+
+        [Test]
+        public void Diagonal3DPositive() {
+            Point start = Point.Zero;
+            Point end = Point.One * 10;
+
+            int count = 0;
+            foreach (Point point in Point.Line3D(start, end)) {
+                Assert.AreEqual(Point.One * count++, point);
+            }
+        }
+
+        [Test]
+        public void Diagonal3DPositiveShallow() {
+            Point start = Point.Zero;
+            Point end = new Point(10, 5, 10);
+
+            float distance = Point.FDistance(Point.Zero, end);
+            float stepX = end.X / distance;
+            float stepY = end.Y / distance;
+            float stepZ = end.Z / distance;
+
+            List<Point> line = new List<Point>(Point.Line3D(start, end));
+            line.ForEach(point => Console.Write(point));
+
+            int count = 0;
+            foreach (Point point in line) {
+                Point expected = new Point(
+                    (int)(stepX * count + 0.5f),
+                    (int)(stepY * count + 0.5f),
+                    (int)(stepZ * count + 0.5f)
+                );
+                Assert.AreEqual(expected, point);
+                count++;
+            }
+        }
     }
 }

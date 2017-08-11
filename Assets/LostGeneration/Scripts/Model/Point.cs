@@ -237,64 +237,123 @@ namespace LostGen
             return !p1.Equals(p2);
         }
 
-        public static Point[] Line(Point start, Point end)
-        {
-            bool steep = Math.Abs(end.Y - start.Y) > Math.Abs(end.X - start.Y);
+        private static int[,] Line2D(int x1, int y1, int x2, int y2) {
+            bool steep = Math.Abs(y2 - y1) > Math.Abs(x2 - x1);
 
             int swap;
-            if (steep)
-            {
-                swap = start.X;
-                start.X = start.Y;
-                start.Y = swap;
+            if (steep) {
+                swap = x1;
+                x1 = y1;
+                y1 = swap;
 
-                swap = end.X;
-                end.X = end.Y;
-                end.Y = swap;
+                swap = x2;
+                x2 = y2;
+                y2 = swap;
             }
 
-            if (start.X > end.X)
-            {
-                swap = start.X;
-                start.X = end.X;
-                end.X = swap;
+            if (x1 > x2) {
+                swap = x1;
+                x1 = x2;
+                x2 = swap;
 
-                swap = start.Y;
-                start.Y = end.Y;
-                end.Y = swap;
+                swap = y1;
+                y1 = y2;
+                y2 = swap;
             }
 
-            int dx = end.X - start.X;
-            int dy = Math.Abs(end.Y - start.Y);
+            int dx = x2 - x1;
+            int dy = Math.Abs(y2 - y1);
 
             int err = dx / 2;
-            int ystep = (start.Y < end.Y) ? 1 : -1;
-            int y = start.Y;
+            int ystep = (y1 < y2) ? 1 : -1;
+            int y = y1;
 
-            Point[] line = new Point[Math.Abs(end.X - start.X) + 1];
-
-            for (int x = start.X; x <= end.X; x++)
-            {
-                Point point;
-                if (steep)
-                {
-                    point = new Point(y, x);
+            int[,] line = new int[Math.Abs(x2 - x1) + 1, 2];
+            int index = 0;
+            for (int x = x1; x <= x2; x++) {
+                if (steep) {
+                    line[index, 0] = y;
+                    line[index, 1] = x;
                 }
-                else
-                {
-                    point = new Point(x, y);
+                else {
+                    line[index, 0] = x;
+                    line[index, 1] = y;
                 }
                 err -= dy;
-                if (err < 0)
-                {
+                if (err < 0) {
                     y += ystep;
                     err += dx;
                 }
-
-                line[x - start.X] = point;
             }
 
             return line;
+        }
+
+        public static Point[] Line(Point start, Point end) {
+            Point[] line = new Point[Math.Abs(end.X - start.X)];
+            int[,] xy = Line2D(start.X, start.Y, end.X, end.Y);
+            int[,] xz = Line2D(start.X, start.Z, end.X, end.Z);
+
+            for (int i = 0; i < line.Length; i++) {
+                line[i].X = start.X + i;
+                line[i].Y = xy[i, 1];
+                line[i].Z = xz[i, 1];
+            }
+
+            return line;
+        }
+
+        public static IEnumerable<Point> Line3D(Point start, Point end) {
+            Point delta = end - start;
+            Point absDelta = Point.Abs(delta);
+
+            int length = Math.Max(absDelta.X, Math.Max(absDelta.Y, absDelta.Z));
+            Point step = new Point(
+                delta.X > 0 ? 1 : -1,
+                delta.Y > 0 ? 1 : -1,
+                delta.Z > 0 ? 1 : -1
+            );
+            Point error = new Point();
+            Point scanStep = new Point();
+            
+            // Check which axis is the largest, then use that as the primary increment axis
+            if (absDelta.X >= absDelta.Y && absDelta.X >= absDelta.Z) {
+                length = absDelta.X;
+                error = new Point(0, absDelta.X / 2, absDelta.X / 2);
+                absDelta.X = 0;
+                scanStep.X = 1;
+            } else if (absDelta.Y >= absDelta.X && absDelta.Y >= absDelta.Z) {
+                length = absDelta.Y;
+                error = new Point(absDelta.Y / 2, 0, absDelta.Y / 2);
+                absDelta.Y = 0;
+                scanStep.Y = 1;
+            } else if (absDelta.Z >= absDelta.X && absDelta.Z >= absDelta.Y) {
+                length = absDelta.Z;
+                error = new Point(absDelta.Z / 2, absDelta.Z / 2, 0);
+                absDelta.Z = 0;
+                scanStep.Z = 1;
+            } else {
+                throw new Exception("Couldn't find a maximum axis. This really shouldn't happen!");
+            }
+
+            Point point = start;
+            for (int i = 0; i < length; i++) {
+                yield return point;
+                error -= absDelta;
+                if (error.X < 0) {
+                    point.X += step.X;
+                    error.X += absDelta.X;
+                }
+                if (error.Y < 0) {
+                    point.Y += step.Y;
+                    error.Y += absDelta.Y;
+                }
+                if (error.Z < 0) {
+                    point.Z += step.Z;
+                    error.Z += absDelta.Z;
+                }
+                point += scanStep;
+            }
         }
 
         public static CardinalDirection DirectionBetweenPoints(Point p1, Point p2)
