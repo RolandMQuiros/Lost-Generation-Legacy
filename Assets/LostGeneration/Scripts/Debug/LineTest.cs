@@ -8,11 +8,12 @@ public class LineTest : MonoBehaviour {
 	// Use this for initialization
 	private void Awake () {
 		_mesh = GetComponent<BlockMesh>();
+		_mesh.Resize(100 * Point.One);
 	}
 	
 	public void OnCursorMove(Point to) {
-		_mesh.Resize(to);
-		foreach (Point point in Point.Line3D(Point.Zero, to)) {
+		_mesh.Clear();
+		foreach (Point point in Point.Line(Point.Zero, to)) {
 			_mesh.SetBlock(point, 1);
 		}
 		_mesh.Build();

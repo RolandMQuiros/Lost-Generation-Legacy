@@ -12,7 +12,7 @@ namespace Tests {
             Point start = Point.Zero;
             Point end = Point.Right * 10;
 
-            Point[] line = Point.Line(start, end);
+            Point[] line = Point.Line(start, end).ToArray();
 
             for (int i = 0; i < line.Length; i++) {
                 Console.Write(line[i]);
@@ -28,7 +28,7 @@ namespace Tests {
             Point start = new Point(16, 23);
             Point end = start + (Point.Up * 10);
 
-            Point[] line = Point.Line(start, end);
+            Point[] line = Point.Line(start, end).ToArray();
 
             int i = 0;
             foreach (Point point in line.OrderBy(p => Point.TaxicabDistance(start, p))) {
@@ -43,7 +43,7 @@ namespace Tests {
             Point start = new Point(16, 23);
             Point end = start + ((Point.Up + Point.Left) * 10);
 
-            Point[] line = Point.Line(start, end);
+            Point[] line = Point.Line(start, end).ToArray();
             Point[] expected = new Point[line.Length];
 
             Point expPoint = start;
@@ -67,7 +67,7 @@ namespace Tests {
             Point end = Point.One * 10;
 
             int count = 0;
-            foreach (Point point in Point.Line3D(start, end)) {
+            foreach (Point point in Point.Line(start, end)) {
                 Assert.AreEqual(Point.One * count++, point);
             }
         }
@@ -82,7 +82,7 @@ namespace Tests {
             float stepY = end.Y / distance;
             float stepZ = end.Z / distance;
 
-            List<Point> line = new List<Point>(Point.Line3D(start, end));
+            List<Point> line = new List<Point>(Point.Line(start, end));
             line.ForEach(point => Console.Write(point));
 
             int count = 0;

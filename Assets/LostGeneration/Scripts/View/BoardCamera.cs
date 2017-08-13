@@ -5,7 +5,7 @@ using LostGen;
 
 public class BoardCamera : MonoBehaviour {
     #region UnityFields
-    public Camera Camera;
+    [SerializeField]private Camera _camera;
     #endregion
 
     #region MotionDefs
@@ -96,7 +96,7 @@ public class BoardCamera : MonoBehaviour {
 
     #region MonoBehaviour
     private void Start() {
-        _originalOffset = Camera.transform.localPosition;
+        _originalOffset = _camera.transform.localPosition;
         _directionToCamera = _originalOffset.normalized;
     }
 
@@ -138,12 +138,12 @@ public class BoardCamera : MonoBehaviour {
         if (_currentMotion != null) {
             _currentMotion.End();
         }
-        _currentMotion = new ZoomMotion(Camera.transform, transform, _originalOffset, scale, duration);
+        _currentMotion = new ZoomMotion(_camera.transform, transform, _originalOffset, scale, duration);
         _motions.Clear();
     }
 
     public void AddZoom(float scale, float duration) {
-        _motions.Enqueue(new ZoomMotion(Camera.transform, transform, _originalOffset, scale, duration));
+        _motions.Enqueue(new ZoomMotion(_camera.transform, transform, _originalOffset, scale, duration));
     }
 
     public void Rotate(float angle, float duration) {

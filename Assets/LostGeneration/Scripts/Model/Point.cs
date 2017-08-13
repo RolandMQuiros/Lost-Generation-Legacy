@@ -237,122 +237,33 @@ namespace LostGen
             return !p1.Equals(p2);
         }
 
-        private static int[,] Line2D(int x1, int y1, int x2, int y2) {
-            bool steep = Math.Abs(y2 - y1) > Math.Abs(x2 - x1);
-
-            int swap;
-            if (steep) {
-                swap = x1;
-                x1 = y1;
-                y1 = swap;
-
-                swap = x2;
-                x2 = y2;
-                y2 = swap;
-            }
-
-            if (x1 > x2) {
-                swap = x1;
-                x1 = x2;
-                x2 = swap;
-
-                swap = y1;
-                y1 = y2;
-                y2 = swap;
-            }
-
-            int dx = x2 - x1;
-            int dy = Math.Abs(y2 - y1);
-
-            int err = dx / 2;
-            int ystep = (y1 < y2) ? 1 : -1;
-            int y = y1;
-
-            int[,] line = new int[Math.Abs(x2 - x1) + 1, 2];
-            int index = 0;
-            for (int x = x1; x <= x2; x++) {
-                if (steep) {
-                    line[index, 0] = y;
-                    line[index, 1] = x;
-                }
-                else {
-                    line[index, 0] = x;
-                    line[index, 1] = y;
-                }
-                err -= dy;
-                if (err < 0) {
-                    y += ystep;
-                    err += dx;
-                }
-            }
-
-            return line;
-        }
-
-        public static Point[] Line(Point start, Point end) {
-            Point[] line = new Point[Math.Abs(end.X - start.X)];
-            int[,] xy = Line2D(start.X, start.Y, end.X, end.Y);
-            int[,] xz = Line2D(start.X, start.Z, end.X, end.Z);
-
-            for (int i = 0; i < line.Length; i++) {
-                line[i].X = start.X + i;
-                line[i].Y = xy[i, 1];
-                line[i].Z = xz[i, 1];
-            }
-
-            return line;
-        }
-
-        public static IEnumerable<Point> Line3D(Point start, Point end) {
-            Point delta = end - start;
-            Point absDelta = Point.Abs(delta);
-
-            int length = Math.Max(absDelta.X, Math.Max(absDelta.Y, absDelta.Z));
+        public static IEnumerable<Point> Line(Point start, Point end) {
+            Point delta = Point.Abs(end - start);
             Point step = new Point(
                 delta.X > 0 ? 1 : -1,
                 delta.Y > 0 ? 1 : -1,
                 delta.Z > 0 ? 1 : -1
             );
-            Point error = new Point();
-            Point scanStep = new Point();
-            
-            // Check which axis is the largest, then use that as the primary increment axis
-            if (absDelta.X >= absDelta.Y && absDelta.X >= absDelta.Z) {
-                length = absDelta.X;
-                error = new Point(0, absDelta.X / 2, absDelta.X / 2);
-                absDelta.X = 0;
-                scanStep.X = 1;
-            } else if (absDelta.Y >= absDelta.X && absDelta.Y >= absDelta.Z) {
-                length = absDelta.Y;
-                error = new Point(absDelta.Y / 2, 0, absDelta.Y / 2);
-                absDelta.Y = 0;
-                scanStep.Y = 1;
-            } else if (absDelta.Z >= absDelta.X && absDelta.Z >= absDelta.Y) {
-                length = absDelta.Z;
-                error = new Point(absDelta.Z / 2, absDelta.Z / 2, 0);
-                absDelta.Z = 0;
-                scanStep.Z = 1;
-            } else {
-                throw new Exception("Couldn't find a maximum axis. This really shouldn't happen!");
-            }
+            int maxDelta = Math.Max(delta.X, Math.Max(delta.Y, delta.Z));
+            int halfMaxDelta = maxDelta >> 1;
+            Point error = new Point(halfMaxDelta, halfMaxDelta, halfMaxDelta);
 
             Point point = start;
-            for (int i = 0; i < length; i++) {
+            for (int i = maxDelta; i > 0; i--) {
                 yield return point;
-                error -= absDelta;
+                error -= delta;
                 if (error.X < 0) {
+                    error.X += maxDelta;
                     point.X += step.X;
-                    error.X += absDelta.X;
                 }
                 if (error.Y < 0) {
+                    error.Y += maxDelta;
                     point.Y += step.Y;
-                    error.Y += absDelta.Y;
                 }
                 if (error.Z < 0) {
+                    error.Z += maxDelta;
                     point.Z += step.Z;
-                    error.Z += absDelta.Z;
                 }
-                point += scanStep;
             }
         }
 

@@ -134,7 +134,7 @@ namespace LostGen {
         #region SelectAlgs
         
         public bool LineCast(Point start, Point end, HashSet<Pawn> pawns = null, bool passThroughWalls = false, bool passThroughSolids = false) {
-            Point[] line = Point.Line(start, end);
+            IEnumerable<Point> line = Point.Line(start, end);
             bool stopped = false;
 
             foreach (Point point in line.OrderBy(p => Point.TaxicabDistance(start, p))) {

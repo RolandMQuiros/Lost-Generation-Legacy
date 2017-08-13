@@ -2,6 +2,11 @@
 
 public class BoardCameraController : MonoBehaviour {
     #region EditorFields
+    [SerializeField]private string _verticalInput;
+	[SerializeField]private string _horizontalInput;
+    [SerializeField]private string _shiftPlaneInput;
+    [SerializeField]private string _sprintInput;
+
     [SerializeField]private float _regularSpeed = 8f;
     [SerializeField]private float _highSpeed = 14f;
     [SerializeField]private float _correctionTime = 0.5f;
@@ -20,14 +25,14 @@ public class BoardCameraController : MonoBehaviour {
     public bool DebugSprint;
 
     private void Update () {
-        float dx = Input.GetAxis("Horizontal");
-        float dz = Input.GetAxis("Vertical");
-        float dy = Input.GetAxis("Shift Plane");
-        bool sprint = Input.GetButton("Sprint");
+        float dx = Input.GetAxis(_horizontalInput);
+        float dz = Input.GetAxis(_verticalInput);
+        float dy = Input.GetAxis(_shiftPlaneInput);
+        bool sprint = Input.GetButton(_sprintInput);
 
         if (dx != 0 || dz != 0 || dy != 0) {
             _isManuallyPanning = true;
-            _boardCamera.CancelPan ();
+            _boardCamera.CancelPan();
 
             Vector3 forward = Vector3.ProjectOnPlane(_camera.forward, Vector3.up).normalized;
             Vector3 right = Vector3.Cross(Vector3.up, forward).normalized;
