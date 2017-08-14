@@ -98,9 +98,9 @@ namespace LostGen {
             return canAttack;
         }
 
-        public override PawnAction Fire() {
+        public override IEnumerable<PawnAction> Fire() {
             AttackAction attack = new AttackAction(Pawn, _transforms[Direction]);
-            return attack;
+            yield return attack;
         }
     }
 }

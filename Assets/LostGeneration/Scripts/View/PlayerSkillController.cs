@@ -69,24 +69,26 @@ public class PlayerSkillController : MonoBehaviour
 
     public void FireActiveSkill()
     {
-        if (_activeSkill != null)
-        {
-            PawnAction action = _activeSkill.Fire();
-            if (action != null)
-            {
-                if (action.Cost <= _combatant.ActionPoints.Current)
-                {
+        if (_activeSkill != null) {
+            bool isFired = false;
+            foreach (PawnAction action in _activeSkill.Fire()) {
+                if (action.Cost <= _combatant.ActionPoints.Current) {
+                    isFired = true;
                     // Move timeline back to the current Pawn's latest step
                     //_timelineController.SetAllStep(Math.Min(Math.Min(_timelineController.Step, _timeline.Count), _activationStep));
                     // Push the new action and step forward
                     _timelineController.SetStepAction(action);
-                    SkillFired.Invoke(_activeSkill);
-                    DeactivateSkill();
                 }
-                else
-                {
+                else {
                     // Play error noise
+                    throw new Exception("Combatant for Pawn " + _combatant.Pawn + " does not have enough Action Points for action " + action +
+                        ". Check Skill " + _activeSkill.Name + ", as it should not push actions that do not satisfy all conditions!");
                 }
+            }
+
+            if (isFired) {
+                SkillFired.Invoke(_activeSkill);
+                DeactivateSkill();
             }
         }
     }

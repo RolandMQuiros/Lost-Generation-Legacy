@@ -65,22 +65,18 @@
 
 //         #endregion PointCollections
 
-//         public override PawnAction Fire() {
-//             MoveAction move = null;
+//         public override IEnumerable<PawnAction> Fire() {
 //             List<WalkNode> path = FindPath(Pawn.Position, Target);
 
 //             if (path != null) {
 //                 Debug.Log("Repathed");
 //                 for (int i = 1; i < path.Count; i++) {
-//                     move = new MoveAction(Pawn, path[i - 1].Point, path[i].Point, true);
-//                     Pawn.PushAction(move);
+//                     yield return new MoveAction(Pawn, path[i - 1].Point, path[i].Point, 1, true);
 //                 }
 
 //                 // Clear the range for the next step
 //                 _range = null;
 //             }
-
-//             return move;
 //         }
 
 //         public override string ToString() {
@@ -88,11 +84,11 @@
 //         }
 
 //         private List<WalkNode> FindPath(Point origin, Point target) {
-//             WalkNode end = new WalkNode(_board, target, CanWalkDiagonally);
+//             WalkNode end = new WalkNode(_board, target, CanWalkDiagonally, true);
 //             List<WalkNode> path = null;
 
 //             if (end != null) {
-//                 WalkNode start = new WalkNode(_board, target, CanWalkDiagonally);
+//                 WalkNode start = new WalkNode(_board, target, CanWalkDiagonally, true);
 
 //                 if (start == null) {
 //                     throw new Exception("This Skill's owner is positioned outside the graph");
@@ -100,12 +96,12 @@
 
 //                 if (Point.TaxicabDistance(Pawn.Position, target) == 1) {
 //                     path = new List<WalkNode>();
-//                     path.Add(new WalkNode(_board, origin, CanWalkDiagonally));
-//                     path.Add(new WalkNode(_board, target, CanWalkDiagonally));
+//                     path.Add(new WalkNode(_board, origin, CanWalkDiagonally, true));
+//                     path.Add(new WalkNode(_board, target, CanWalkDiagonally, true));
 //                 } else {
 //                     path = new List<WalkNode>(
 //                         GraphMethods<WalkNode>.FindPath(
-//                             new WalkNode(_board, origin, CanWalkDiagonally),
+//                             new WalkNode(_board, origin, CanWalkDiagonally, true),
 //                             end,
 //                             Heuristic
 //                         )
@@ -125,7 +121,7 @@
 //             // If the cached range collection doesn't exist yet, or the origin has changed,
 //             // then create the range
 //             if (_range == null || _prevOrigin != origin) {
-//                 WalkNode startNode = new WalkNode(Pawn.Board, origin, CanWalkDiagonally);
+//                 WalkNode startNode = new WalkNode(Pawn.Board, origin, CanWalkDiagonally, true);
 //                 _prevOrigin = origin;
 //                 _range = new HashSet<Point>();
 //                 if (startNode != null) {
