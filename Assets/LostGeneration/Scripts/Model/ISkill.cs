@@ -25,7 +25,7 @@ namespace LostGen {
         /// Generates this Skill's Actions and pushes them onto the owning Combatant's Action queue,
         /// either on the front or back.
         /// </summary>
-        PawnAction Fire();
+        IEnumerable<PawnAction> Fire();
 
         /// <summary>
         /// Whether or not this Skill is usable based on the Pawn's current state.

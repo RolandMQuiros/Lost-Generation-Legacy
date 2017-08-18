@@ -107,16 +107,7 @@ public class SkillSelector : MonoBehaviour {
 		}
 	}
 
-	public void Fire()
-	{
-		if (_skill != null)
-		{
-			PawnAction action = _skill.Fire();
-		}
-	}
-
-    private void UpdateAreaOfEffect()
-    {
+    private void UpdateAreaOfEffect() {
 		if (_aoe != null)
 		{
 			SetBlocks(_areaOfEffectMesh, _aoe.GetAreaOfEffect(), 1);
@@ -162,16 +153,13 @@ public class SkillSelector : MonoBehaviour {
 		return wasResized;
 	}
 
-	private void SetBlocks(BlockMesh mesh, IEnumerable<Point> points, byte blockType)
-	{
-		if (!ResizeFromPoints(mesh, points))
-		{
+	private void SetBlocks(BlockMesh mesh, IEnumerable<Point> points, byte blockType) {
+		if (!ResizeFromPoints(mesh, points)) {
 			mesh.Clear();
 		}
 
 		Point lower = Point.LowerBound(points);
-		foreach (Point point in points)
-		{
+		foreach (Point point in points) {
 			mesh.SetBlock(point - lower, blockType);
 			mesh.transform.position = PointVector.ToVector(lower);
 		}

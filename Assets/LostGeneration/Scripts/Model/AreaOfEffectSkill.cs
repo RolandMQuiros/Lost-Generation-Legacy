@@ -20,7 +20,7 @@ namespace LostGen {
         }
 
         public abstract IEnumerable<Point> GetAreaOfEffect();
-        public abstract PawnAction Fire();
+        public abstract IEnumerable<PawnAction> Fire();
         
         public virtual bool IsUsable()
         {

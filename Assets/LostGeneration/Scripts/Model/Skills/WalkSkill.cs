@@ -41,14 +41,14 @@ namespace LostGen
             return Enumerable.Empty<Point>();
         }
 
-        public override PawnAction Fire()
+        public override IEnumerable<PawnAction> Fire()
         {
             PawnAction move = null;
             if (InRange(Target))
             {
                 move = new MoveAction(Pawn, Pawn.Position, Target, MoveCost(Pawn.Position, Target), true);
             }
-            return move;
+            yield return move;
         }
 
         public static int MoveCost(Point from, Point to) {

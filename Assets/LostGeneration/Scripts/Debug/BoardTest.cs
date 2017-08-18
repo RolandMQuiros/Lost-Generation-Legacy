@@ -105,6 +105,8 @@ public class BoardTest : MonoBehaviour
             skillSet.AddSkill(new MeleeAttackSkill(pawn, 2, new Point[] { Point.Right, Point.Right * 2}));
         }
 
+        //skillSet.AddSkill(new LongWalkSkill(pawn));
+
         pawn.AddComponent(new Timeline());
 
         return pawn;
