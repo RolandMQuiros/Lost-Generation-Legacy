@@ -5,7 +5,7 @@ using UnityEngine.Events;
 using LostGen;
 
 
-[RequireComponent(typeof(BoxCollider))]
+[RequireComponent(typeof(BoardCursor))]
 public class BoardCursorMouseController : MonoBehaviour,
                                           IBoardCursorController,
                                           IPointerClickHandler,
@@ -13,13 +13,13 @@ public class BoardCursorMouseController : MonoBehaviour,
                                           IPointerUpHandler
 {
     [SerializeField]private Camera _camera;
-    [SerializeField]private BoardRef _boardRef;
     [SerializeField]private Vector3 _screenPoint;
     [SerializeField]private Vector3 _worldPoint;
     [SerializeField]private Point _boardPoint;
     [SerializeField]private bool _clipThroughSolids = true;
     [SerializeField]private bool _stickToGround = true;
-    private BoxCollider _clickCollider;
+    private BoardCursor _boardCursor;
+    private Board _board;
     private bool _isWindowFocused;
     public Point BoardPoint { get { return _boardPoint; } }
     public event Action<Point> Clicked;
@@ -29,18 +29,12 @@ public class BoardCursorMouseController : MonoBehaviour,
 
     #region MonoBehaviour
     private void Awake() {
-        _clickCollider = GetComponent<BoxCollider>();
+        _boardCursor = GetComponent<BoardCursor>();
         _camera = _camera ?? Camera.main;
     }
 
     private void Start() {
-        Bounds clickBounds = _clickCollider.bounds;
-        Vector3 size = PointVector.ToVector(_boardRef.Board.Blocks.Size);
-        size.y = 1f;
-        clickBounds.SetMinMax(_boardRef.transform.position, size);
-
-        _clickCollider.center = clickBounds.center;
-        _clickCollider.size = clickBounds.size;
+        _board = _boardCursor.BoardRef.Board;
     }
 
     private void LateUpdate() {
@@ -51,64 +45,26 @@ public class BoardCursorMouseController : MonoBehaviour,
             // Get the point on the Collider beneath the cursor
             Ray screenCast = _camera.ScreenPointToRay(_screenPoint);
             RaycastHit hitInfo;
-            _clickCollider.Raycast(screenCast, out hitInfo, 100f);
-            _worldPoint = hitInfo.point;
+            _boardCursor.ClickCollider.Raycast(screenCast, out hitInfo, 100f);
+            
+            Point entryPoint = PointVector.ToPoint(hitInfo.point);
 
-            // Convert to integer Point
-            Point snapped = PointVector.ToPoint(_worldPoint);
-            snapped = new Point
-            (
-                Math.Min(Math.Max(snapped.X, 0), _boardRef.Board.Blocks.Size.X - 1),
-                Math.Min(Math.Max(snapped.Y, 0), _boardRef.Board.Blocks.Size.Y - 1),
-                Math.Min(Math.Max(snapped.Z, 0), _boardRef.Board.Blocks.Size.Z - 1)
-            );
+            // Get the opposing cast point
+            float distanceToBoardCenter = Vector3.Distance(screenCast.origin, _boardCursor.BoardRef.transform.position);
+            Ray opposingCast = new Ray(screenCast.GetPoint(2f * distanceToBoardCenter + 1f), -screenCast.direction);
+            _boardCursor.ClickCollider.Raycast(opposingCast, out hitInfo, 100f);
 
-            Point? boardPoint = null;
+            Point exitPoint = PointVector.ToPoint(hitInfo.point);
 
-            if (_clipThroughSolids)
-            {
-                boardPoint = snapped;
-            }
-            else
-            {
-                // Move up until a non-solid block is found
-                BoardBlock block = _boardRef.Board.Blocks.At(snapped);
-                if (block.IsSolid)
-                {
-                    while (block.IsSolid && _boardRef.Board.Blocks.InBounds(block.Point + Point.Up))
-                    {
-                        block = _boardRef.Board.Blocks.At(block.Point + Point.Up);
-                        if (!block.IsSolid)
-                        {
-                            boardPoint = block.Point;
-                        }
+            // Perform a discrete line cast from the entry and exit points
+            foreach (Point point in Point.Line(entryPoint, exitPoint)) {
+                if (_board.Blocks.InBounds(point)) {
+                    BoardBlock block = _board.Blocks.At(point);
+                    if (block.IsSolid) {
+                        _boardPoint = point;
+                        break;
                     }
                 }
-                else
-                {
-                    // Move down until a solid block is found
-                    if (_stickToGround)
-                    {
-                        while (!block.IsSolid && _boardRef.Board.Blocks.InBounds(block.Point + Point.Down))
-                        {
-                            BoardBlock below = _boardRef.Board.Blocks.At(block.Point + Point.Down);
-                            if (below.IsSolid)
-                            {
-                                boardPoint = below.Point;
-                            }
-                            block = below;
-                        }
-                    }
-                    else
-                    {
-                        boardPoint = block.Point;
-                    }
-                }
-            }
-
-            if (boardPoint != null && boardPoint.Value != _boardPoint) {
-                _boardPoint = boardPoint.Value;
-                if (Moved != null) { Moved(_boardPoint); }
             }
         }
     }
