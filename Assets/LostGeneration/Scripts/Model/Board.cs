@@ -11,7 +11,6 @@ namespace LostGen {
         private IBlockManager _blocks;
         private IPawnManager _pawns;
 
-
         public Board(IBlockManager blockManager, IPawnManager pawnManager) {
             _blocks = blockManager;
             _pawns = pawnManager;
@@ -134,10 +133,9 @@ namespace LostGen {
         #region SelectAlgs
         
         public bool LineCast(Point start, Point end, HashSet<Pawn> pawns = null, bool passThroughWalls = false, bool passThroughSolids = false) {
-            IEnumerable<Point> line = Point.Line(start, end);
             bool stopped = false;
 
-            foreach (Point point in line.OrderBy(p => Point.TaxicabDistance(start, p))) {
+            foreach (Point point in Point.Line(start, end)) {
                 if (_blocks.InBounds(point)) {
                     if (!passThroughWalls && _blocks.At(point).IsSolid) {
                         stopped = true;
