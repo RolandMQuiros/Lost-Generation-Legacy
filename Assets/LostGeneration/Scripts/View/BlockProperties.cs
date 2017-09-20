@@ -5,14 +5,21 @@ using UnityEngine;
 
 [Serializable]
 [CreateAssetMenu(fileName = "Block Properties", menuName = "Lost Generation/Block Properties")]
-public class BlockProperties : ScriptableObject {
+public class BlockProperties : ScriptableObject,
+							   IBlockProperties {
 	private const int _SIDE_COUNT = 6;
-	public AutoTile Top;
-	public AutoTile Right;
-	public AutoTile Bottom;
-	public AutoTile Left;
-	public AutoTile Forward;
-	public AutoTile Backward;
+	[SerializeField]
+	public AutoTile _top;
+	[SerializeField]
+	public AutoTile _right;
+	[SerializeField]
+	public AutoTile _bottom;
+	[SerializeField]
+	public AutoTile _left;
+	[SerializeField]
+	public AutoTile _forward;
+	[SerializeField]
+	public AutoTile _backward;
 
 	public AutoTile[] SideTiles {
 		get { return _sideTiles; }
@@ -30,7 +37,7 @@ public class BlockProperties : ScriptableObject {
 
 	public void Setup() {
 		_sideTiles = new AutoTile[] {
-			Top, Right, Bottom, Left, Forward, Backward
+			_top, _right, _bottom, _left, _forward, _backward
 		};
 		for (int i = 0; i < _sideTiles.Length; i++) {
 			if (_sideTiles[i] != null)

@@ -36,5 +36,12 @@ namespace LostGen {
         public override int GetHashCode() {
             return Point.GetHashCode();
         }
+
+        public override bool Equals(object other) {
+            BlockNode otherNode = other as BlockNode;
+            return otherNode != null &&
+                   otherNode.Board == Board &&
+                   otherNode.Point == Point;
+        }
     }
 }

@@ -23,21 +23,19 @@ namespace LostGen {
             }
         }
 
-        public static IEnumerable<T> FloodFill(T start, int maxCost = -1, int maxDepth = -1) {
+        public static IEnumerable<T> FloodFill(T start, int maxCost = -1, int maxDepth = -1, Dictionary<T, T> paths = null) {
             HashSet<T> domain = new HashSet<T>();
-            List<SortNode> open = new List<SortNode>();
+            HashSet<SortNode> open = new HashSet<SortNode>();
 
-            open.Add(new SortNode() { Node = start, Level = 1 });
-            domain.Add(open[0].Node);
+            SortNode first = new SortNode() { Node = start, Level = 1 };
+            open.Add(first);
+            domain.Add(first.Node);
 
-            //Profiler.BeginSample("GraphMethods.FloodFill");
             while (open.Count > 0) {
-                open.Sort();
-                SortNode current = open[0];
-                open.RemoveAt(0);
-                //domain.Add(current.Node);
+                SortNode current = open.Min();
+                open.Remove(current);
 
-                if (maxDepth == -1 || current.Level < maxDepth) {
+                if ((maxDepth == -1 || current.Level < maxDepth)) {
                     foreach (T neighbor in current.Node.GetNeighbors()) {
                         if (domain.Contains(neighbor)) {
                             continue;
@@ -47,6 +45,10 @@ namespace LostGen {
 
                         if (maxCost == -1 || tentativeGScore < maxCost) {
                             domain.Add(neighbor);
+                            if (paths != null) {
+                                paths.Add(current.Node, neighbor);
+                            }
+                            
                             open.Add(new SortNode() {
                                 Node = neighbor,
                                 GScore = tentativeGScore,
@@ -57,8 +59,7 @@ namespace LostGen {
                     }
                 }
             }
-            //Profiler.EndSample();
-
+            
             return domain;
         }
 

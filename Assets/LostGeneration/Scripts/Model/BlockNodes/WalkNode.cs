@@ -64,6 +64,7 @@ namespace LostGen {
                                 BoardBlock blockBelow = Board.Blocks.At(below);
                                 if (blockBelow.IsSolid) {
                                     WalkNode neighborNode = new WalkNode(Board, adjacent, _canWalkDiagonally, _ignorePawns);
+                                    // Add the current node as a neighbor to the new node
                                     neighborNode._neighbors.Add(Point, this);
                                     _neighbors.Add(adjacent, neighborNode);
                                 } else {

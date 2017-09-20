@@ -61,8 +61,11 @@ public class BoardTest : MonoBehaviour
 
     private void Start() {
         Pawn combatant1 = MakeCombatant(new Pawn("Test Combatant 1", _boardRef.Board, _boardRef.Board.Blocks.Size / 2 + Point.Right), 5);
+        combatant1.GetComponent<SkillSet>().AddSkill(new LongWalkSkill(combatant1) { CanWalkDiagonally = true });
+        
         Pawn combatant2 = MakeCombatant(new Pawn("Test Combatant 2", _boardRef.Board, _boardRef.Board.Blocks.Size / 2 + Point.Left), 6);
-
+        combatant2.GetComponent<SkillSet>().AddSkill(new LongWalkSkill(combatant1) { CanWalkDiagonally = false });
+        
         _boardRef.Board.Pawns.Add(combatant1);
         _boardRef.Board.Pawns.Add(combatant2);
 
@@ -104,8 +107,6 @@ public class BoardTest : MonoBehaviour
         for (int i = 0; i < 5; i++) {
             skillSet.AddSkill(new MeleeAttackSkill(pawn, 2, new Point[] { Point.Right, Point.Right * 2}));
         }
-
-        //skillSet.AddSkill(new LongWalkSkill(pawn));
 
         pawn.AddComponent(new Timeline());
 
