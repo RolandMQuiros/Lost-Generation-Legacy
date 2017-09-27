@@ -23,7 +23,7 @@ namespace LostGen {
             }
         }
 
-        public static IEnumerable<T> FloodFill(T start, int maxCost = -1, int maxDepth = -1, Dictionary<T, T> paths = null) {
+        public static IEnumerable<T> FloodFill(T start, int maxCost = -1, int maxDepth = -1) {
             HashSet<T> domain = new HashSet<T>();
             HashSet<SortNode> open = new HashSet<SortNode>();
 
@@ -43,12 +43,8 @@ namespace LostGen {
 
                         int tentativeGScore = current.GScore + current.Node.GetEdgeCost(neighbor);
 
-                        if (maxCost == -1 || tentativeGScore < maxCost) {
-                            domain.Add(neighbor);
-                            if (paths != null) {
-                                paths.Add(current.Node, neighbor);
-                            }
-                            
+                        if (maxCost == -1 || tentativeGScore <= maxCost) {
+                            domain.Add(neighbor);                            
                             open.Add(new SortNode() {
                                 Node = neighbor,
                                 GScore = tentativeGScore,

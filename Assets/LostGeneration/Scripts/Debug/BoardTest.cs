@@ -64,7 +64,7 @@ public class BoardTest : MonoBehaviour
         combatant1.GetComponent<SkillSet>().AddSkill(new LongWalkSkill(combatant1) { CanWalkDiagonally = true });
         
         Pawn combatant2 = MakeCombatant(new Pawn("Test Combatant 2", _boardRef.Board, _boardRef.Board.Blocks.Size / 2 + Point.Left), 6);
-        combatant2.GetComponent<SkillSet>().AddSkill(new LongWalkSkill(combatant1) { CanWalkDiagonally = false });
+        combatant2.GetComponent<SkillSet>().AddSkill(new LongWalkSkill(combatant2) { CanWalkDiagonally = false });
         
         _boardRef.Board.Pawns.Add(combatant1);
         _boardRef.Board.Pawns.Add(combatant2);

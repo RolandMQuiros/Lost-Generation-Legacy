@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using LostGen;
 
+///<summary>
+/// Receives IPawnMessages from the Model layer and distributes them to each PawnComponentView on the View layer
+///</summary>
 public class PawnView : MonoBehaviour {
 	private List<PawnComponentView> _components;
 

@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using LostGen;
 
+
+/// <summary>
+/// Processes how PawnActions are animated by a GameObject when the actions are added to the
+/// attached Combatant's Timeline.  Similar to CombatantView, except it processes PawnActions
+/// instead of events.
+/// </summary>
 [RequireComponent(typeof(CombatantAnimator))]
 public class CombatantActionView : MonoBehaviour {
 	public Pawn Pawn;
@@ -27,15 +33,22 @@ public class CombatantActionView : MonoBehaviour {
 		}
 	}
 
-	public void OnActionAdded(PawnAction action) {
-		if (action.Owner == Pawn) {
-			MoveAction move = action as MoveAction;
-			if (move != null) {
-				Coroutine moveCo = StartCoroutine(AddMove(move));
-				_activeRuns.Add(move, moveCo);
+	public void OnActionsAdded(IEnumerable<PawnAction> actions) {
+		Coroutine coroutine = StartCoroutine(RunActions(actions));
+	}
+	
+	private IEnumerator RunActions(IEnumerable<PawnAction> actions) {
+		foreach (PawnAction action in actions) {
+			if (action.Owner == Pawn) {
+				MoveAction move = action as MoveAction;
+				if (move != null) {
+					yield return _animator.Move(move.Start, move.End);
+					Finish(move);
+				}
 			}
 		}
 	}
+
 	private void Finish(PawnAction action) {
 		// Removes the action from the list of active Coroutines
 		_activeRuns.Remove(action);
@@ -47,6 +60,7 @@ public class CombatantActionView : MonoBehaviour {
 		yield return _animator.Move(move.Start, move.End);
 		Finish(move);
 	}
+
 	private void DoMove(MoveAction move) {
 		transform.position = PointVector.ToVector(move.End);;
 	}

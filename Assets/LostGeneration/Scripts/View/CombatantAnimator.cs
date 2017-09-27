@@ -19,13 +19,15 @@ public class CombatantAnimator : MonoBehaviour {
 		_animator = GetComponent<Animator>();
 	}
 	#endregion MonoBehaviour
-
-	public IEnumerator Move(Point from, Point to) {
+	public IEnumerator Move(Point from, Point to, bool rotate = true) {
 		Vector3 vFrom = PointVector.ToVector(from);
 		Vector3 vTo = PointVector.ToVector(to);
 
 		Quaternion rotFrom = transform.rotation;
-		Quaternion rotTo = Quaternion.LookRotation((vTo - vFrom).normalized, Vector3.up);
+		Quaternion rotTo = transform.rotation;
+		if (rotate) {
+			rotTo = Quaternion.LookRotation((vTo - vFrom).normalized, Vector3.up);
+		}
 
 		Vector3 step = (vTo - vFrom) / MoveDuration;
 		float time = 0f;
@@ -34,13 +36,19 @@ public class CombatantAnimator : MonoBehaviour {
 		while (time < MoveDuration) {
 			time += Time.deltaTime;
 			transform.position = Vector3.Lerp(vFrom, vTo, time / MoveDuration);
-			transform.rotation = Quaternion.Lerp(rotFrom, rotTo, time / (MoveDuration / 5f));
+			
+			if (rotate) {
+				transform.rotation = Quaternion.Lerp(rotFrom, rotTo, time / (MoveDuration / 5f));
+			}
 			
 			yield return null;
 		}
 		_animator.SetFloat("Run", 0f);
 
 		transform.position = vTo;
-		transform.rotation = rotTo;
+
+		if (rotate) {
+			transform.rotation = rotTo;
+		}
 	}
 }

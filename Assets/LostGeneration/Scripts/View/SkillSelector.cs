@@ -46,8 +46,11 @@ public class SkillSelector : MonoBehaviour {
 			
 			if (_ranged != null)
 			{
-				SetBlocks(_rangeMesh, _ranged.GetRange(), 1);
-				_rangeMesh.Build();
+				//SetBlocks(_rangeMesh, _ranged.GetRange(), 1);
+				//_rangeMesh.Build();
+
+				_rangeMesh.gameObject.GetComponent<TileField>().Build(_ranged.GetRange());
+
 				_rangeMesh.gameObject.SetActive(true);
 			}
 		}

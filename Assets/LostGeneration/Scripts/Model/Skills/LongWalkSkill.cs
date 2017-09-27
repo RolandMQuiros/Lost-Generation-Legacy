@@ -18,7 +18,7 @@ namespace LostGen {
     /// more specific skills to cover smaller possibility spaces.
     /// </summary>
     public class LongWalkSkill : RangedSkill {
-        public override int ActionPoints { get { return _actionPoints; } }
+        public override int ActionPoints { get { return 0; } }
         public bool CanWalkDiagonally = true;
 
         protected Board _board;
@@ -71,7 +71,13 @@ namespace LostGen {
             if (path != null) {
                 Debug.Log("Repathed");
                 for (int i = 1; i < path.Count; i++) {
-                    yield return new MoveAction(Pawn, path[i - 1].Point, path[i].Point, 1, true);
+                    yield return new MoveAction(
+                        Pawn,
+                        path[i - 1].Point,
+                        path[i].Point,
+                        WalkNode.GetCost(path[i - 1].Point, path[i].Point),
+                        true
+                    );
                 }
 
                 // Clear the range for the next step
@@ -85,7 +91,7 @@ namespace LostGen {
 
         private List<WalkNode> FindPath(Point origin, Point target) {
             WalkNode end = new WalkNode(_board, target, CanWalkDiagonally, true);
-            List<WalkNode> path = null;
+            List<WalkNode> path = new List<WalkNode>();
 
             if (end != null) {
                 WalkNode start = new WalkNode(_board, target, CanWalkDiagonally, true);
@@ -95,7 +101,6 @@ namespace LostGen {
                 }
 
                 if (Point.TaxicabDistance(Pawn.Position, target) == 1) {
-                    path = new List<WalkNode>();
                     path.Add(new WalkNode(_board, origin, CanWalkDiagonally, true));
                     path.Add(new WalkNode(_board, target, CanWalkDiagonally, true));
                 } else {
@@ -127,7 +132,7 @@ namespace LostGen {
                 if (startNode != null) {
                     // GraphMethods include the origin in their result sets.  Make sure we skip the first one. 
                     bool firstSkipped = false;
-                    foreach (WalkNode node in GraphMethods<WalkNode>.FloodFill(startNode, -1, _ownerPoints.Current)) {
+                    foreach (WalkNode node in GraphMethods<WalkNode>.FloodFill(startNode, _ownerPoints.Current, -1)) {
                         if (firstSkipped) {
                             _range.Add(node.Point);
                         } else {
@@ -143,15 +148,18 @@ namespace LostGen {
         /// <param name="to"></param>
         /// <returns></returns>
         private int ActionCostBetweenNodes(BlockNode from, BlockNode to) {
-            int actionPoints = Math.Abs(to.Point.X - from.Point.Y);
-            int heightDifference = to.Point.Y - from.Point.Y;
             
-            // Climbing costs 2 points per block. Dropping only costs the horizontal component.
-            if (heightDifference > 0) {
-                actionPoints += heightDifference * 2;
-            }
+            // int actionPoints = Math.Abs(to.Point.X - from.Point.Y);
+            // int heightDifference = to.Point.Y - from.Point.Y;
+            
+            // // Climbing costs 2 points per block. Dropping only costs the horizontal component.
+            // if (heightDifference > 0) {
+            //     actionPoints += heightDifference * 2;
+            // }
 
-            return actionPoints;
+            // return actionPoints;
+
+            return WalkNode.GetCost(from.Point, to.Point);
         }
 
         protected virtual int Heuristic(WalkNode start, WalkNode end) {

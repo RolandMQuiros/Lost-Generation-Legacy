@@ -17,7 +17,7 @@ namespace LostGen {
         public override int GetEdgeCost(BlockNode neighbor) {
             // Moving to adjacent tiles on the same plane or lower costs 1 point
             // Moving to adjacent tiles from a lower to a higher plane costs the height difference
-            return Math.Abs(neighbor.Point.X - Point.X) + Math.Max(neighbor.Point.Y - Point.Y, 0);
+            return GetCost(Point, neighbor.Point);
         }
 
         public override IEnumerable<IGraphNode> GetNeighbors() {
@@ -25,6 +25,11 @@ namespace LostGen {
             foreach (WalkNode neighbor in _neighbors.Values) {
                 yield return neighbor;
             }
+        }
+
+        public static int GetCost(Point start, Point end) {
+            Point offset = Point.Abs(end - start);
+            return Math.Max(offset.X, offset.Z) + Math.Max(end.Y - start.Y, 0);
         }
 
         private void BuildNeighbors() {

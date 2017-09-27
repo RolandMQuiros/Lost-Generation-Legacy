@@ -24,7 +24,7 @@ public class PlayerTimelineController : MonoBehaviour {
 	}
 	public PawnActionEvent ActionDone;
 	public PawnActionEvent ActionUndone;
-	public PawnActionEvent ActionAdded;
+	public PawnActionsEvent ActionsAdded;
 	public PawnActionEvent ActionInterrupted;
 
 	private Dictionary<Pawn, Timeline> _timelines = new Dictionary<Pawn, Timeline>();
@@ -87,28 +87,35 @@ public class PlayerTimelineController : MonoBehaviour {
 		}
 	}
 
-	public void SetStepAction(PawnAction action) {
-		Timeline timeline;
-		if (_timelines.TryGetValue(action.Owner, out timeline)) {
-			// Undo all actions that have been set after the current step
-			List<PawnAction> undone = new List<PawnAction>();
-			timeline.TruncateAt(_step, undone);
+	public void SetStepActions(IEnumerable<PawnAction> actions) {
+		Queue<PawnAction> added = new Queue<PawnAction>();
+		foreach (PawnAction action in actions) {
+			Timeline timeline;
+			if (_timelines.TryGetValue(action.Owner, out timeline)) {
+				// Undo all actions that have been set after the current step
+				List<PawnAction> undone = new List<PawnAction>();
+				timeline.TruncateAt(_step, undone);
 
-			for (int i = 0; i < undone.Count; i++) {
-				// Unwind the deleted actions
-				ActionUndone.Invoke(undone[i]);
+				for (int i = 0; i < undone.Count; i++) {
+					// Unwind the deleted actions
+					ActionUndone.Invoke(undone[i]);
+				}
+
+				// Push the new action
+				timeline.PushAction(action);
+
+				// Do the new action
+				PawnAction done = timeline.Next();
+				done.Do();
+				action.Owner.RequireComponent<ActionPoints>().Current -= done.Cost;
+
+				added.Enqueue(done);
+				SetAllStep(_step + 1);
 			}
+		}
 
-			// Push the new action
-			timeline.PushAction(action);
-
-			// Do the new action
-			PawnAction done = timeline.Next();
-			done.Do();
-			action.Owner.RequireComponent<ActionPoints>().Current -= done.Cost;
-
-			ActionAdded.Invoke(done);
-			SetAllStep(_step + 1);
+		if (added.Count > 0) {
+			ActionsAdded.Invoke(added);
 		}
 	}
 

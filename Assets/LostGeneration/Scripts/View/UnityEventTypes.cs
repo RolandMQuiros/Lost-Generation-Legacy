@@ -1,5 +1,10 @@
-﻿using UnityEngine.Events;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine.Events;
 using LostGen;
 
-[System.Serializable]
+[Serializable]
 public class PawnActionEvent : UnityEvent<PawnAction> { }
+
+[Serializable]
+public class PawnActionsEvent : UnityEvent<IEnumerable<PawnAction>> { }
