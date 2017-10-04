@@ -50,6 +50,10 @@ public class BoardRef : MonoBehaviour {
         BoardStepped.Invoke(messages);
     }
 
+    public void BeginTurn() {
+        _board.BeginTurn();
+    }
+
     public void Turn() {
         Queue<IPawnMessage> messages = new Queue<IPawnMessage>();
 
@@ -76,4 +80,10 @@ public class BoardRef : MonoBehaviour {
     {
         PawnRemoved.Invoke(pawn);
     }
+
+    #region MonoBehaviour
+    private void Start() {
+        BeginTurn();
+    }
+    #endregion MonoBehaviour
 }
