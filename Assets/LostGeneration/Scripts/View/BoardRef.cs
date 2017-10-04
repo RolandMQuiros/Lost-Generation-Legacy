@@ -47,8 +47,19 @@ public class BoardRef : MonoBehaviour {
     public void Step() {
         Queue<IPawnMessage> messages = new Queue<IPawnMessage>();
         Board.Step(messages);
-
         BoardStepped.Invoke(messages);
+    }
+
+    public void Turn() {
+        Queue<IPawnMessage> messages = new Queue<IPawnMessage>();
+
+        do {
+            messages.Clear();
+            Board.Step(messages);
+            if (messages.Count > 0) {
+                BoardStepped.Invoke(messages);
+            }
+        } while (messages.Count > 0);
     }
 
     private void OnBlocksChanged(Dictionary<BoardBlock, BoardBlock> blocksChanged)

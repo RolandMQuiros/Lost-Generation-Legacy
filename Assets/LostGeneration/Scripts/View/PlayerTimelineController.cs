@@ -122,12 +122,16 @@ public class PlayerTimelineController : MonoBehaviour {
 	}
 
 	public void ApplyTimelines() {
-		foreach (KeyValuePair<Pawn, Timeline> pair in _timelines) {
-			// Push all actions on the timeline into the Pawn's action queue
-			pair.Key.PushActions(pair.Value.GetPawnActions());
+		// foreach (KeyValuePair<Pawn, Timeline> pair in _timelines) {
+		// 	// Push all actions on the timeline into the Pawn's action queue
+		// 	pair.Key.PushActions(pair.Value.GetPawnActions());
 
-			// Undo all actions on the timeline, so we're at the proper state
-			pair.Value.Clear();
+		// 	// Undo all actions on the timeline, so we're at the proper state
+		// 	pair.Value.Clear();
+		// }
+		foreach (Timeline timeline in _timelines.Values) {
+			timeline.Apply();
+			timeline.Clear();
 		}
 	}
 

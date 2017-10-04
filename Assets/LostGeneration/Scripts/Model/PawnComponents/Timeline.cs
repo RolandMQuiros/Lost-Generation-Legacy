@@ -140,8 +140,7 @@ namespace LostGen
         public IEnumerable<PawnAction> GetPawnActions()
         {
             Node node = _head;
-            while (node != null)
-            {
+            while (node != _tail) {
                 yield return node.Action;
                 node = node.Next;
             }

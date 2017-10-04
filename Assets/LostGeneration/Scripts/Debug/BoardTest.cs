@@ -75,10 +75,10 @@ public class BoardTest : MonoBehaviour
     }
 
     private void Update() {   
-        if (Input.GetKeyDown(KeyCode.Space)) {
-            _boardRef.Step();
-            _pawnManager.DistributeMessages();   
-        }   
+        // if (Input.GetKeyDown(KeyCode.Space)) {
+        //     _boardRef.Step();
+        //     _pawnManager.DistributeMessages();   
+        // }   
     }
     #endregion MonoBehaviour
 

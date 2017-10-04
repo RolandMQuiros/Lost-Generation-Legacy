@@ -81,12 +81,11 @@ public class PawnViewManager : MonoBehaviour
         }
     }
 
-    public void OnStep(Queue<IPawnMessage> messages)
-    {
+    public void OnStep(Queue<IPawnMessage> messages) {
         _messageBuffer.PushMessages(messages);
     }
 
-    public bool DistributeMessages()
+    public void DistributeMessages()
     {
         if (_messageBuffer.HasMessages)
         {
@@ -108,6 +107,6 @@ public class PawnViewManager : MonoBehaviour
             }
         }
 
-        return _messageBuffer.HasMessages;
+        //return _messageBuffer.HasMessages;
     }
 }

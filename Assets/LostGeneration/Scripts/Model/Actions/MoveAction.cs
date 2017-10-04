@@ -22,8 +22,8 @@ namespace LostGen {
         }
 
         public override bool Do() {
-            //_moveSuccess = Owner.SetPosition(_end);
-            Owner.Board.Pawns.Move(Owner, _end);
+            _moveSuccess = Owner.SetPosition(_end);
+            //Owner.Board.Pawns.Move(Owner, _end);
             return true;// _moveSuccess;
         }
 

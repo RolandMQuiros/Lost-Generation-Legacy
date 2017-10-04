@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEditor;
 //using UnityEngine.TestTools;
 using NUnit.Framework;
@@ -98,14 +99,18 @@ namespace Tests.PawnComponents
 
 			Assert.AreEqual(10, timeline.Count);
 
-			Assert.DoesNotThrow(
-				() => {
-					int expectedCost = 0;
-					foreach (PawnAction action in timeline.GetPawnActions()) {
-						Assert.AreEqual(expectedCost++, action.Cost);
-					}
-				}
-			);
+			int expectedCost = 0;
+			foreach (PawnAction action in timeline.GetPawnActions()) {
+				Assert.NotNull(action);
+				Assert.AreEqual(expectedCost++, action.Cost);
+			}
+
+			// Make sure it doesn't break from multiple iterations
+			expectedCost = 0;
+			foreach (PawnAction action in timeline.GetPawnActions()) {
+				Assert.NotNull(action);
+				Assert.AreEqual(expectedCost++, action.Cost);
+			}
 		}
 	}
 
