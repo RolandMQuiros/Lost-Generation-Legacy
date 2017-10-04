@@ -16,11 +16,12 @@ namespace Tests.PawnComponents
 		{
 			public Point From;
 			public Point To;
-			public TestMoveAction(Pawn owner, Point from, Point to)
+			public TestMoveAction(Pawn owner, Point from, Point to, int cost = 0)
 				: base(owner)
 			{
 				From = from;
 				To = to;
+				Cost = cost;
 			}
 		}
 
@@ -81,6 +82,30 @@ namespace Tests.PawnComponents
 			timeline.TruncateAt(5, undone);
 
 			Assert.AreEqual(5, undone.Count);
+		}
+
+		[Test]
+		public void Iterate() {
+			Timeline timeline = new Timeline();
+			Point from = Point.Zero;
+			Point to = new Point(1, 0, 0);
+			for (int i = 0; i < 10; i++) {
+				PawnAction action = new TestMoveAction(null, from, to, i);
+				timeline.PushAction(action);
+				from = to;
+				to.X++;
+			}
+
+			Assert.AreEqual(10, timeline.Count);
+
+			Assert.DoesNotThrow(
+				() => {
+					int expectedCost = 0;
+					foreach (PawnAction action in timeline.GetPawnActions()) {
+						Assert.AreEqual(expectedCost++, action.Cost);
+					}
+				}
+			);
 		}
 	}
 

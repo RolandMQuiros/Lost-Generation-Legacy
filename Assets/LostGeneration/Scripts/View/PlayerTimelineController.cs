@@ -22,10 +22,11 @@ public class PlayerTimelineController : MonoBehaviour {
 			return maxStep;
 		}
 	}
-	public PawnActionEvent ActionDone;
-	public PawnActionEvent ActionUndone;
-	public PawnActionsEvent ActionsAdded;
-	public PawnActionEvent ActionInterrupted;
+	[SerializeField]private PawnActionEvent _actionDone;
+	[SerializeField]private PawnActionEvent _actionUndone;
+	[SerializeField]private PawnActionsEvent _actionsAdded;
+	[SerializeField]private PawnActionEvent _actionInterrupted;
+	[SerializeField]private BooleanEvent _allPointsSpent;
 
 	private Dictionary<Pawn, Timeline> _timelines = new Dictionary<Pawn, Timeline>();
 	private int _step = 0;
@@ -82,7 +83,7 @@ public class PlayerTimelineController : MonoBehaviour {
 			{
 				pawn.RequireComponent<ActionPoints>().Current -= undone[i].Cost;
 				// Unwind the deleted actions
-				ActionUndone.Invoke(undone[i]);
+				_actionUndone.Invoke(undone[i]);
 			}
 		}
 	}
@@ -98,7 +99,7 @@ public class PlayerTimelineController : MonoBehaviour {
 
 				for (int i = 0; i < undone.Count; i++) {
 					// Unwind the deleted actions
-					ActionUndone.Invoke(undone[i]);
+					_actionUndone.Invoke(undone[i]);
 				}
 
 				// Push the new action
@@ -115,7 +116,8 @@ public class PlayerTimelineController : MonoBehaviour {
 		}
 
 		if (added.Count > 0) {
-			ActionsAdded.Invoke(added);
+			_actionsAdded.Invoke(added);
+			CheckPointsSpent();
 		}
 	}
 
@@ -141,7 +143,7 @@ public class PlayerTimelineController : MonoBehaviour {
 					else {
 						undone.Undo();
 						actionPoints.Current += undone.Cost;
-						ActionUndone.Invoke(undone);
+						_actionUndone.Invoke(undone);
 					}
 				}
 
@@ -151,11 +153,42 @@ public class PlayerTimelineController : MonoBehaviour {
 					else {
 						done.Do();
 						actionPoints.Current -= done.Cost;
-						ActionDone.Invoke(done);
+						_actionDone.Invoke(done);
 					}
 				}
 			}
 		}
+	}
+
+	public void AttachActionView(CombatantActionView view) {
+		_actionDone.AddListener(view.OnActionDone);
+		_actionUndone.AddListener(view.OnActionUndone);
+		_actionsAdded.AddListener(view.OnActionsAdded);
+	}
+
+	public void DetachActionView(CombatantActionView view) {
+		_actionDone.RemoveListener(view.OnActionDone);
+		_actionUndone.RemoveListener(view.OnActionUndone);
+		_actionsAdded.RemoveListener(view.OnActionsAdded);
+	}
+
+	/// <summary>
+	/// Checks if all the Action Points for all Pawns handled by this controller have been
+	/// spent on actions.
+	/// </summary>
+	private void CheckPointsSpent() {
+		bool allPointsSpent = true;
+		foreach (KeyValuePair<Pawn, Timeline> pair in _timelines) {
+			int maxPoints = pair.Key.GetComponent<ActionPoints>().Max;
+			int pointsSpent = pair.Value.GetPawnActions().Sum(a => a.Cost);
+			Debug.Log("Max Points: " + maxPoints + "; Points Spent: " + pointsSpent);
+			if (maxPoints != pointsSpent) {
+				allPointsSpent = false;
+				break;
+			}
+		}
+
+		_allPointsSpent.Invoke(allPointsSpent);
 	}
 
 	#region MonoBehaviour
