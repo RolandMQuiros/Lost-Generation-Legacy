@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -104,6 +105,15 @@ namespace LostGen {
                 _footprint.Add(Point.Zero);
             }
 
+            // Check if any of the Pawn's points in its footprint fall outside the board
+            if (_footprint.Select(p => position + p)
+                          .Any(p => !board.Blocks.InBounds(p))) {
+                throw new ArgumentOutOfRangeException(
+                    "footprint",
+                    "The given footprint for Pawn \"" + name + "\" has a footprint point outside the bounds of the board" 
+                );
+            }
+
             Board = board;
             IsCollidable = isCollidable;
             IsSolid = isSolid;
@@ -174,7 +184,6 @@ namespace LostGen {
                 stepAction = _actions.First.Value;
                 CallComponents(c => c.PreAction(stepAction));
 
-                stepAction.Do();
                 stepAction.Commit();
 
                 _actions.RemoveFirst();

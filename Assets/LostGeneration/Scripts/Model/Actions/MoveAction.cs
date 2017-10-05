@@ -22,8 +22,7 @@ namespace LostGen {
         }
 
         public override bool Do() {
-            _moveSuccess = Owner.SetPosition(_end);
-            //Owner.Board.Pawns.Move(Owner, _end);
+            Owner.Board.Pawns.Move(Owner, _end);
             return true;// _moveSuccess;
         }
 
@@ -32,7 +31,7 @@ namespace LostGen {
         }
 
         public override void Commit() {
-            if (_moveSuccess) {
+            if (Owner.SetPosition(_end)) {
                 Owner.PushMessage(new MoveMessage(Owner, _start, _end, _isContinuous));
             }
         }

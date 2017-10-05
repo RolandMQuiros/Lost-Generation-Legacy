@@ -7,11 +7,11 @@ namespace Tests.Integration {
     [TestFixture]
     public class PawnTests {
         [Test]
-        // [ExpectedException(typeof(ArgumentNullException))]
         public void CreateWithoutBoard() {
-            Pawn pawn = new Pawn("NoBoard", null, Point.Zero);
-
-            Assert.NotNull(pawn);
+            Assert.Throws(
+                typeof(ArgumentNullException),
+                () => { Pawn pawn = new Pawn("NoBoard", null, Point.Zero); }
+            );
         }
 
         [Test]
@@ -109,6 +109,23 @@ namespace Tests.Integration {
             Assert.AreEqual(pos2, pawn2.Position, "Pawn was able to move from " + pos3 + " to " + pos2);
         }
 
+        [Test]
+        public void PawnFootprintOutsideBoard() {
+            Board board = BoardCommon.ArrayToBoard(BoardCommon.GRID_12X1X9);
+
+            Assert.Throws(
+                typeof(ArgumentOutOfRangeException),
+                () => {
+                    Pawn pawn = new Pawn(
+                        "Footprint",
+                        board,
+                        new Point(6, 0, 4),
+                        new Point[] { Point.Zero, Point.Up }
+                    );
+                }
+            );
+        }
+
 
         private class TestComponent : PawnComponent {
             public event Action<Pawn, Pawn> CollisionEntered;
@@ -129,13 +146,16 @@ namespace Tests.Integration {
         [Test]
         public void CollisionTest() {
             // Arrange
-            Board board = BoardCommon.ArrayToBoard(BoardCommon.GRID_12X1X9);
+            int[,,] grid = new int[2, 8, 12];
+            Array.Copy(BoardCommon.GRID_12X1X9, 0, grid, 12*8, 12 * 8);
+            Board board = BoardCommon.ArrayToBoard(grid);
 
-            Point pos1 = board.Blocks.Size / 2; // Center of board
+            Point pos1 = new Point(6, 1, 4); // Center of board
             Point pos2 = pos1 + (3 * Point.Right); // Two tiles to the right of center
 
+            // TODO: Write a test where the footprint falls outside the board
             List<Point> footprint = new List<Point>(new Point[] {
-                Point.Zero, Point.Up, Point.Down, Point.Left, Point.Right
+                Point.Zero, Point.Forward, Point.Backward, Point.Left, Point.Right
             });
 
             Pawn pawn1 = new Pawn("First", board, pos1, footprint, true, true, true);

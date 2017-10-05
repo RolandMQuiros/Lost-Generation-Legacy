@@ -56,8 +56,6 @@ namespace LostGen {
                 return false;
             }
             IEnumerable<Point> oldFootprint = pawn.Footprint.Select(f => f + pawn.Position);
-            
-
 
             // Gather collisions at the old and new positions
             IEnumerable<Pawn> oldCollisions = _pawns.At(oldFootprint)
@@ -72,7 +70,7 @@ namespace LostGen {
             }
 
             // Call pawn's collision handlers
-            if (pawn.IsCollidable && canMove) {
+            if (pawn.IsCollidable) {
                 // Collisions at the new position that were not at the old position are newly-entered
                 IEnumerable<Pawn> enterCollisions = newCollisions.Except(oldCollisions);
                 // Collisions at both the old and new position are sustained
@@ -91,7 +89,7 @@ namespace LostGen {
                 }
                 foreach (Pawn other in exitCollisions) {
                     pawn.OnCollisionExit(other);
-                    other.OnCollisionStay(pawn);
+                    other.OnCollisionExit(pawn);
                 }
             }
 

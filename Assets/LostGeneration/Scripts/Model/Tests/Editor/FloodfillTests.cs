@@ -92,11 +92,11 @@ namespace Tests {
 
             string expected =
                 "█████████\n" +
-                "█░░░░░░░█\n" +
                 "█░░░╬░░░█\n" +
                 "█░░╬╬╬░░█\n" +
+                "█░╬╬╬╬╬░█\n" +
+                "█░░╬╬╬░░█\n" +
                 "█░░░╬░░░█\n" +
-                "█░░░░░░░█\n" +
                 "█████████\n";
 
             Assert.AreEqual(expected, fillStr, "Expected:\n" + expected + "\nActual:\n" + fillStr);
@@ -119,11 +119,11 @@ namespace Tests {
 
             string expected =
                 "█████████\n" +
-                "█░░░╬░░░█\n" +
-                "█░░╬╬█░░█\n" +
+                "█░░╬╬╬░░█\n" +
                 "█░╬╬╬█░░█\n" +
-                "█░░█╬╬░░█\n" +
-                "█░░░╬░░░█\n" +
+                "█╬╬╬╬█░░█\n" +
+                "█░╬█╬╬╬░█\n" +
+                "█░░╬╬╬░░█\n" +
                 "█████████\n";
             
             Assert.AreEqual(expected, fillStr, "Expected:\n" + expected + "\nActual:\n" + fillStr);

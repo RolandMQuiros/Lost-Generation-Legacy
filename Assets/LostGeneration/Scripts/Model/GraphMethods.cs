@@ -27,7 +27,7 @@ namespace LostGen {
             HashSet<T> domain = new HashSet<T>();
             HashSet<SortNode> open = new HashSet<SortNode>();
 
-            SortNode first = new SortNode() { Node = start, Level = 1 };
+            SortNode first = new SortNode() { Node = start, Level = 0 };
             open.Add(first);
             domain.Add(first.Node);
 

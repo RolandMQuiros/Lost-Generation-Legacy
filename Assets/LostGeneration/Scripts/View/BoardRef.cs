@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -24,14 +25,14 @@ public class BoardRef : MonoBehaviour {
         {
             if (_board != null)
             {
-                _board.Blocks.Changed -= OnBlocksChanged;
-                _board.Pawns.Added -= OnPawnAdded;
-                _board.Pawns.Removed -= OnPawnRemoved;
+                _board.Blocks.Changed -= BlocksChanged.Invoke;
+                _board.Pawns.Added -= PawnAdded.Invoke;
+                _board.Pawns.Removed -= PawnRemoved.Invoke;
             }
             _board = value;
-            _board.Blocks.Changed += OnBlocksChanged;
-            _board.Pawns.Added += OnPawnAdded;
-            _board.Pawns.Removed += OnPawnRemoved;
+            _board.Blocks.Changed += BlocksChanged.Invoke;
+            _board.Pawns.Added += PawnAdded.Invoke;
+            _board.Pawns.Removed += PawnRemoved.Invoke;
         }
     }
 
@@ -54,7 +55,7 @@ public class BoardRef : MonoBehaviour {
         _board.BeginTurn();
     }
 
-    public void Turn() {
+    public IEnumerator Turn() {
         Queue<IPawnMessage> messages = new Queue<IPawnMessage>();
 
         do {
@@ -63,22 +64,8 @@ public class BoardRef : MonoBehaviour {
             if (messages.Count > 0) {
                 BoardStepped.Invoke(messages);
             }
+            yield return null;
         } while (messages.Count > 0);
-    }
-
-    private void OnBlocksChanged(Dictionary<BoardBlock, BoardBlock> blocksChanged)
-    {
-        BlocksChanged.Invoke(blocksChanged);
-    }
-
-    private void OnPawnAdded(Pawn pawn)
-    {
-        PawnAdded.Invoke(pawn);
-    }
-
-    private void OnPawnRemoved(Pawn pawn)
-    {
-        PawnRemoved.Invoke(pawn);
     }
 
     #region MonoBehaviour

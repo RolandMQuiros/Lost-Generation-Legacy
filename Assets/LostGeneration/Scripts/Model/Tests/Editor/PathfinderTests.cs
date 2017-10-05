@@ -241,8 +241,8 @@ namespace Tests {
             costDomain.Sort();
             string costString = TestNode.PathToString(costDomain);
 
-            Assert.AreEqual("ABCDEFGHIJ", depthString);
-            Assert.AreEqual("ABCDEFGHIJ", costString);
+            Assert.AreEqual("ABCDEFGHIJK", depthString);
+            Assert.AreEqual("ABCDEFGHIJK", costString);
         }
 
         [Test]
