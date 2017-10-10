@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -91,19 +92,23 @@ public class PawnViewManager : MonoBehaviour
         {
             _messageBuffer.PopMessages(_messages);
 
-            while (_messages.Count > 0)
-            {
+            HashSet<PawnView> affectedViews = new HashSet<PawnView>();
+            while (_messages.Count > 0) {
                 IPawnMessage message = _messages.Dequeue();
                 PawnView pawnView;
-                if (message.Source != null && _pawnViews.TryGetValue(message.Source, out pawnView))
-                {
-                    pawnView.HandleMessage(message);
+                if (message.Source != null && _pawnViews.TryGetValue(message.Source, out pawnView)) {
+                    pawnView.PushMessage(message);
+                    affectedViews.Add(pawnView);
                 }
 
-                if (message.Target != null && _pawnViews.TryGetValue(message.Target, out pawnView))
-                {
-                    pawnView.HandleMessage(message);
+                if (message.Target != null && _pawnViews.TryGetValue(message.Target, out pawnView)) {
+                    pawnView.PushMessage(message);
+                    affectedViews.Add(pawnView);
                 }
+            }
+
+            foreach (PawnView view in affectedViews) {
+                view.HandleMessages();
             }
         }
 

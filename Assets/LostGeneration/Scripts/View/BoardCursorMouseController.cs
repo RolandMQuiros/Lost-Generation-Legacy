@@ -12,12 +12,16 @@ public class BoardCursorMouseController : MonoBehaviour,
                                           IPointerDownHandler,
                                           IPointerUpHandler
 {
-    [SerializeField]private Camera _camera;
-    [SerializeField]private Vector3 _screenPoint;
-    [SerializeField]private Vector3 _worldPoint;
-    [SerializeField]private Point _boardPoint;
-    [SerializeField]private bool _clipThroughSolids = true;
-    [SerializeField]private bool _stickToGround = true;
+    #region PrivateFields
+    [SerializeField] private Camera _camera;
+    [SerializeField] private Vector3 _screenPoint;
+    [SerializeField] private Vector3 _worldPoint;
+    [SerializeField] private Point _boardPoint;
+    [SerializeField] private bool _clipThroughSolids = true;
+    [SerializeField] private bool _stickToGround = true;
+    #endregion PrivateFields
+
+    #region Private
     private BoardCursor _boardCursor;
     private Board _board;
     private bool _isWindowFocused;
@@ -25,6 +29,7 @@ public class BoardCursorMouseController : MonoBehaviour,
     private Ray _screenCast;
     private Point _entryPoint;
     private Point _exitPoint;
+    #endregion Private
 
     public Point BoardPoint { get { return _boardPoint; } }
     public event Action<Point> Clicked;
@@ -50,13 +55,13 @@ public class BoardCursorMouseController : MonoBehaviour,
             _screenCast = _camera.ScreenPointToRay(_screenPoint);
             RaycastHit hitInfo;
             if (_boardCursor.ClickCollider.Raycast(_screenCast, out hitInfo, 100f)) {
-                
+
                 Point entry = Point.Clamp(
                     PointVector.ToPoint(hitInfo.point),
                     Point.Zero,
                     _board.Blocks.Size - Point.One
                 );
-                
+
                 if (entry != _entryPoint) {
                     _entryPoint = entry;
 
@@ -64,7 +69,7 @@ public class BoardCursorMouseController : MonoBehaviour,
                     float distanceToBoardCenter = Vector3.Distance(_screenCast.origin, _boardCursor.BoardRef.transform.position);
                     Ray opposingCast = new Ray(_screenCast.GetPoint(2f * distanceToBoardCenter + 1f), -_screenCast.direction);
                     _boardCursor.ClickCollider.Raycast(opposingCast, out hitInfo, 100f);
-                    
+
                     _exitPoint = Point.Clamp(
                         PointVector.ToPoint(hitInfo.point),
                         Point.Zero,
@@ -103,13 +108,11 @@ public class BoardCursorMouseController : MonoBehaviour,
         }
     }
 
-    private void OnApplicationFocus(bool hasFocus)
-    {
+    private void OnApplicationFocus(bool hasFocus) {
         _isWindowFocused = hasFocus;
     }
 
-    private bool IsMouseOutsideWindow()
-    {
+    private bool IsMouseOutsideWindow() {
         return Input.mousePosition.x < 0 || Input.mousePosition.x >= Screen.width &&
                Input.mousePosition.y < 0 || Input.mousePosition.y >= Screen.height;
     }
@@ -132,18 +135,15 @@ public class BoardCursorMouseController : MonoBehaviour,
 
     #region PointerEvents
 
-    public void OnPointerClick(PointerEventData eventData)
-    {
+    public void OnPointerClick(PointerEventData eventData) {
         if (Clicked != null) { Clicked(_boardPoint); }
     }
 
-    public void OnPointerDown(PointerEventData eventData)
-    {
+    public void OnPointerDown(PointerEventData eventData) {
         if (TappedDown != null) { TappedDown(_boardPoint); }
     }
 
-    public void OnPointerUp(PointerEventData eventData)
-    {
+    public void OnPointerUp(PointerEventData eventData) {
         if (TappedUp != null) { TappedUp(_boardPoint); }
     }
     #endregion PointerEvents
