@@ -8,7 +8,7 @@ namespace LostGen {
         public Pawn Pawn { get; private set; }
         public string Name { get; private set; }
         public string Description { get; private set; }
-        public virtual int ActionPoints { get; }
+        public virtual int ActionPoints { get; protected set; }
         public event Action AreaOfEffectChanged;
         private Combatant _combatant;
 

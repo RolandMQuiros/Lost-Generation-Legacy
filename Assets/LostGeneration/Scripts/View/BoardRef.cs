@@ -55,7 +55,7 @@ public class BoardRef : MonoBehaviour {
         _board.BeginTurn();
     }
 
-    public IEnumerator Turn() {
+    public void Turn() {
         Queue<IPawnMessage> messages = new Queue<IPawnMessage>();
 
         do {
@@ -64,7 +64,6 @@ public class BoardRef : MonoBehaviour {
             if (messages.Count > 0) {
                 BoardStepped.Invoke(messages);
             }
-            yield return null;
         } while (messages.Count > 0);
     }
 

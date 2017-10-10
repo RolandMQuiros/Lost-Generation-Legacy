@@ -16,7 +16,7 @@ public class CombatantView : PawnComponentView
 	private CombatantAnimator _view;
 	private Dictionary<IPawnMessage, Coroutine> _activeRuns = new Dictionary<IPawnMessage, Coroutine>();
 
-    private List<IPawnMessage> _messages = new List<IPawnMessage>();
+    private Queue<IPawnMessage> _messages = new Queue<IPawnMessage>();
 
     /// <summary>
     /// Takes a message and starts a Coroutine based on that message.
@@ -27,12 +27,13 @@ public class CombatantView : PawnComponentView
     /// </summary>
     /// <param name="message">IPawnMessage to process</param>
     public override void PushMessage(IPawnMessage message) {
-        _messages.Add(message);
+        _messages.Enqueue(message);
     }
 
     public override IEnumerator HandleMessages() {
-        for (int i = 0; i < _messages.Count; i++) {
-            yield return StartCoroutineFromMessage(_messages[i]);
+        while (_messages.Count > 0) {
+            IPawnMessage message = _messages.Dequeue();
+            yield return StartCoroutineFromMessage(message);
         }
     }
 
