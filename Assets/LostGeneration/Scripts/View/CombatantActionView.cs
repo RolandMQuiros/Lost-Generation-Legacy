@@ -11,7 +11,11 @@ using LostGen;
 /// </summary>
 [RequireComponent(typeof(CombatantAnimator))]
 public class CombatantActionView : MonoBehaviour {
-	public Pawn Pawn;
+    #region EditorFields
+    [SerializeField] float _moveDuration = 0.1f;
+    #endregion EditorFields
+
+    public Pawn Pawn;
 	private CombatantAnimator _animator;
 	private Dictionary<PawnAction, Coroutine> _activeRuns = new Dictionary<PawnAction, Coroutine>();
 
@@ -42,7 +46,7 @@ public class CombatantActionView : MonoBehaviour {
 			if (action.Owner == Pawn) {
 				MoveAction move = action as MoveAction;
 				if (move != null) {
-					yield return _animator.Move(move.Start, move.End);
+					yield return _animator.Move(move.Start, move.End, _moveDuration);
 					Finish(move);
 				}
 			}
@@ -57,12 +61,12 @@ public class CombatantActionView : MonoBehaviour {
 	#region PawnActionMethods
 
 	private IEnumerator AddMove(MoveAction move) {
-		yield return _animator.Move(move.Start, move.End);
+		yield return _animator.Move(move.Start, move.End, _moveDuration);
 		Finish(move);
 	}
 
 	private void DoMove(MoveAction move) {
-		transform.position = PointVector.ToVector(move.End);;
+		transform.position = PointVector.ToVector(move.End);
 	}
 
 	private void UndoMove(MoveAction move) {

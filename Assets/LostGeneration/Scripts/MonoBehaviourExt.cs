@@ -4,7 +4,8 @@ using UnityEngine;
 
 public static class MonoBehaviourExt {
 
-    public static Coroutine WaitFor(this MonoBehaviour component, IEnumerable<IEnumerator> routines) {
+    #region WaitForMethods
+    public static Coroutine WaitForCoroutines(this MonoBehaviour component, IEnumerable<IEnumerator> routines) {
         return component.StartCoroutine(component.RunParallelCoroutines(routines));
     }
 
@@ -26,5 +27,6 @@ public static class MonoBehaviourExt {
         yield return run;
         running.Remove(run);
     }
+    #endregion WaitForMethods
 
 }

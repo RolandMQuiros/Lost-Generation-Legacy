@@ -50,6 +50,10 @@ namespace LostGen {
             // _loadout = Pawn.RequireComponent<Loadout>();
         }
 
+        public override void OnActionInterrupted(PawnAction action) {
+            Pawn.ClearActions();
+        }
+
         public override void PreStep() {
             Pawn.Priority = _stats.Effective.Agility;
         }

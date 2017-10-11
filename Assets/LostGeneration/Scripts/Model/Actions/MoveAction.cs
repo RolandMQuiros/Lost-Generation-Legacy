@@ -23,17 +23,19 @@ namespace LostGen {
 
         public override bool Do() {
             Owner.Board.Pawns.Move(Owner, _end);
-            return true;// _moveSuccess;
+            return true;
         }
 
         public override void Undo() {
             Owner.Board.Pawns.Move(Owner, _start);
         }
 
-        public override void Commit() {
-            if (Owner.SetPosition(_end)) {
+        public override bool Commit() {
+            bool moved = Owner.SetPosition(_end);
+            if (moved) {
                 Owner.PushMessage(new MoveMessage(Owner, _start, _end, _isContinuous));
             }
+            return moved;
         }
 
         public override string ToString() {

@@ -23,7 +23,8 @@
 		public virtual void OnCollisionExit(Pawn other) { }
 		public virtual void OnPushAction(PawnAction action) { }
 		public virtual void BeforeClearActions() { }
-		
+        public virtual void OnActionInterrupted(PawnAction action) { }
+
 		public virtual void BeginTurn() { }
 		public virtual void EndTurn() { }
 

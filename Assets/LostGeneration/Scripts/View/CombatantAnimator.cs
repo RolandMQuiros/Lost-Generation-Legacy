@@ -5,11 +5,6 @@ using UnityEngine.Events;
 using LostGen;
 
 public class CombatantAnimator : MonoBehaviour {
-	#region EditorFields
-	/// <summary>Time needed to move across one block</summary>
-	[TooltipAttribute("Time needed to move across one block")]
-	public float MoveDuration = 0.5f;
-	#endregion EditorFields
 	
 	private Animator _animator;
 	private int _runTrigger = Animator.StringToHash("Base Layer.Grounded");
@@ -19,7 +14,7 @@ public class CombatantAnimator : MonoBehaviour {
 		_animator = GetComponent<Animator>();
 	}
 	#endregion MonoBehaviour
-	public IEnumerator Move(Point from, Point to, bool rotate = true) {
+	public IEnumerator Move(Point from, Point to, float duration, bool rotate = true) {
 		Vector3 vFrom = PointVector.ToVector(from);
 		Vector3 vTo = PointVector.ToVector(to);
 
@@ -29,21 +24,21 @@ public class CombatantAnimator : MonoBehaviour {
 			rotTo = Quaternion.LookRotation((vTo - vFrom).normalized, Vector3.up);
 		}
 
-		Vector3 step = (vTo - vFrom) / MoveDuration;
+		Vector3 step = (vTo - vFrom) / duration;
 		float time = 0f;
 
-		_animator.SetFloat("Run", 1f);
-		while (time < MoveDuration) {
+		//_animator.SetFloat("Run", 1f);
+		while (time < duration) {
 			time += Time.deltaTime;
-			transform.position = Vector3.Lerp(vFrom, vTo, time / MoveDuration);
+			transform.position = Vector3.Lerp(vFrom, vTo, time / duration);
 			
 			if (rotate) {
-				transform.rotation = Quaternion.Lerp(rotFrom, rotTo, time / (MoveDuration / 5f));
+				transform.rotation = Quaternion.Lerp(rotFrom, rotTo, time / (duration / 5f));
 			}
 			
 			yield return null;
 		}
-		_animator.SetFloat("Run", 0f);
+		//_animator.SetFloat("Run", 0f);
 
 		transform.position = vTo;
 

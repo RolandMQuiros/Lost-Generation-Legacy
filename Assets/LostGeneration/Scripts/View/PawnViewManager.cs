@@ -91,27 +91,26 @@ public class PawnViewManager : MonoBehaviour
         if (_messageBuffer.HasMessages)
         {
             _messageBuffer.PopMessages(_messages);
-
-            HashSet<PawnView> affectedViews = new HashSet<PawnView>();
             while (_messages.Count > 0) {
                 IPawnMessage message = _messages.Dequeue();
                 PawnView pawnView;
                 if (message.Source != null && _pawnViews.TryGetValue(message.Source, out pawnView)) {
                     pawnView.PushMessage(message);
-                    affectedViews.Add(pawnView);
                 }
 
                 if (message.Target != null && _pawnViews.TryGetValue(message.Target, out pawnView)) {
                     pawnView.PushMessage(message);
-                    affectedViews.Add(pawnView);
                 }
             }
-
-            foreach (PawnView view in affectedViews) {
-                view.HandleMessages();
-            }
         }
-
-        //return _messageBuffer.HasMessages;
+    }
+    
+    /// <summary>
+    /// Runs every Pawn's HandleMessage coroutine simultaneously
+    /// </summary>
+    public void HandleMessages() {
+        this.WaitForCoroutines(
+            _pawnViews.Values.Select(v => v.HandleMessages())
+        );
     }
 }

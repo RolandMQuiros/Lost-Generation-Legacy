@@ -6,16 +6,11 @@ using LostGen;
 using System;
 
 [RequireComponent(typeof(CombatantAnimator))]
-public class CombatantView : PawnComponentView
-{
-	#region EditorFields
-	/// <summary>Invoked when this CombatantView's coroutines finish.</summary>
-	[TooltipAttribute("Invoked when this CombatantView's coroutines finish")]
-	public UnityEvent Finished;
-	#endregion EditorFields
-	private CombatantAnimator _view;
-	private Dictionary<IPawnMessage, Coroutine> _activeRuns = new Dictionary<IPawnMessage, Coroutine>();
-
+public class CombatantView : PawnComponentView {
+    #region EditorFields
+    [SerializeField]private float _moveDuration = 0.5f;
+    #endregion EditorFields
+    private CombatantAnimator _view;
     private Queue<IPawnMessage> _messages = new Queue<IPawnMessage>();
 
     /// <summary>
@@ -42,31 +37,15 @@ public class CombatantView : PawnComponentView
         if (Pawn == message.Source) {
             MoveMessage move = message as MoveMessage;
             if (move != null) {
-                co = StartCoroutine(OnMoveMessage(move));
+                co = StartCoroutine(_view.Move(move.From, move.To, _moveDuration));
             }
         }
         return co;
     }
 
-	private void Finish(IPawnMessage message) {
-		// Removes the message from the list of active Coroutines
-		_activeRuns.Remove(message);
-		if (_activeRuns.Count == 0) {
-			Finished.Invoke();
-		}
-	}
-
-	private IEnumerator OnMoveMessage(MoveMessage move)
-	{
-		yield return _view.Move(move.From, move.To);
-		Finish(move);
-	}
-
-
-	#region MonoBehaviour
-	private void Awake()
-	{
-		_view = GetComponent<CombatantAnimator>();
-	}
-	#endregion MonoBehaviour
+    #region MonoBehaviour
+    private void Awake() {
+        _view = GetComponent<CombatantAnimator>();
+    }
+    #endregion MonoBehaviour
 }

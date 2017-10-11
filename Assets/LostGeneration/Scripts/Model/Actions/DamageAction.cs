@@ -11,12 +11,13 @@ namespace LostGen {
             Target = target;
         }
 
-        public override void Commit() {
+        public override bool Commit() {
             Health target = Target.GetComponent<Health>();
             if (Amount > 0) {
                 target.Current = target.Current - Amount;
                 Owner.PushMessage(new DamageMessage(Owner, Target, Amount));
             }
+            return true;
         }
     }
 }

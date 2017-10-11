@@ -17,7 +17,7 @@ namespace LostGen {
             _areaOfEffect = new List<Point>(area);
         }
 
-        public override void Commit() {
+        public override bool Commit() {
             for (int i = 0; i < _areaOfEffect.Count; i++) {
                 int damage = Owner.RequireComponent<PawnStats>().Effective.Attack;
 
@@ -31,8 +31,8 @@ namespace LostGen {
                         Owner.PushMessage(new DamageMessage(Owner, pawn, damage));
                     }
                 }
-
             }
+            return true;
         }
     }
 }

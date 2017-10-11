@@ -184,7 +184,9 @@ namespace LostGen {
                 stepAction = _actions.First.Value;
                 CallComponents(c => c.PreAction(stepAction));
 
-                stepAction.Commit();
+                if (!stepAction.Commit()) {
+                    CallComponents(c => c.OnActionInterrupted(stepAction));
+                }
 
                 _actions.RemoveFirst();
 

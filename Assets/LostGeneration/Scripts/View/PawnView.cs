@@ -16,8 +16,8 @@ public class PawnView : MonoBehaviour {
         }
     }
 
-    public void HandleMessages() {
-        this.WaitFor(_components.Select(c => c.HandleMessages()));
+    public IEnumerator HandleMessages() {
+        yield return this.WaitForCoroutines(_components.Select(c => c.HandleMessages()));
     }
 
     #region MonoBehaviour

@@ -35,10 +35,11 @@ namespace LostGen {
             }
         }
 
-        public override void Commit() {
-            if (_blocksDug.Count > 0) {
+        public override bool Commit() {
+            if (Do() && _blocksDug.Count > 0) {
                 Owner.PushMessage(new DigMessage(Owner, _blocksDug.Cast<BlockNode>()));
             }
+            return true;
         }
     }
 
