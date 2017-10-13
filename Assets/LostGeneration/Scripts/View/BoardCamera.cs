@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using LostGen;
@@ -6,158 +7,122 @@ using LostGen;
 public class BoardCamera : MonoBehaviour {
     #region UnityFields
     [SerializeField]private Camera _camera;
-    #endregion
+    #endregion UnityFields
 
-    #region MotionDefs
-    private abstract class Motion {
-        protected Transform _camera;
-        protected Transform _pivot;
-        protected float _duration;
-        protected float _time = 0f;
-
-        public Motion(Transform camera, Transform pivot, float duration) {
-            _camera = camera;
-            _pivot = pivot;
-            _duration = duration;
-        }
-        public virtual void Begin() {
-            _time = 0f;
-        }
-        public abstract bool Update(float deltaTime);
-        public virtual void End() { }
-    }
-
-    private class PanMotion : Motion {
-        private Vector3 _target;
-
-        public PanMotion(Transform pivot, Vector3 target, float duration)
-            : base(null, pivot, duration) {
-            _target = target;
-        }
-
-        public override bool Update(float deltaTime) {
-            _time += deltaTime;
-            _pivot.position = Vector3.Lerp(_pivot.position, _target, _time / _duration);
-            return _time >= _duration;
-        }
-
-        public override void End() {
-            _pivot.position = _target;
-        }
-    }
-
-    private class ZoomMotion : Motion {
-        private float _scale;
-        private Vector3 _offset;
-        public ZoomMotion(Transform camera, Transform pivot, Vector3 offset, float scale, float duration)
-            : base(camera, pivot, duration) {
-            _scale = scale;
-            _offset = offset;
-        }
-
-        public override bool Update(float deltaTime) {
-            _time += deltaTime;
-            _camera.localPosition = Vector3.Lerp(_camera.localPosition, _offset / _scale, _time / _duration);
-            return _time >= _duration;
-        }
-
-        public override void End() {
-            _camera.localPosition = _offset / _scale;
-        }
-    }
-
-    private class RotateMotion : Motion {
-        private Quaternion _targetRot;
-        public RotateMotion(Transform pivot, float angle, float duration)
-            : base(null, pivot, duration) {
-            _targetRot = Quaternion.Euler(0f, angle, 0f);
-        }
-
-        public override bool Update(float deltaTime) {
-            _time += deltaTime;
-            _pivot.rotation = Quaternion.Lerp(_pivot.rotation, _targetRot, _time / _duration);
-            return _time >= _duration;
-        }
-
-        public override void End() {
-            _pivot.rotation = _targetRot;
-        }
-    }
-    #endregion
-
-    private Queue<Motion> _motions = new Queue<Motion>();
-    private Motion _currentMotion;
+    private enum MotionType {
+        Pan, Zoom, Rotate
+    };
+    private MotionType _motionType;
+    private IEnumerator _motion;
+    private Queue<IEnumerator> _motions = new Queue<IEnumerator>();
 
     private Vector3 _originalOffset;
-    private Vector3 _directionToCamera;
-    private Vector3 _target;
-    private float _timer;
-    private float _zoom = 1f;
+
+     #region MotionDefs
+    private IEnumerator Pan(Vector3 target, float duration, Action after = null) {
+        _motionType = MotionType.Pan;
+        float time = 0f;
+        while (time < duration) {
+            time += Time.deltaTime;
+            transform.position = Vector3.Lerp(transform.position, target, time / duration);
+            yield return null;
+        }
+        transform.position = target;
+
+        if (after != null) { after(); }
+    }
+
+    private IEnumerator Zoom(Vector3 offset, float scale, float duration, Action after = null) {
+        _motionType = MotionType.Zoom;
+        float time = 0f;
+        
+        while (time < duration) {
+            time += Time.deltaTime;
+            _camera.transform.localPosition = Vector3.Lerp(_camera.transform.localPosition, offset / scale, time / duration);
+            yield return null;
+        }
+        _camera.transform.localPosition = offset / scale;
+
+        if (after != null) { after(); }
+    }
+
+    private IEnumerator Rotate(float angle, float duration, Action after = null) {
+        _motionType = MotionType.Rotate;
+        Quaternion target = Quaternion.Euler(0f, angle, 0f);
+        float time = 0f;
+
+        while (time < duration) {
+            transform.rotation = Quaternion.Lerp(transform.rotation, target, time / duration);
+            yield return null;
+        }
+        transform.rotation = target;
+        if (after != null) { after(); }
+    }
+    #endregion MotionDefs
 
     #region MonoBehaviour
     private void Start() {
         _originalOffset = _camera.transform.localPosition;
-        _directionToCamera = _originalOffset.normalized;
     }
 
-    private void Update() {
-        if (_currentMotion != null) {
-            if (_currentMotion.Update(Time.deltaTime)) {
-                _currentMotion.End();
-                if (_motions.Count > 0) {
-                    _currentMotion = _motions.Dequeue();
-                }
-            }
-        }
-    }
     #endregion MonoBehaviour
 
     #region MotionMethods
     public void CancelPan() {
-        if (_currentMotion != null && _currentMotion is PanMotion) {
-            _currentMotion = null;
+        if (_motion != null && _motionType == MotionType.Pan) {
+            StopCoroutine(_motion);
         }
     }
 
     public void Pan(Point point, float duration) {
         Vector3 end = PointVector.ToVector(point);
 
-        if (_currentMotion != null && !(_currentMotion is PanMotion)) {
-            _currentMotion.End();
+        if (_motion != null && !(_motionType == MotionType.Pan)) {
+            StopCoroutine(_motion);
         }
-        _currentMotion = new PanMotion(transform, end, duration);
+        _motion = Pan(end, duration);
+        StartCoroutine(_motion);
         _motions.Clear();
     }
 
     public void AddPan(Point point, float duration) {
         Vector3 end = PointVector.ToVector(point);
-        _motions.Enqueue(new PanMotion(transform, end, duration));
+        _motions.Enqueue(Pan(end, duration, EndMotion));
     }
 
     public void Zoom(float scale, float duration) {
-        if (_currentMotion != null) {
-            _currentMotion.End();
+        if (_motion != null) {
+            StopCoroutine(_motion);
         }
-        _currentMotion = new ZoomMotion(_camera.transform, transform, _originalOffset, scale, duration);
+        _motion = Zoom(_originalOffset, scale, duration);
+        StartCoroutine(_motion);
         _motions.Clear();
     }
 
     public void AddZoom(float scale, float duration) {
-        _motions.Enqueue(new ZoomMotion(_camera.transform, transform, _originalOffset, scale, duration));
+        _motions.Enqueue(Zoom(_originalOffset, scale, duration, EndMotion));
     }
 
     public void Rotate(float angle, float duration) {
-        if (_currentMotion != null && !(_currentMotion is RotateMotion)) {
-            _currentMotion.End();
+        if (_motion != null && !(_motionType == MotionType.Rotate)) {
+            StopCoroutine(_motion);
         }
-
-        _currentMotion = new RotateMotion(transform, angle, duration);
+        _motion = Rotate(angle, duration, null);
+        StartCoroutine(_motion);
         _motions.Clear();
     }
 
     public void AddRotate(float angle, float duration) {
-        _motions.Enqueue(new RotateMotion(transform, angle, duration));
+        _motions.Enqueue(Rotate(angle, duration, EndMotion));
     }
 
+    private void EndMotion() {
+        if (_motions.Count > 0) {
+            _motion = _motions.Dequeue();
+            StartCoroutine(_motion);
+        } else {
+            _motion = null;
+        }
+    }
     #endregion MotionMethods
 }
