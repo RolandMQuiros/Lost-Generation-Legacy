@@ -5,21 +5,43 @@ using UnityEngine;
 using UnityEngine.Events;
 using LostGen;
 
+/// <summary>
+/// A cursor constrained to a <see cref="Board"/>
+/// </summary>
+/// <remarks>
+/// This <see cref="MonoBehaviour"/> searches its <see cref="GameObject"/> for other MonoBehaviours that inherit from
+/// <see cref="IBoardCursorController"/>. IBoardCursorController classes map device inputs to cursor events, allowing
+/// control from gamepads, mice, keyboards, touchscreens, or any other device.
+/// </remarks>
 [RequireComponent(typeof(BoxCollider))]
 public class BoardCursor : MonoBehaviour {
-
-	[SerializeField]private Transform _pointer;
-	[SerializeField]private BoardRef _boardRef;
 	[Serializable]private class BoardCursorEvent : UnityEvent<Point> { }
-	[SerializeField]private Point _boardPoint;
-	[SerializeField]private BoardCursorEvent Clicked;
-    [SerializeField]private BoardCursorEvent TappedDown;
-    [SerializeField]private BoardCursorEvent TappedUp;
-    [SerializeField]private BoardCursorEvent Moved;
 
+	[Tooltip("The cursor pointer")]
+	[SerializeField]private Transform _pointer;
+	[Tooltip("Reference to the Board")]
+	[SerializeField]private BoardRef _boardRef;
+	[Tooltip("The cursor's current Point on the Board")]
+	[SerializeField]private Point _boardPoint;
+	[Tooltip("Called when the player taps and releases")]
+	[SerializeField]private BoardCursorEvent Clicked;
+	[Tooltip("Called when the player taps down")]
+    [SerializeField]private BoardCursorEvent TappedDown;
+	[Tooltip("Called when the player releases a tap")]
+    [SerializeField]private BoardCursorEvent TappedUp;
+	[Tooltip("Called when the cursor's position moves")]
+    [SerializeField]private BoardCursorEvent Moved;
 	private BoxCollider _clickCollider;
+	
+	/// <summary>This cursor's <see cref="Point"/> on the <see cref="Board"/></summary>
+	/// <returns>The current <see cref="Point"/></returns>
 	public Point BoardPoint { get { return _boardPoint; } }
+	/// <returns>The <see cref="BoardRef"/> this cursor is attached to</returns>
 	public BoardRef BoardRef { get { return _boardRef; } }
+	/// <summary>
+	/// A <see cref="BoxCollider"/> that can be used to capture raycasts, for inputs that need it
+	/// </summary>
+	/// <returns>Reference to this BoardCursor's <see cref="BoxCollider"/></returns>
 	public BoxCollider ClickCollider { get { return _clickCollider; } }
 
 	private void ResizeClickCollider() {

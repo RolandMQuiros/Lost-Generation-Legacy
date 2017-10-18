@@ -110,7 +110,7 @@ public class PawnViewManager : MonoBehaviour
     /// </summary>
     public void HandleMessages() {
         this.WaitForCoroutines(
-            _pawnViews.Values.Select(v => v.HandleMessages())
+            _pawnViews.Values.Select(v => v.ProcessMessages())
         );
     }
 }

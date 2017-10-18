@@ -25,7 +25,7 @@ public class CombatantView : PawnComponentView {
         _messages.Enqueue(message);
     }
 
-    public override IEnumerator HandleMessages() {
+    public override IEnumerator ProcessMessages() {
         while (_messages.Count > 0) {
             IPawnMessage message = _messages.Dequeue();
             yield return StartCoroutineFromMessage(message);
