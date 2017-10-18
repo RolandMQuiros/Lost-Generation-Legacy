@@ -4,6 +4,15 @@ using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace LostGen {
+    /// <summary>
+    /// A Dictionary of world state values, representing potential outcomes of <see cref="IDecisions"/>.
+    /// </summary>
+    /// <remarks>
+    /// StateOffsets are used by <see cref="Planner"/>s as nodes in a graph connected by IDecisions. A StateOffset
+    /// represents a world state that is 'offset' from the current one. Internally, a StateOffset is a
+    /// <see cref="Dictionary"/> keyed by <see cref="string"/>s, holding values of floats, integers, booleans, or
+    /// <see cref="Point"/>s.
+    /// </remarks>
     public class StateOffset {
         [StructLayout(LayoutKind.Explicit)]
         private struct ValueUnion {
@@ -33,6 +42,12 @@ namespace LostGen {
         
         private Dictionary<string, StateValue> _stateValues;
 
+        /// <summary>
+        /// Create a new StateOffset
+        /// </summary>
+        /// <param name="offset">
+        /// Another StateOffset. This offset's key-value pairs are added to the new StateOffset being created
+        /// </param>
         public StateOffset(StateOffset offset = null) {
             if (offset == null) {
                 _stateValues = new Dictionary<string, StateValue>();
@@ -41,6 +56,11 @@ namespace LostGen {
             }
         }
 
+        /// <summary>
+        /// Sets a state value to an integer
+        /// </summary>
+        /// <param name="key">State key</param>
+        /// <param name="value">integer value</param>
         public void Set(string key, int value) {
             StateValue stateValue = new StateValue();
             stateValue.Active = true;
@@ -50,6 +70,11 @@ namespace LostGen {
             _stateValues[key] = stateValue;
         }
 
+        /// <summary>
+        /// Sets a state value to a float
+        /// </summary>
+        /// <param name="key">State key</param>
+        /// <param name="value">Float value</param>
         public void Set(string key, float value) {
             StateValue stateValue = new StateValue();
             stateValue.Active = true;
@@ -59,6 +84,11 @@ namespace LostGen {
             _stateValues[key] = stateValue;
         }
 
+        /// <summary>
+        /// Sets a state value to a boolean
+        /// </summary>
+        /// <param name="key">State key</param>
+        /// <param name="value">Boolean value</param>
         public void Set(string key, bool value) {
             StateValue stateValue = new StateValue();
             stateValue.Active = true;
@@ -68,6 +98,11 @@ namespace LostGen {
             _stateValues[key] = stateValue;
         }
 
+        /// <summary>
+        /// Sets a state value to a <see cref="Point"/>
+        /// </summary>
+        /// <param name="key">State key</param>
+        /// <param name="value">Point value</param>
         public void Set(string key, Point value) {
             StateValue stateValue = new StateValue();
             stateValue.Active = true;
@@ -76,6 +111,15 @@ namespace LostGen {
 
             _stateValues[key] = stateValue;
         }
+
+        /// <summary>
+        /// Retrieve a state value from this StateOffset. If the value doesn't exist, the function will return the
+        /// provided <c>defaultValue</c> parameter, which is typically the current world state value of that particular
+        /// characteristic.
+        /// </summary>
+        /// <param name="key">State key</param>
+        /// <param name="defaultValue">The value returned if the state key doesn't exist in this StateOffset.</param>
+        /// <returns>The state value</returns>
 
         public int Get(string key, int defaultValue) {
             StateValue stateValue;
@@ -87,6 +131,14 @@ namespace LostGen {
             }
         }
 
+        /// <summary>
+        /// Retrieve a state value from this StateOffset. If the value doesn't exist, the function will return the
+        /// provided <c>defaultValue</c> parameter, which is typically the current world state value of that particular
+        /// characteristic.
+        /// </summary>
+        /// <param name="key">State key</param>
+        /// <param name="defaultValue">The value returned if the state key doesn't exist in this StateOffset.</param>
+        /// <returns>The state value</returns>
         public float Get(string key, float defaultValue) {
             StateValue stateValue;
             _stateValues.TryGetValue(key, out stateValue);
@@ -96,6 +148,15 @@ namespace LostGen {
                 return defaultValue;
             }
         }
+
+        /// <summary>
+        /// Retrieve a state value from this StateOffset. If the value doesn't exist, the function will return the
+        /// provided <c>defaultValue</c> parameter, which is typically the current world state value of that particular
+        /// characteristic.
+        /// </summary>
+        /// <param name="key">State key</param>
+        /// <param name="defaultValue">The value returned if the state key doesn't exist in this StateOffset.</param>
+        /// <returns>The state value</returns>
 
         public bool Get(string key, bool defaultValue) {
             StateValue stateValue;
@@ -107,6 +168,15 @@ namespace LostGen {
             }
         }
 
+        /// <summary>
+        /// Retrieve a state value from this StateOffset. If the value doesn't exist, the function will return the
+        /// provided <c>defaultValue</c> parameter, which is typically the current world state value of that particular
+        /// characteristic.
+        /// </summary>
+        /// <param name="key">State key</param>
+        /// <param name="defaultValue">The value returned if the state key doesn't exist in this StateOffset.</param>
+        /// <returns>The state value</returns>
+
         public Point Get(string key, Point defaultValue) {
             StateValue stateValue;  
             _stateValues.TryGetValue(key, out stateValue);
@@ -117,6 +187,19 @@ namespace LostGen {
             }
         }
 
+        /// <summary>
+        /// Checks if the current StateOffset's values are subset to another.
+        /// </summary>
+        /// <remarks>
+        /// A StateOffset can be subset to another if the other offset includes a later change to some value that wasn't
+        /// previously changed. For example, one <see cref="IDecision"/> moves a Pawn to a certain position, creating a
+        /// StateOffset with a state value "PawnPosition" set to that position's point <see cref="Point"/>, then a
+        /// subsequent IDecision causes the Pawn to attack an enemy, setting state value "EnemyHealth", since the latter
+        /// StateOffset will include the original "PawnPosition" state value as well. This tells us the first
+        /// StateOffset occurred before the second, and the Planner can form behaviors by building from previous states.   
+        /// </remarks>
+        /// <param name="other">The other StateOffset</param>
+        /// <returns>Whether or not the current StateOffset is subset to the given one</returns>
         public bool IsSubsetOf(StateOffset other) {
             bool isSubset = true;
             foreach (string key in _stateValues.Keys) {
@@ -133,6 +216,10 @@ namespace LostGen {
             return isSubset;
         }
 
+        /// <summary>
+        /// Returns a JSON-like string representation of this StateOffset. 
+        /// </summary>
+        /// <returns>String representation of this StateOffset</returns>
         public override string ToString() {
             string buffer = "{ ";
             foreach (KeyValuePair<string, StateValue> pair in _stateValues) {
@@ -158,6 +245,18 @@ namespace LostGen {
             return buffer;
         }
 
+        /// <summary>
+        /// A rough estimate of "difference" between one state and another, measuring how drastic the changes were.
+        /// </summary>
+        /// <remarks>
+        /// Calculates an integer value based on absolute difference between each corresponding value in the two
+        /// offsets. For floats and integer state values, this is simply the absolute value of their arithmetic
+        /// difference. For booleans, it's the logical difference. And for <see cref="Point"/>s, it's the Taxicab
+        /// distance.
+        /// </remarks>
+        /// <param name="s1">First StateOffset</param>
+        /// <param name="s2">Second StateOffset</param>
+        /// <returns>An integer estimation of difference between the two states</returns>
         public static int Heuristic(StateOffset s1, StateOffset s2) {
             IEnumerable<string> intersection = s1._stateValues.Keys.Intersect(s2._stateValues.Keys);
             int difference = 0;
@@ -190,6 +289,12 @@ namespace LostGen {
             return difference;
         }
 
+        /// <summary>
+        /// Adds all the common state values between two StateOffsets. 
+        /// </summary>
+        /// <param name="s1">First StateOffset</param>
+        /// <param name="s2">Second StateOffset</param>
+        /// <returns></returns>
         public static StateOffset operator + (StateOffset s1, StateOffset s2) {
             StateOffset sum = new StateOffset(s1);
 
@@ -198,14 +303,6 @@ namespace LostGen {
             }
 
             return sum;
-        }
-
-        public static string CombatantKey(Combatant combatant, string append) {
-            return combatant.Pawn.InstanceID + append;
-        }
-
-        public static string CombatantHealthKey(Combatant combatant) {
-            return combatant.Pawn.InstanceID + "health";
         }
     }
 }

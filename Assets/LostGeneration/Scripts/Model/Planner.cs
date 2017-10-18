@@ -5,13 +5,14 @@ using System.Text;
 
 namespace LostGen {
     /// <summary>
-    /// A node in the Planner's decision graph. A GoalNode represents a possible state of the world created
-    /// as the result or cause of an IDecision.
-    /// 
+    /// A node in the <see cref="Planner"/>'s decision graph. A GoalNode represents a possible state of the world created
+    /// as the result or cause of an <see cref="IDecision"/>.
+    /// </summary>
+    /// <remarks>
     /// With a given list of possible IDecisions, a single GoalNode will generate its full graph on its own through
     /// calls to GetNeighbors. The graphs are constructed from end to start, so the edges are unidirectional and point
     /// towards the current GoalNode.
-    /// </summary>
+    /// </remarks>
     public class GoalNode : IGraphNode {
         public StateOffset State { get; private set; }
         private List<IDecision> _decisions;
@@ -85,6 +86,9 @@ namespace LostGen {
         }
     }
 
+    /// <summary>
+    /// Creates a sequence of actions 
+    /// </summary>
     public class Planner {
         private List<IDecision> _decisions = new List<IDecision>();
         private List<GoalNode> _goals = new List<GoalNode>();
