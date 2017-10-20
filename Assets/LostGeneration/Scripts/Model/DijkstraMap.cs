@@ -131,7 +131,7 @@ namespace LostGen {
 			}
 		}
 		
-		private bool InBounds(Point point) {
+		public bool InBounds(Point point) {
 			return point.X >= 0 && point.X < _values.GetLength(0) &&
 				   point.Y >= 0 && point.Y < _values.GetLength(1) &&
 				   point.Z >= 0 && point.Z < _values.GetLength(2);
@@ -140,23 +140,6 @@ namespace LostGen {
 		private bool DefaultFilter(Point point) {
 			return true;
 		}
-		
-		// private bool DefaultFilter(Point point) {
-		// 	bool skip = false;
-
-		// 	// Skip only if the current block is solid, or the block below it is not solid.
-		// 	// This limits the scan to blocks that have ground to stand on.
-		// 	if (Board.Blocks.InBounds(point)) {
-		// 		BoardBlock block = Board.Blocks.At(point);
-		// 		skip = block.IsSolid;
-		// 		if (!skip && Board.Blocks.InBounds(point + Point.Down)) {
-		// 			BoardBlock below = Board.Blocks.At(point + Point.Down);
-		// 			skip = !below.IsSolid;
-		// 		}
-		// 	}
-
-		// 	return skip;
-		// }
 
 		#region OperatorOverloads
 
@@ -167,7 +150,12 @@ namespace LostGen {
 			for (int x = 0; x < sum._values.GetLength(0); x++) {
 				for (int y = 0; y < sum._values.GetLength(1); y++) {
 					for (int z = 0; z < sum._values.GetLength(2); z++) {
-						sum._values[x, y, z] += amount;
+						Point point = new Point(x, y, z);
+						if (map._filter(point)) {
+							sum._values[x, y, z] = int.MaxValue;
+						} else {
+							sum._values[x, y, z] += amount;
+						}
 					}
 				}
 			}
@@ -176,19 +164,24 @@ namespace LostGen {
 		}
 
 		public static DijkstraMap operator *(DijkstraMap map, float multiplier) {
-			DijkstraMap sum = new DijkstraMap(map.Size, map._filter);
-			Array.Copy(map._values, sum._values, map._values.Length);
+			DijkstraMap product = new DijkstraMap(map.Size, map._filter);
+			Array.Copy(map._values, product._values, map._values.Length);
 
-			for (int x = 0; x < sum._values.GetLength(0); x++) {
-				for (int y = 0; y < sum._values.GetLength(1); y++) {
-					for (int z = 0; z < sum._values.GetLength(2); z++) {
-						int value = sum._values[x, y, z];
-						sum._values[x, y, z] = (int)(multiplier * value + 0.5f);
+			for (int x = 0; x < product._values.GetLength(0); x++) {
+				for (int y = 0; y < product._values.GetLength(1); y++) {
+					for (int z = 0; z < product._values.GetLength(2); z++) {
+						Point point = new Point(x, y, z);
+						if (map._filter(point)) {
+							product._values[x, y, z] = int.MaxValue;
+						} else {
+							int value = product._values[x, y, z];
+							product._values[x, y, z] = (int)(multiplier * value + 0.5f);
+						}
 					}
 				}
 			}
 
-			return sum;
+			return product;
 		}
 
 		#endregion OperatorOverloads

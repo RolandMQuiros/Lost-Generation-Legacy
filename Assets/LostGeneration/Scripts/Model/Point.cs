@@ -325,9 +325,9 @@ namespace LostGen
             int iy = lower.Y <= upper.Y ? 1 : -1;
             int iz = lower.Z <= upper.Z ? 1 : -1;
 
-            for (int x = 0; x <= dp.X; x++) {
-                for (int y = 0; y <= dp.Y; y++) {
-                    for (int z = 0; z <= dp.Z; z++) {
+            for (int y = 0; y <= dp.Y; y++) {
+                for (int z = 0; z <= dp.Z; z++) {
+                    for (int x = 0; x <= dp.X; x++) {
                         yield return new Point(
                             lower.X + (ix * x),
                             lower.Y + (iy * y),
