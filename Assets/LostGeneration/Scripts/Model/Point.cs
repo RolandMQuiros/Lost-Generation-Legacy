@@ -308,5 +308,34 @@ namespace LostGen
             }
             return min;
         }
+
+
+        /// <summary>
+        /// Returns all Points in an axis-aligned box defined by the lower and upper parameters 
+        /// </summary>
+        /// <param name="lower">Lower corner of the box</param>
+        /// <param name="upper">Upper corner of the box</param>
+        /// <returns>Every point contained within the defined box</returns>
+        public static IEnumerable<Point> Range(Point lower, Point upper) {
+            // Get absolute difference between axes
+            Point dp = Point.Abs(upper - lower);
+            
+            // Get increments
+            int ix = lower.X <= upper.X ? 1 : -1;
+            int iy = lower.Y <= upper.Y ? 1 : -1;
+            int iz = lower.Z <= upper.Z ? 1 : -1;
+
+            for (int x = 0; x <= dp.X; x++) {
+                for (int y = 0; y <= dp.Y; y++) {
+                    for (int z = 0; z <= dp.Z; z++) {
+                        yield return new Point(
+                            lower.X + (ix * x),
+                            lower.Y + (iy * y),
+                            lower.Z + (iz * z)
+                        );
+                    }
+                }
+            }
+        }
     }
 }

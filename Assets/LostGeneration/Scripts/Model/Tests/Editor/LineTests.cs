@@ -96,5 +96,16 @@ namespace Tests {
                 count++;
             }
         }
+
+        [Test]
+        public void Range() {
+            foreach (Point point in Point.Range(Point.Zero, new Point(10, 10, 10))) {
+                Assert.IsTrue(
+                    point.X >= 0 && point.X <= 10 &&
+                    point.Y >= 0 && point.Y <= 10 &&
+                    point.Z >= 0 && point.Z <= 10  
+                );
+            }
+        }
     }
 }
