@@ -5,17 +5,6 @@
 
 // namespace LostGen.Decision {
 //     public class AttackWithMelee : IDecision {
-//         public int Cost { get { return _melee.ActionPoints; } }
-//         public Combatant Target {
-//             get { return _target; }
-//             set { _target = value; }
-//         }
-
-//         private Combatant _source;
-//         private MeleeAttackSkill _melee;
-//         private Combatant _target;
-//         private CardinalDirection _direction;
-
 //         public AttackWithMelee(Combatant source) {
 //             _source = source;
 //             _melee = _source.GetSkill<MeleeAttackSkill>();
@@ -33,16 +22,6 @@
 //         public bool ArePreconditionsMet(StateOffset state) {
 //             Point _targetPos = state.Get(StateKey.Position(_target.Pawn), _target.Pawn.Position);
 //             return _melee.InFullAreaOfEffect(_targetPos);
-//         }
-
-//         public void Run() {
-//             CardinalDirection direction;
-//             bool directionFound = false;
-//             for (direction = CardinalDirection.East; !directionFound && direction < CardinalDirection.Count; direction++) {
-//                 _melee.SetDirection(direction); // TODO: undo this
-//                 directionFound = _melee.GetAreaOfEffect().Contains(_target.Pawn.Position);
-//             }
-//             _melee.Fire();
 //         }
 //     }
 // }

@@ -6,7 +6,7 @@ using System.Text;
 namespace LostGen {
     public abstract class CombatantDecision : IDecision {
         public Combatant Source { get { return _source; } }
-        public abstract int Cost { get; }
+        public abstract int DecisionCost { get; }
         private Combatant _source;
 
         public CombatantDecision(Combatant source) {

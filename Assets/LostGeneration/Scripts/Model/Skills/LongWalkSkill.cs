@@ -26,6 +26,7 @@ namespace LostGen {
 
         private Point _prevOrigin;
         private HashSet<Point> _range;
+        private List<WalkNode> _path;
         private ActionPoints _ownerPoints;
 
         public LongWalkSkill(Pawn owner)
@@ -51,31 +52,27 @@ namespace LostGen {
         }
 
         public override IEnumerable<Point> GetPath() {
-            List<WalkNode> nodePath = FindPath(Pawn.Position, Target);
-            List<Point> path = new List<Point>();
-
-            if (nodePath != null) {
-                for (int i = 1; i < nodePath.Count; i++) {
-                    path.Add(nodePath[i].Point);
-                }
+            if (_path == null) {
+                _path = FindPath(Pawn.Position, Target);
             }
 
-            return path;
+            for (int i = 0; i < _path.Count; i++) {
+                yield return _path[i].Point;
+            }
         }
 
         #endregion PointCollections
 
         public override IEnumerable<PawnAction> Fire() {
-            List<WalkNode> path = FindPath(Pawn.Position, Target);
-
-            if (path != null) {
+            _path = _path ?? FindPath(Pawn.Position, Target);
+            if (_path != null) {
                 Debug.Log("Repathed");
-                for (int i = 1; i < path.Count; i++) {
+                for (int i = 1; i < _path.Count; i++) {
                     yield return new MoveAction(
                         Pawn,
-                        path[i - 1].Point,
-                        path[i].Point,
-                        WalkNode.GetCost(path[i - 1].Point, path[i].Point),
+                        _path[i - 1].Point,
+                        _path[i].Point,
+                        WalkNode.GetCost(_path[i - 1].Point, _path[i].Point),
                         true
                     );
                 }
@@ -148,17 +145,6 @@ namespace LostGen {
         /// <param name="to"></param>
         /// <returns></returns>
         private int ActionCostBetweenNodes(BlockNode from, BlockNode to) {
-            
-            // int actionPoints = Math.Abs(to.Point.X - from.Point.Y);
-            // int heightDifference = to.Point.Y - from.Point.Y;
-            
-            // // Climbing costs 2 points per block. Dropping only costs the horizontal component.
-            // if (heightDifference > 0) {
-            //     actionPoints += heightDifference * 2;
-            // }
-
-            // return actionPoints;
-
             return WalkNode.GetCost(from.Point, to.Point);
         }
 

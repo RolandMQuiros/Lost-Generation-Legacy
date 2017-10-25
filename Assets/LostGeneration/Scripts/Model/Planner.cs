@@ -46,7 +46,7 @@ namespace LostGen {
             GoalNode neighborGoal = (GoalNode)neighbor;
             IDecision edge = GetEdge(neighborGoal);
 
-            return edge.Cost;
+            return edge.DecisionCost;
         }
 
         public bool IsMatch(IGraphNode other) {

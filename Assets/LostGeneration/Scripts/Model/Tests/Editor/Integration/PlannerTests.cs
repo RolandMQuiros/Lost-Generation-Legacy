@@ -14,7 +14,7 @@ namespace Tests.Integration {
         }
 
         private class MoveToFridge : IDecision {
-            public int Cost { get { return 2; } }
+            public int DecisionCost { get { return 2; } }
             private CurrentState _state;
 
             public MoveToFridge(CurrentState state) {
@@ -39,7 +39,7 @@ namespace Tests.Integration {
         }
 
         private class KillFridgeGuardian : IDecision {
-            public int Cost { get { return 3; } }
+            public int DecisionCost { get { return 3; } }
             private CurrentState _state;
 
             public KillFridgeGuardian(CurrentState state) {
@@ -80,7 +80,7 @@ namespace Tests.Integration {
         }
 
         private class OpenFridgeDecision : IDecision {
-            public int Cost { get { return 1; } }
+            public int DecisionCost { get { return 1; } }
             private CurrentState _state;
 
             public OpenFridgeDecision(CurrentState state) {
@@ -106,7 +106,7 @@ namespace Tests.Integration {
         }
 
         private class GetBananaFromFridge : IDecision {
-            public int Cost { get { return 1; } }
+            public int DecisionCost { get { return 1; } }
             private CurrentState _state;
 
             public GetBananaFromFridge(CurrentState state) {

@@ -6,7 +6,7 @@ namespace LostGen {
         public virtual Point Target {
             get { return _target; }
         }
-        public event Action<Point> TargetChanged;
+        public event Action<Point, Point> TargetChanged;
         private Point _target;
 
         public RangedSkill(Pawn owner, string name, string description)
@@ -20,12 +20,14 @@ namespace LostGen {
         public virtual bool SetTarget(Point target) {
             bool targetChanged = false;
             if (_target != target && InRange(target)) {
+                Point oldTarget = _target;
                 _target = target;
 
                 targetChanged = true;
                 InvokeAreaOfEffectChange();
+
                 if (TargetChanged != null) {
-                    TargetChanged(_target);
+                    TargetChanged(oldTarget, _target);
                 }
             }
             return targetChanged;
