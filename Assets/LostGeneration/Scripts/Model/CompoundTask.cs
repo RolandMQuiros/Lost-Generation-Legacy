@@ -50,23 +50,23 @@ namespace LostGen {
         
         private HashSet<ITask> _subtasks = new HashSet<ITask>();
         private Func<StateOffset, StateOffset, int> _transitionScore;
-        public StateOffset PostConditions {
-            get {
-                return _subtasks.Select(s => s.Preconditions)
-                                .Aggregate((accumulator, next) => StateOffset.Intersect(accumulator, next));
-            }
-        }
 
         public CompoundTask(Func<StateOffset, StateOffset, int> transitionScore) {
             _transitionScore = transitionScore;
         }
 
-        public virtual StateOffset ApplyPreconditions(StateOffset state) {
-            // Get the intersection of all subtask preconditions
+        public StateOffset ApplyPreconditions(StateOffset state) {
             StateOffset preconditions =
-                _subtasks.Select(s => s.ApplyPostconditions(state))
+                _subtasks.Select(s => s.ApplyPreconditions(state))
                          .Aggregate((accumulator, next) => StateOffset.Intersect(accumulator, next));
             return preconditions;
+        }
+
+        public StateOffset ApplyPostconditions(StateOffset state) {
+            StateOffset postconditions =
+                _subtasks.Select(s => s.ApplyPostconditions(state))
+                         .Aggregate((accumulator, next) => StateOffset.Intersect(accumulator, next));
+            return postconditions;
         }
 
         public bool AddSubtask(ITask subtask) {

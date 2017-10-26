@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -13,7 +14,7 @@ namespace LostGen {
     /// <see cref="Dictionary"/> keyed by <see cref="string"/>s, holding values of floats, integers, booleans, or
     /// <see cref="Point"/>s.
     /// </remarks>
-    public class StateOffset {
+    public class StateOffset : IEnumerable {
         [StructLayout(LayoutKind.Explicit)]
         private struct ValueUnion {
             [FieldOffset(0)]
@@ -61,7 +62,7 @@ namespace LostGen {
         /// </summary>
         /// <param name="key">State key</param>
         /// <param name="value">integer value</param>
-        public void Set(string key, int value) {
+        public void Add(string key, int value) {
             StateValue stateValue = new StateValue();
             stateValue.Active = true;
             stateValue.Type = StateValue.ValueType.Int;
@@ -75,7 +76,7 @@ namespace LostGen {
         /// </summary>
         /// <param name="key">State key</param>
         /// <param name="value">Float value</param>
-        public void Set(string key, float value) {
+        public void Add(string key, float value) {
             StateValue stateValue = new StateValue();
             stateValue.Active = true;
             stateValue.Type = StateValue.ValueType.Float;
@@ -89,7 +90,7 @@ namespace LostGen {
         /// </summary>
         /// <param name="key">State key</param>
         /// <param name="value">Boolean value</param>
-        public void Set(string key, bool value) {
+        public void Add(string key, bool value) {
             StateValue stateValue = new StateValue();
             stateValue.Active = true;
             stateValue.Type = StateValue.ValueType.Bool;
@@ -103,7 +104,7 @@ namespace LostGen {
         /// </summary>
         /// <param name="key">State key</param>
         /// <param name="value">Point value</param>
-        public void Set(string key, Point value) {
+        public void Add(string key, Point value) {
             StateValue stateValue = new StateValue();
             stateValue.Active = true;
             stateValue.Type = StateValue.ValueType.Point;
@@ -214,6 +215,10 @@ namespace LostGen {
             }
 
             return isSubset;
+        }
+
+        public IEnumerator GetEnumerator() {
+            return _stateValues.GetEnumerator();
         }
 
         /// <summary>
