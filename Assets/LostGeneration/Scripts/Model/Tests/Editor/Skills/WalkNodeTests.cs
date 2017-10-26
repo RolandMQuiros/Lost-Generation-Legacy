@@ -54,7 +54,7 @@ namespace Tests {
 
 			WalkNode center = new WalkNode(board, new Point(1, 1, 1), true, false);
 			HashSet<Point> points = new HashSet<Point>(
-				GraphMethods<WalkNode>.FloodFill(center).Select(n => n.Point)
+				GraphMethods.FloodFill<BlockNode>(center).Select(n => n.Point)
 			);
 
 			Assert.AreEqual(8, points.Count);

@@ -13,7 +13,7 @@ namespace LostGen {
     /// calls to GetNeighbors. The graphs are constructed from end to start, so the edges are unidirectional and point
     /// towards the current GoalNode.
     /// </remarks>
-    public class GoalNode : IGraphNode {
+    public class GoalNode : IGraphNode<GoalNode> {
         public StateOffset State { get; private set; }
         private List<IDecision> _decisions;
         private Dictionary<GoalNode, IDecision> _edges = new Dictionary<GoalNode, IDecision>();
@@ -35,7 +35,7 @@ namespace LostGen {
             return edge;
         }
 
-        public int GetEdgeCost(IGraphNode neighbor) {
+        public int GetEdgeCost(GoalNode neighbor) {
             // We're basically banking on GetNeighbor being called BEFORE GetEdgeCost, since the goals won't be
             // cached until the former is used.
             // This might bite us in the ass later.
@@ -49,18 +49,18 @@ namespace LostGen {
             return edge.DecisionCost;
         }
 
-        public bool IsMatch(IGraphNode other) {
+        public bool IsMatch(GoalNode other) {
             GoalNode otherGoal = other as GoalNode;
             bool match = false;
 
             if (otherGoal != null) {
-                match = IsMatch(otherGoal);
+                match = other.State.IsSubsetOf(State);
             }
 
             return match;
         }
 
-        public IEnumerable<IGraphNode> GetNeighbors() {
+        public IEnumerable<GoalNode> GetNeighbors() {
             if (_cacheComplete) {
                 foreach (GoalNode neighbor in _edges.Keys) {
                     yield return neighbor;
@@ -79,10 +79,6 @@ namespace LostGen {
                 }
                 _cacheComplete = true;
             }
-        }
-
-        private bool IsMatch(GoalNode other) {
-            return other.State.IsSubsetOf(State);
         }
     }
 
@@ -109,7 +105,7 @@ namespace LostGen {
         public Queue<IDecision> CreatePlan(StateOffset goal) {
             GoalNode start = new GoalNode(new StateOffset(), _decisions);
             GoalNode end = new GoalNode(goal, _decisions);
-            Queue<GoalNode> goals = new Queue<GoalNode>(GraphMethods<GoalNode>.FindPath(start, end, Heuristic));
+            Queue<GoalNode> goals = new Queue<GoalNode>(GraphMethods.FindPath<GoalNode>(start, end, Heuristic));
 
             Queue<IDecision> plan = new Queue<IDecision>();
             if (goals.Count > 0) {

@@ -26,7 +26,7 @@ namespace LostGen {
 
         private Point _prevOrigin;
         private HashSet<Point> _range;
-        private List<WalkNode> _path;
+        private List<Point> _path;
         private ActionPoints _ownerPoints;
 
         public LongWalkSkill(Pawn owner)
@@ -55,10 +55,7 @@ namespace LostGen {
             if (_path == null) {
                 _path = FindPath(Pawn.Position, Target);
             }
-
-            for (int i = 0; i < _path.Count; i++) {
-                yield return _path[i].Point;
-            }
+            return _path;
         }
 
         #endregion PointCollections
@@ -68,13 +65,9 @@ namespace LostGen {
             if (_path != null) {
                 Debug.Log("Repathed");
                 for (int i = 1; i < _path.Count; i++) {
-                    yield return new MoveAction(
-                        Pawn,
-                        _path[i - 1].Point,
-                        _path[i].Point,
-                        WalkNode.GetCost(_path[i - 1].Point, _path[i].Point),
-                        true
-                    );
+                    Point from = _path[i - 1];
+                    Point to = _path[i];
+                    yield return new MoveAction(Pawn, from, to, WalkNode.GetCost(from, to), true);
                 }
 
                 // Clear the range for the next step
@@ -86,9 +79,9 @@ namespace LostGen {
             return "WalkSkill : { Owner: " + Pawn + ", Range: " + _range.Count + "}";
         }
 
-        private List<WalkNode> FindPath(Point origin, Point target) {
+        private List<Point> FindPath(Point origin, Point target) {
             WalkNode end = new WalkNode(_board, target, CanWalkDiagonally, true);
-            List<WalkNode> path = new List<WalkNode>();
+            List<Point> path = new List<Point>();
 
             if (end != null) {
                 WalkNode start = new WalkNode(_board, target, CanWalkDiagonally, true);
@@ -98,21 +91,21 @@ namespace LostGen {
                 }
 
                 if (Point.TaxicabDistance(Pawn.Position, target) == 1) {
-                    path.Add(new WalkNode(_board, origin, CanWalkDiagonally, true));
-                    path.Add(new WalkNode(_board, target, CanWalkDiagonally, true));
+                    path.Add(origin);
+                    path.Add(target);
                 } else {
-                    path = new List<WalkNode>(
-                        GraphMethods<WalkNode>.FindPath(
+                    path = new List<Point>(
+                        GraphMethods.FindPath<BlockNode>(
                             new WalkNode(_board, origin, CanWalkDiagonally, true),
                             end,
                             Heuristic
-                        )
+                        ).Select(n => n.Point)
                     );
                 }
                 
                 _actionPoints = 0;
                 for (int i = 1; i < path.Count; i++) {
-                    _actionPoints += ActionCostBetweenNodes(path[i-1], path[i]);
+                    _actionPoints += WalkNode.GetCost(path[i-1], path[i]);
                 }
             }
 
@@ -129,7 +122,7 @@ namespace LostGen {
                 if (startNode != null) {
                     // GraphMethods include the origin in their result sets.  Make sure we skip the first one. 
                     bool firstSkipped = false;
-                    foreach (WalkNode node in GraphMethods<WalkNode>.FloodFill(startNode, _ownerPoints.Current, -1)) {
+                    foreach (WalkNode node in GraphMethods.FloodFill<BlockNode>(startNode, _ownerPoints.Current, -1)) {
                         if (firstSkipped) {
                             _range.Add(node.Point);
                         } else {
@@ -139,16 +132,8 @@ namespace LostGen {
                 }
             }
         }
-        
-        /// <summary>Retrieves both the ActionPoint and Pathfinding cost between two nodes</summary>
-        /// <param name="from"></param>
-        /// <param name="to"></param>
-        /// <returns></returns>
-        private int ActionCostBetweenNodes(BlockNode from, BlockNode to) {
-            return WalkNode.GetCost(from.Point, to.Point);
-        }
 
-        protected virtual int Heuristic(WalkNode start, WalkNode end) {
+        protected virtual int Heuristic(BlockNode start, BlockNode end) {
             return Point.TaxicabDistance(start.Point, end.Point);
         }
     }

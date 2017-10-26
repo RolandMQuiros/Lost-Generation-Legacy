@@ -4,16 +4,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace LostGen {
-    public static class GraphMethods<T> where T : IGraphNode {
-        public delegate int Heuristic(T start, T end);
+    public static class GraphMethods {
+        public delegate int Heuristic<T>(T start, T end);
 
-        private class SortNode : IComparable<SortNode> {
+        private class SortNode<T> : IComparable<SortNode<T>> {
             public T Node;
             public int GScore = 0;
             public int FScore = 0;
             public int Level = 0;
 
-            public int CompareTo(SortNode other) {
+            public int CompareTo(SortNode<T> other) {
                 int compare = 0;
                 
                 if (FScore < other.FScore) { compare = -1; }
@@ -21,18 +21,30 @@ namespace LostGen {
 
                 return compare;
             }
+
+            public override bool Equals(object obj) {
+                SortNode<T> other = obj as SortNode<T>;
+                if (other != null) {
+                    return Node.Equals(other.Node);
+                }
+                return false;
+            }
+
+            public override int GetHashCode() {
+                return Node.GetHashCode();
+            }
         }
 
-        public static IEnumerable<T> FloodFill(T start, int maxCost = -1, int maxDepth = -1) {
+        public static IEnumerable<T> FloodFill<T>(T start, int maxCost = -1, int maxDepth = -1) where T : IGraphNode<T> {
             HashSet<T> domain = new HashSet<T>();
-            HashSet<SortNode> open = new HashSet<SortNode>();
+            HashSet<SortNode<T>> open = new HashSet<SortNode<T>>();
 
-            SortNode first = new SortNode() { Node = start, Level = 0 };
+            SortNode<T> first = new SortNode<T>() { Node = start, Level = 0 };
             open.Add(first);
             domain.Add(first.Node);
 
             while (open.Count > 0) {
-                SortNode current = open.Min();
+                SortNode<T> current = open.Min();
                 open.Remove(current);
 
                 if ((maxDepth == -1 || current.Level < maxDepth)) {
@@ -45,7 +57,7 @@ namespace LostGen {
 
                         if (maxCost == -1 || tentativeGScore <= maxCost) {
                             domain.Add(neighbor);                            
-                            open.Add(new SortNode() {
+                            open.Add(new SortNode<T>() {
                                 Node = neighbor,
                                 GScore = tentativeGScore,
                                 FScore = tentativeGScore,
@@ -59,18 +71,17 @@ namespace LostGen {
             return domain;
         }
 
-        public static IEnumerable<T> FindPath(T start, T end, Heuristic heuristic) {
+        public static IEnumerable<T> FindPath<T>(T start, T end, Heuristic<T> heuristic) where T : IGraphNode<T> {
             HashSet<T> visited = new HashSet<T>();
-            List<SortNode> open = new List<SortNode>();
+            SortedDictionary<SortNode<T>, SortNode<T>> open = new SortedDictionary<SortNode<T>, SortNode<T>>();
             Dictionary<T, T> cameFrom = new Dictionary<T, T>();
 
             Stack<T> path = new Stack<T>();
-
-            open.Add(new SortNode() { Node = start });
+            SortNode<T> startNode = new SortNode<T>() { Node = start };
+            open.Add(startNode, startNode);
             
             while (open.Count > 0) {
-                open.Sort();
-                SortNode current = open[0];
+                SortNode<T> current = open.First().Key;
                 
                 if (current.Node.IsMatch(end)) {
                     T pathNode = current.Node;
@@ -82,7 +93,7 @@ namespace LostGen {
                     break;
                 }
 
-                open.RemoveAt(0);
+                open.Remove(current);
 
                 foreach (T neighbor in current.Node.GetNeighbors()) {
                     if (visited.Contains(neighbor)) {
@@ -94,15 +105,15 @@ namespace LostGen {
                     int tentativeGScore = current.GScore + current.Node.GetEdgeCost(neighbor);
 
                     // If the recorded distance is less than the neighbor distance, replace it
-                    SortNode oldNeighbor = open.Find(node => node.Node.Equals(neighbor));
+                    SortNode<T> neighborNode = new SortNode<T>() {
+                        Node = neighbor,
+                        GScore = Int32.MaxValue
+                    };
+                    SortNode<T> oldNeighbor;
                     
-                    if (oldNeighbor == null) {
-                        oldNeighbor = new SortNode() {
-                            Node = neighbor,
-                            GScore = Int32.MaxValue
-                        };
-
-                        open.Add(oldNeighbor);
+                    if (!open.TryGetValue(neighborNode, out oldNeighbor)) {
+                        oldNeighbor = neighborNode;
+                        open.Add(oldNeighbor, oldNeighbor);
                     }
 
                     if (tentativeGScore < oldNeighbor.GScore) {

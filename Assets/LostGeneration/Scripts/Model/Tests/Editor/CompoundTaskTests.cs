@@ -10,15 +10,14 @@ namespace Tests.Integration {
             public override StateOffset ApplyPreconditions(StateOffset state) {
                 return state + new StateOffset() {
                     { "In Forest", false },
-                    { "In City", true },
-                    { "Need Wood", true }
+                    { "In City", true }
                 };
             }
 
             public override bool ArePreconditionsMet(StateOffset state) {
-                return state.Get("In Forest", false) &&
+                return !state.Get("In Forest", false) &&
                        state.Get("In City", false) &&
-                       state.Get("Need Wood", false);
+                       state.Get("Money", 0) < 10;
             }
 
             public override StateOffset ApplyPostconditions(StateOffset state) {
@@ -45,7 +44,7 @@ namespace Tests.Integration {
             public override bool ArePreconditionsMet(StateOffset state) {
                 return state.Get("In Forest", false) &&
                        state.Get("Has Axe", false) &&
-                       state.Get("Has Wood", false);
+                       !state.Get("Has Wood", false);
             }
 
             public override StateOffset ApplyPostconditions(StateOffset state) {
@@ -68,7 +67,7 @@ namespace Tests.Integration {
             }
 
             public override bool ArePreconditionsMet(StateOffset state) {
-                return state.Get("In City", false) &&
+                return !state.Get("In City", false) &&
                        state.Get("In Forest", true);
             }
 
@@ -107,7 +106,7 @@ namespace Tests.Integration {
             }
 
             public override void Do() {
-                Console.Write("Sold wood");
+                Console.WriteLine("Sold wood");
             }
         }
         
@@ -130,9 +129,11 @@ namespace Tests.Integration {
             StateOffset goal = new StateOffset() {
                 { "Money", 10 }
             };
-
-            foreach (ITask task in planner.Decompose(start, goal)) {
-                ((PrimitiveTask)task).Do();
+            
+            List<ITask> plan = new List<ITask>(planner.Decompose(start, goal));
+            Assert.Greater(plan.Count, 0);
+            for (int i = 0; i < plan.Count; i++) {
+                ((PrimitiveTask)plan[i]).Do();
             }
         }
     }

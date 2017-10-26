@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 
 namespace LostGen {
-    public interface IGraphNode {
-        int GetEdgeCost(IGraphNode neighbor);
-        IEnumerable<IGraphNode> GetNeighbors();
-        bool IsMatch(IGraphNode other);
+    public interface IGraphNode<T> {
+        int GetEdgeCost(T neighbor);
+        IEnumerable<T> GetNeighbors();
+        bool IsMatch(T other);
     }
 }

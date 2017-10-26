@@ -8,9 +8,9 @@ using LostGen;
 namespace Tests {
     public class PathfinderTests {
 
-        private class TestNode : IGraphNode, IComparable<TestNode> {
+        private class TestNode : IGraphNode<TestNode>, IComparable<TestNode> {
             public char Value { get; private set; }
-            public Dictionary<IGraphNode, int> _neighbors = new Dictionary<IGraphNode, int>();
+            public Dictionary<TestNode, int> _neighbors = new Dictionary<TestNode, int>();
             public bool IsVowel {
                 get {
                     char upper = Char.ToUpper(Value);
@@ -26,18 +26,16 @@ namespace Tests {
                 _neighbors[neighbor] = edgeCost;
             }
 
-            public int GetEdgeCost(IGraphNode to) {
-                TestNode neighbor = (TestNode)to;
-                return _neighbors[neighbor];
+            public int GetEdgeCost(TestNode to) {
+                return _neighbors[to];
             }
 
-            public IEnumerable<IGraphNode> GetNeighbors() {
+            public IEnumerable<TestNode> GetNeighbors() {
                 return _neighbors.Keys;
             }
 
-            public bool IsMatch(IGraphNode other) {
-                TestNode otherNode = (TestNode)other;
-                return Value == otherNode.Value;
+            public bool IsMatch(TestNode other) {
+                return Value == other.Value;
             }
 
             public static string PathToString(IEnumerable<TestNode> path) {
@@ -99,7 +97,7 @@ namespace Tests {
             nodeE.AddNeighbor(nodeD, 10);
 
             List<TestNode> path = new List<TestNode>(
-                GraphMethods<TestNode>.FindPath(nodeA, nodeE, delegate (TestNode start, TestNode end) {
+                GraphMethods.FindPath<TestNode>(nodeA, nodeE, delegate (TestNode start, TestNode end) {
                     return 10 * Math.Abs(end.Value - start.Value);
                 })
             );
@@ -134,7 +132,7 @@ namespace Tests {
             nodeE.AddNeighbor(nodeD, 10);
 
             string pathStr = TestNode.PathToString(
-                GraphMethods<TestNode>.FindPath(nodeA, nodeE, delegate (TestNode start, TestNode end) {
+                GraphMethods.FindPath<TestNode>(nodeA, nodeE, delegate (TestNode start, TestNode end) {
                     return 10 * Math.Abs(end.Value - start.Value);
                 })
             );
@@ -167,7 +165,7 @@ namespace Tests {
             nodeE.AddNeighbor(nodeD, 10);
 
             string pathStr = TestNode.PathToString(
-                GraphMethods<TestNode>.FindPath(nodeA, nodeE, delegate (TestNode start, TestNode end) {
+                GraphMethods.FindPath<TestNode>(nodeA, nodeE, delegate (TestNode start, TestNode end) {
                     return 10 * Math.Abs(end.Value - start.Value);
                 })
             );
@@ -190,7 +188,7 @@ namespace Tests {
             nodeD.AddNeighbor(nodeC, 10);
 
             string pathStr = TestNode.PathToString(
-                GraphMethods<TestNode>.FindPath(nodeA, nodeD, delegate (TestNode start, TestNode end) {
+                GraphMethods.FindPath<TestNode>(nodeA, nodeD, delegate (TestNode start, TestNode end) {
                     return 10 * Math.Abs(end.Value - start.Value);
                 })
             );
@@ -212,7 +210,7 @@ namespace Tests {
             nodeC.AddNeighbor(nodeB, 10);
 
             string pathStr = TestNode.PathToString(
-                GraphMethods<TestNode>.FindPath(nodeA, nodeD, delegate (TestNode start, TestNode end) {
+                GraphMethods.FindPath<TestNode>(nodeA, nodeD, delegate (TestNode start, TestNode end) {
                     return 10 * Math.Abs(end.Value - start.Value);
                 })
             );
@@ -232,12 +230,12 @@ namespace Tests {
             }
 
             List<TestNode> depthDomain = new List<TestNode>(
-                GraphMethods<TestNode>.FloodFill(nodes[0], -1, 10)
+                GraphMethods.FloodFill<TestNode>(nodes[0], -1, 10)
             );
             depthDomain.Sort();
             string depthString = TestNode.PathToString(depthDomain);
 
-            List<TestNode> costDomain = new List<TestNode>(GraphMethods<TestNode>.FloodFill(nodes[0], 100, -1));
+            List<TestNode> costDomain = new List<TestNode>(GraphMethods.FloodFill<TestNode>(nodes[0], 100, -1));
             costDomain.Sort();
             string costString = TestNode.PathToString(costDomain);
 
@@ -249,7 +247,7 @@ namespace Tests {
         public void SprawlingGraph() {
             TestNode[] nodes = VowelGraph();
 
-            string pathStr = TestNode.PathToString(GraphMethods<TestNode>.FindPath(nodes[0], nodes[25],
+            string pathStr = TestNode.PathToString(GraphMethods.FindPath<TestNode>(nodes[0], nodes[25],
                 delegate (TestNode start, TestNode end) {
                     return 10 * Math.Abs(end.Value - start.Value);
                 }
@@ -263,7 +261,7 @@ namespace Tests {
         public void FloodFillSprawlingGraph() {
             TestNode[] nodes = VowelGraph();
 
-            List<TestNode> fill = new List<TestNode>(GraphMethods<TestNode>.FloodFill(nodes[0]));
+            List<TestNode> fill = new List<TestNode>(GraphMethods.FloodFill<TestNode>(nodes[0]));
             fill.Sort();
 
             string fillStr = TestNode.PathToString(fill);

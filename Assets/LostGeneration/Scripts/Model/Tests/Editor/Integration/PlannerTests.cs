@@ -22,7 +22,7 @@ namespace Tests.Integration {
             }
 
             public StateOffset ApplyPostconditions(StateOffset state) {
-                state.Set("NearFridge", true);
+                state.Add("NearFridge", true);
                 return state;
             }
 
@@ -49,13 +49,13 @@ namespace Tests.Integration {
             public StateOffset ApplyPostconditions(StateOffset state) {
                 int guardianHealth = state.Get("GuardianHealth", _state.GuardianHealth) - 1;
                 if (guardianHealth <= 0) {
-                    state.Set("GuardianHealth", 0);
-                    state.Set("GuardianDead", true);
-                    state.Set("FridgeLocked", false);
+                    state.Add("GuardianHealth", 0);
+                    state.Add("GuardianDead", true);
+                    state.Add("FridgeLocked", false);
                 } else {
-                    state.Set("GuardianHealth", guardianHealth);
-                    state.Set("GuardianDead", false);
-                    state.Set("FridgeLocked", true);
+                    state.Add("GuardianHealth", guardianHealth);
+                    state.Add("GuardianDead", false);
+                    state.Add("FridgeLocked", true);
                 }
 
                 return state;
@@ -88,7 +88,7 @@ namespace Tests.Integration {
             }
 
             public StateOffset ApplyPostconditions(StateOffset state) {
-                state.Set("FridgeOpen", true);
+                state.Add("FridgeOpen", true);
                 return state;
             }
 
@@ -114,7 +114,7 @@ namespace Tests.Integration {
             }
 
             public StateOffset ApplyPostconditions(StateOffset state) {
-                state.Set("HasBanana", true);
+                state.Add("HasBanana", true);
                 return state;
             }
 
@@ -186,7 +186,7 @@ namespace Tests.Integration {
             }
 
             StateOffset goal = new StateOffset();
-            goal.Set("HasBanana", true);
+            goal.Add("HasBanana", true);
 
             Queue<IDecision> plan = planner.CreatePlan(goal);
 

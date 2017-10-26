@@ -20,7 +20,7 @@ namespace LostGen {
             return GetCost(Point, neighbor.Point);
         }
 
-        public override IEnumerable<IGraphNode> GetNeighbors() {
+        public override IEnumerable<BlockNode> GetNeighbors() {
             BuildNeighbors();
             foreach (WalkNode neighbor in _neighbors.Values) {
                 yield return neighbor;
