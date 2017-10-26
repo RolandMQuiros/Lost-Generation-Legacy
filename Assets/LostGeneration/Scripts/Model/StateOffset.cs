@@ -304,5 +304,15 @@ namespace LostGen {
 
             return sum;
         }
+
+        public static StateOffset Intersect(StateOffset s1, StateOffset s2) {
+            StateOffset intersection = new StateOffset();
+            foreach (string key in s1._stateValues.Keys
+                                     .Intersect(s2._stateValues.Keys)
+                                     .Where(k => s1._stateValues[k].Value.Equals(s2._stateValues[k].Value))) {
+                intersection._stateValues[key] = s1._stateValues[key];
+            }
+            return intersection;
+        }
     }
 }
