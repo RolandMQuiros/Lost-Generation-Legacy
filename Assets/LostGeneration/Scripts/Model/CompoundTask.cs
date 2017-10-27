@@ -5,19 +5,15 @@ using System.Collections.Generic;
 
 namespace LostGen {
     public class CompoundTask {
-        public delegate int StateHeuristic(StateOffset from, StateOffset to);
+        public delegate int StateScore(StateOffset from, StateOffset to);
         private class StateNode : IGraphNode<StateNode> {
             public StateOffset State { get { return _state; } }
-            public ITask Cause { get { return _cause; } }
             private StateOffset _state;
-            private ITask _cause;
-            private int _taskLevel = 0;
-            private HashSet<ITask> _taskPool;
+            private IEnumerable<ITask> _taskPool;
             private Dictionary<StateNode, ITask> _neighbors = null;
-            private Func<StateOffset, StateOffset, int> _edgeCost;
+            private StateScore _edgeCost;
 
-            public StateNode(ITask cause, StateOffset state, HashSet<ITask> taskPool, Func<StateOffset, StateOffset, int> edgeCost) {
-                _cause = cause;
+            public StateNode(StateOffset state, IEnumerable<ITask> taskPool, StateScore edgeCost) {
                 _state = state;
                 _taskPool = taskPool;
                 _edgeCost = edgeCost;
@@ -27,21 +23,14 @@ namespace LostGen {
                 return _edgeCost(_state, neighbor._state);
             }
             public IEnumerable<StateNode> GetNeighbors() {
-                if (_taskLevel >= 20) {
-                    return Enumerable.Empty<StateNode>();
-                }
-
-                if (_neighbors == null) {
+            if (_neighbors == null) {
                     _neighbors = new Dictionary<StateNode, ITask>();
                     foreach (ITask task in _taskPool.Where(t => t.ArePreconditionsMet(_state))) {
                         StateNode newNode = new StateNode(
-                            task,
                             task.ApplyPostconditions(_state),
-                            new HashSet<ITask>(_taskPool.Where(t => t != this)),
+                            _taskPool.Where(t => t != task),
                             _edgeCost
                         );
-                        newNode._taskLevel = _taskLevel + 1;
-
                         _neighbors.Add(newNode, task);
                     }
                 }
@@ -53,22 +42,19 @@ namespace LostGen {
             }
 
             public ITask GetTask(StateNode neighbor) {
+                ITask task;
+                if (!_neighbors.TryGetValue(neighbor, out task)) {
+                    throw new ArgumentException("neighbor", "This StateNode at " + neighbor._state + " is not a neighbor of this StateNode");
+                }
                 return _neighbors[neighbor];
             }
         }
         
         private HashSet<ITask> _subtasks = new HashSet<ITask>();
-        private Func<StateOffset, StateOffset, int> _transitionScore;
+        private StateScore _transitionScore;
 
-        public CompoundTask(Func<StateOffset, StateOffset, int> transitionScore) {
+        public CompoundTask(StateScore transitionScore) {
             _transitionScore = transitionScore;
-        }
-
-        public StateOffset ApplyPreconditions(StateOffset state) {
-            StateOffset preconditions =
-                _subtasks.Select(s => s.ApplyPreconditions(state))
-                         .Aggregate((accumulator, next) => StateOffset.Intersect(accumulator, next));
-            return preconditions;
         }
 
         public StateOffset ApplyPostconditions(StateOffset state) {
@@ -85,13 +71,15 @@ namespace LostGen {
         public bool RemoveSubtask(ITask subtask) {
             return _subtasks.Remove(subtask);
         }
-        public IEnumerable<ITask> Decompose(StateOffset from, StateOffset to) {
-            // GOAP goes here
-            StateNode start = new StateNode(null, from, _subtasks, _transitionScore);
-            StateNode end = new StateNode(null, to, _subtasks, _transitionScore);
 
+        public IEnumerable<ITask> Decompose(StateOffset from, StateOffset to) {
+            StateNode start = new StateNode(from, _subtasks, _transitionScore);
+            StateNode end = new StateNode(to, _subtasks, _transitionScore);
+
+            StateNode previous = null;
             foreach (StateNode stateNode in GraphMethods.FindPath<StateNode>(start, end, Heuristic)) {
-                if (stateNode.Cause != null) { yield return stateNode.Cause; }
+                if (previous == null) { previous = stateNode; }
+                else { yield return stateNode.GetTask(previous); }
             }
         }
         private int Heuristic(StateNode start, StateNode end) {

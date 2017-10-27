@@ -73,7 +73,7 @@ namespace LostGen {
             openGraphNodes.Add(start, startNode);
             
             while (openSet.Count > 0) {
-                SortNode<T> current = openSet.First();
+                SortNode<T> current = openSet.Min();
                 
                 if (current.Node.IsMatch(end)) {
                     T pathNode = current.Node;

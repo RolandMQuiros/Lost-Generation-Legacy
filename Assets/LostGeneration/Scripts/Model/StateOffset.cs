@@ -221,6 +221,16 @@ namespace LostGen {
             return _stateValues.GetEnumerator();
         }
 
+        public bool Equals(StateOffset other) {
+            foreach(KeyValuePair<string, StateValue> pair in _stateValues) {
+                StateValue otherValue;
+                if (!other._stateValues.TryGetValue(pair.Key, out otherValue) || !otherValue.Equals(pair.Value)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         /// <summary>
         /// Returns a JSON-like string representation of this StateOffset. 
         /// </summary>

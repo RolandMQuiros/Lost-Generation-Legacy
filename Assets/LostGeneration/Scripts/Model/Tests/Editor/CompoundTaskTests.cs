@@ -143,6 +143,7 @@ namespace Tests.Integration {
 
             StateOffset start = new StateOffset() {
                 { "In City", true },
+                { "In Forest", false },
                 { "Has Axe", true },
                 { "Has Wood", false },
                 { "Money", 0 }
@@ -152,7 +153,7 @@ namespace Tests.Integration {
                 { "Money", 10 }
             };
 
-            planner.AddSubtask(new JustEndItAll(goal));
+            //planner.AddSubtask(new JustEndItAll(goal));
             
             List<ITask> plan = new List<ITask>(planner.Decompose(start, goal));
             Assert.Greater(plan.Count, 0);

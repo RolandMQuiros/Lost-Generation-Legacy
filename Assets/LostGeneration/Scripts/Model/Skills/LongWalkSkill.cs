@@ -52,18 +52,14 @@ namespace LostGen {
         }
 
         public override IEnumerable<Point> GetPath() {
-            if (_path == null) {
-                _path = FindPath(Pawn.Position, Target);
-            }
-            return _path;
+            return FindPath(Pawn.Position, Target);
         }
 
         #endregion PointCollections
 
         public override IEnumerable<PawnAction> Fire() {
-            _path = _path ?? FindPath(Pawn.Position, Target);
+            _path = FindPath(Pawn.Position, Target);
             if (_path != null) {
-                Debug.Log("Repathed");
                 for (int i = 1; i < _path.Count; i++) {
                     Point from = _path[i - 1];
                     Point to = _path[i];
@@ -72,6 +68,7 @@ namespace LostGen {
 
                 // Clear the range for the next step
                 _range = null;
+                _path = null;
             }
         }
 
