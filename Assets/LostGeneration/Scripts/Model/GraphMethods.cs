@@ -21,18 +21,6 @@ namespace LostGen {
 
                 return compare;
             }
-
-            public override bool Equals(object obj) {
-                SortNode<T> other = obj as SortNode<T>;
-                if (other != null) {
-                    return Node.Equals(other.Node);
-                }
-                return false;
-            }
-
-            public override int GetHashCode() {
-                return Node.GetHashCode();
-            }
         }
 
         public static IEnumerable<T> FloodFill<T>(T start, int maxCost = -1, int maxDepth = -1) where T : IGraphNode<T> {
@@ -73,15 +61,19 @@ namespace LostGen {
 
         public static IEnumerable<T> FindPath<T>(T start, T end, Heuristic<T> heuristic) where T : IGraphNode<T> {
             HashSet<T> visited = new HashSet<T>();
-            SortedDictionary<SortNode<T>, SortNode<T>> open = new SortedDictionary<SortNode<T>, SortNode<T>>();
+            
+            HashSet<SortNode<T>> openSet = new HashSet<SortNode<T>>();
+            Dictionary<T, SortNode<T>> openGraphNodes = new Dictionary<T, SortNode<T>>();
+            
             Dictionary<T, T> cameFrom = new Dictionary<T, T>();
 
             Stack<T> path = new Stack<T>();
             SortNode<T> startNode = new SortNode<T>() { Node = start };
-            open.Add(startNode, startNode);
+            openSet.Add(startNode);
+            openGraphNodes.Add(start, startNode);
             
-            while (open.Count > 0) {
-                SortNode<T> current = open.First().Key;
+            while (openSet.Count > 0) {
+                SortNode<T> current = openSet.First();
                 
                 if (current.Node.IsMatch(end)) {
                     T pathNode = current.Node;
@@ -92,8 +84,11 @@ namespace LostGen {
                     }
                     break;
                 }
-
-                open.Remove(current);
+                
+                if (!openSet.Remove(current) || !openGraphNodes.Remove(current.Node)) {
+                    throw new Exception("Current node was somehow not in the open sets. " +
+                        "Check your GetHashCode() implementation.");
+                }
 
                 foreach (T neighbor in current.Node.GetNeighbors()) {
                     if (visited.Contains(neighbor)) {
@@ -105,15 +100,15 @@ namespace LostGen {
                     int tentativeGScore = current.GScore + current.Node.GetEdgeCost(neighbor);
 
                     // If the recorded distance is less than the neighbor distance, replace it
-                    SortNode<T> neighborNode = new SortNode<T>() {
-                        Node = neighbor,
-                        GScore = Int32.MaxValue
-                    };
                     SortNode<T> oldNeighbor;
-                    
-                    if (!open.TryGetValue(neighborNode, out oldNeighbor)) {
-                        oldNeighbor = neighborNode;
-                        open.Add(oldNeighbor, oldNeighbor);
+                    if (!openGraphNodes.TryGetValue(neighbor, out oldNeighbor)) {
+                        oldNeighbor = new SortNode<T>() {
+                            Node = neighbor,
+                            GScore = Int32.MaxValue
+                        };
+
+                        openSet.Add(oldNeighbor);
+                        openGraphNodes.Add(oldNeighbor.Node, oldNeighbor);
                     }
 
                     if (tentativeGScore < oldNeighbor.GScore) {

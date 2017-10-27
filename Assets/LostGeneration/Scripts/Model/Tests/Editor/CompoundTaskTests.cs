@@ -109,6 +109,28 @@ namespace Tests.Integration {
                 Console.WriteLine("Sold wood");
             }
         }
+
+        private class JustEndItAll : PrimitiveTask {
+            private StateOffset _goal;
+            public JustEndItAll(StateOffset goal) {
+                _goal = goal;
+            }
+            public override StateOffset ApplyPreconditions(StateOffset state) {
+                return state;
+            }
+
+            public override StateOffset ApplyPostconditions(StateOffset state) {
+                return _goal;
+            }
+
+            public override bool ArePreconditionsMet(StateOffset state) {
+                return true;
+            }
+
+            public override void Do() {
+                Console.WriteLine("just ugh");
+            }
+        }
         
         [Test]
         public void Pathing() {
@@ -129,6 +151,8 @@ namespace Tests.Integration {
             StateOffset goal = new StateOffset() {
                 { "Money", 10 }
             };
+
+            planner.AddSubtask(new JustEndItAll(goal));
             
             List<ITask> plan = new List<ITask>(planner.Decompose(start, goal));
             Assert.Greater(plan.Count, 0);

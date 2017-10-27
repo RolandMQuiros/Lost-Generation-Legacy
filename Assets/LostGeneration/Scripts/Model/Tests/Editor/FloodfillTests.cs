@@ -6,11 +6,11 @@ using LostGen;
 
 namespace Tests {
     public class FloodfillTests {
-        private class TestGridNode : IGraphNode {
+        private class TestGridNode : IGraphNode<TestGridNode> {
             public Point Point { get; private set; }
 
             private int[,] _grid;
-            private Dictionary<Point, IGraphNode> _neighbors = new Dictionary<Point, IGraphNode>();
+            private Dictionary<Point, TestGridNode> _neighbors = new Dictionary<Point, TestGridNode>();
             private bool _neighborsInitialized = false;
 
             public TestGridNode(int[,] grid, Point point) {
@@ -18,11 +18,11 @@ namespace Tests {
                 Point = point;
             }
 
-            public int GetEdgeCost(IGraphNode neighbor) {
-                return Point.TaxicabDistance(Point, ((TestGridNode)neighbor).Point);
+            public int GetEdgeCost(TestGridNode neighbor) {
+                return Point.TaxicabDistance(Point, neighbor.Point);
             }
 
-            public IEnumerable<IGraphNode> GetNeighbors() {
+            public IEnumerable<TestGridNode> GetNeighbors() {
                 //Profiler.BeginSample("TestGridNode.GetNeighbors");
                 if (!_neighborsInitialized) {
                     for (int i = 0; i < Point.NeighborsXY.Length; i++) {
@@ -39,8 +39,8 @@ namespace Tests {
                 return _neighbors.Values;
             }
 
-            public bool IsMatch(IGraphNode other) {
-                return ((TestGridNode)other).Point == Point;
+            public bool IsMatch(TestGridNode other) {
+                return other.Point == Point;
             }
 
             public override int GetHashCode() {
@@ -52,7 +52,7 @@ namespace Tests {
             TestGridNode root = new TestGridNode(grid, point);
 
             HashSet<Point> filled = new HashSet<Point>();
-            foreach (TestGridNode node in GraphMethods<TestGridNode>.FloodFill(root, cost, depth)) {
+            foreach (TestGridNode node in GraphMethods.FloodFill<TestGridNode>(root, cost, depth)) {
                 filled.Add(node.Point);
             }
 
