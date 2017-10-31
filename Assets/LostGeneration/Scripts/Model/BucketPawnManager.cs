@@ -166,7 +166,8 @@ namespace LostGen {
 
         public void Move(Pawn pawn, Point newPosition) {
             IEnumerable<Bucket> oldBuckets = _buckets.Where(b => b.HasPawn(pawn));
-            IEnumerable<Bucket> newBuckets = pawn.Footprint.SelectMany(f => _buckets.Where(b => b.InBounds(f + newPosition))).Distinct();
+            IEnumerable<Bucket> newBuckets = pawn.Footprint.SelectMany(f => _buckets.Where(b => b.InBounds(f + newPosition)))
+                                                           .Distinct();
 
             IEnumerable<Bucket> exitBuckets = oldBuckets.Except(newBuckets);
             IEnumerable<Bucket> enterBuckets = newBuckets.Except(oldBuckets);

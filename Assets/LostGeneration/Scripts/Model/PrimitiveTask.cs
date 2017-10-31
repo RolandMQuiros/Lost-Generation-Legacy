@@ -1,13 +1,14 @@
 using System;
 using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace LostGen {
     public abstract class PrimitiveTask : ITask {
-        public abstract StateOffset ApplyPreconditions(StateOffset state);
-        public abstract bool ArePreconditionsMet(StateOffset state);
-        public abstract StateOffset ApplyPostconditions(StateOffset state);
-        public abstract void Do();
-        public IEnumerable<ITask> Decompose(StateOffset from, StateOffset to) { return Enumerable.Empty<ITask>(); }
+        public abstract WorldState Preconditions { get; }
+        public abstract WorldState Postconditions { get; }
+        public abstract bool ArePreconditionsMet();
+        public abstract IEnumerator Do(WorldState goal);
+        public IEnumerable<ITask> Decompose(WorldState from, WorldState to) { return Enumerable.Empty<ITask>(); }
     }
 }

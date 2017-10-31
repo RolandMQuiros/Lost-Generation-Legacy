@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
@@ -7,159 +8,134 @@ using LostGen;
 namespace Tests.Integration {
     public class CompoundTaskTests {
         private class GoToForest : PrimitiveTask {
-            public override StateOffset ApplyPreconditions(StateOffset state) {
-                return state + new StateOffset() {
+            private WorldState _preconditions, _postconditions;
+            public override WorldState Preconditions { get { return _preconditions; } }
+            public override WorldState Postconditions { get { return _postconditions; } }
+
+            public GoToForest() {
+                _preconditions = new WorldState() {
                     { "In Forest", false },
                     { "In City", true }
                 };
-            }
 
-            public override bool ArePreconditionsMet(StateOffset state) {
-                return !state.Get("In Forest", false) &&
-                       state.Get("In City", false) &&
-                       state.Get("Money", 0) < 10;
-            }
-
-            public override StateOffset ApplyPostconditions(StateOffset state) {
-                return state + new StateOffset() {
+                _postconditions = new WorldState() {
                     { "In Forest", true },
                     { "In City", false }
                 };
             }
 
-            public override void Do() {
+            public override bool ArePreconditionsMet() { return true; }
+
+            public override IEnumerator Do(WorldState goal) {
                 Console.WriteLine("Went to the forest");
+                yield break;
             }
         }
-
+GoToForest, ChopWood, GoToCity, SellWood
         private class ChopWood : PrimitiveTask {
-            public override StateOffset ApplyPreconditions(StateOffset state) {
-                return state + new StateOffset() {
+            private WorldState _preconditions, _postconditions;
+            public override WorldState Preconditions { get { return _preconditions; } }
+            public override WorldState Postconditions { get { return _postconditions; } }
+
+            public ChopWood() {
+                _preconditions = new WorldState() {
                     { "In Forest", true },
                     { "Has Axe", true },
                     { "Has Wood", false }
                 };
-            }
 
-            public override bool ArePreconditionsMet(StateOffset state) {
-                return state.Get("In Forest", false) &&
-                       state.Get("Has Axe", false) &&
-                       !state.Get("Has Wood", false);
-            }
-
-            public override StateOffset ApplyPostconditions(StateOffset state) {
-                return state + new StateOffset() {
+                _postconditions = new WorldState() {
                     { "Has Wood", true }
                 };
             }
 
-            public override void Do() {
+            public override bool ArePreconditionsMet() { return true; }
+
+            public override IEnumerator Do(WorldState goal) {
                 Console.WriteLine("Chopped wood");
+                yield break;
             }
         }
 
         private class GoToCity : PrimitiveTask {
-            public override StateOffset ApplyPreconditions(StateOffset state) {
-                return state + new StateOffset() {
+            private WorldState _preconditions, _postconditions;
+            public override WorldState Preconditions { get { return _preconditions; } }
+            public override WorldState Postconditions { get { return _postconditions; } }
+
+            public GoToCity() {
+                _preconditions = new WorldState() {
                     { "In City", false },
                     { "In Forest", true }
                 };
-            }
 
-            public override bool ArePreconditionsMet(StateOffset state) {
-                return !state.Get("In City", false) &&
-                       state.Get("In Forest", true);
-            }
-
-            public override StateOffset ApplyPostconditions(StateOffset state) {
-                return state + new StateOffset() {
+                _postconditions = new WorldState() {
                     { "In City", true },
                     { "In Forest", false }
                 };
             }
 
-            public override void Do() {
+            public override bool ArePreconditionsMet() { return true; }
+
+            public override IEnumerator Do(WorldState goal) {
                 Console.WriteLine("Went to city");
+                yield break;
             }
         }
 
         private class SellWood : PrimitiveTask {
-            public override StateOffset ApplyPreconditions(StateOffset state) {
-                return state + new StateOffset() {
+            private WorldState _preconditions, _postconditions;
+            public override WorldState Preconditions { get { return _preconditions; } }
+            public override WorldState Postconditions { get { return _postconditions; } }
+            private object _money;
+
+            public SellWood(object money) {
+                _preconditions = new WorldState() {
                     { "Has Wood", true },
                     { "In City", true },
-                    { "Money", Math.Max(state.Get("Money", 0) - 1, 0) }
+                    { "Has Money", false }
                 };
-            }
 
-            public override bool ArePreconditionsMet(StateOffset state) {
-                return state.Get("Has Wood", false) &&
-                       state.Get("In City", false) &&
-                       state.Get("Money", 0) < 10;
-            }
-
-            public override StateOffset ApplyPostconditions(StateOffset state) {
-                return state + new StateOffset() {
-                    { "Has Wood", false },
-                    { "Money", state.Get("Money", 0) + 1 }
+                _postconditions = new WorldState() {
+                    { "Has Money", true }
                 };
+                
+                _money = money;
             }
 
-            public override void Do() {
+            public override bool ArePreconditionsMet() { return (int)_money < 10; }
+
+            public override IEnumerator Do(WorldState goal) {
                 Console.WriteLine("Sold wood");
-            }
-        }
-
-        private class JustEndItAll : PrimitiveTask {
-            private StateOffset _goal;
-            public JustEndItAll(StateOffset goal) {
-                _goal = goal;
-            }
-            public override StateOffset ApplyPreconditions(StateOffset state) {
-                return state;
-            }
-
-            public override StateOffset ApplyPostconditions(StateOffset state) {
-                return _goal;
-            }
-
-            public override bool ArePreconditionsMet(StateOffset state) {
-                return true;
-            }
-
-            public override void Do() {
-                Console.WriteLine("just ugh");
+                yield break;
             }
         }
         
         [Test]
         public void Pathing() {
             CompoundTask planner = new CompoundTask((from, to) => 1);
+            int money = 0;
+
             planner.AddSubtask(new GoToForest());
             planner.AddSubtask(new GoToCity());
             planner.AddSubtask(new ChopWood());
             planner.AddSubtask(new GoToCity());
-            planner.AddSubtask(new SellWood());
+            planner.AddSubtask(new SellWood(money));
 
-            StateOffset start = new StateOffset() {
+            WorldState start = new WorldState() {
                 { "In City", true },
                 { "In Forest", false },
                 { "Has Axe", true },
                 { "Has Wood", false },
-                { "Money", 0 }
             };
 
-            StateOffset goal = new StateOffset() {
-                { "Money", 10 }
+            WorldState goal = new WorldState() {
+                { "Has Money", true }
             };
 
-            //planner.AddSubtask(new JustEndItAll(goal));
-            
-            List<ITask> plan = new List<ITask>(planner.Decompose(start, goal));
-            Assert.Greater(plan.Count, 0);
-            for (int i = 0; i < plan.Count; i++) {
-                ((PrimitiveTask)plan[i]).Do();
-            }
+            Console.WriteLine(planner.Preconditions);
+
+            IEnumerator plan = planner.Do(start, goal);
+            while (plan.MoveNext());
         }
     }
 }

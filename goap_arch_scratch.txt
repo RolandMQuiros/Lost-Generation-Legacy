@@ -59,3 +59,52 @@ Inventory as Skill? You'll need to handle
 Verdict: nah
     * But Skills should do their own stat calculations
 -------
+
+
+10-30-2017
+----------
+Most GOAP implementations handle repeating actions in the replanning stage, since they're running in realtime.
+
+This means, if the goal is to kill a distant enemy, the plan's lifetime goes like this:
+    1. Plan: MoveToEnemy, AttackEnemy, Gloat
+       Execution: MoveToEnemy, enemy is too far! Replan.
+    2. Plan: MoveToEnemy, AttackEnemy, Gloat
+       Execution: MoveToEnemy, enemy is too far! Replan.
+    3. Plan: MoveToEnemy, AttackEnemy, Gloat
+       Execution: MoveToEnemy, enemy is in range!
+                  AttackEnemy, enemy is hurt but not dead! Replan.
+    4. Plan: AttackEnemy, Gloat
+       Execution: AttackEnemy, enemy killed!
+                  Gloat. goal accomplished.
+
+However, in LG our agents work in 5-turn timeslices without replanning.  So the above scenario might work like this:
+    1. Plan: MoveToEnemy, AttackEnemy, Gloat
+       Execution: MoveToEnemy, enemy is too far! End turn.
+
+Okay, so this might work.  Come up with a plan, queue up all the actions involved. We'll need to map those actions to each Task.
+At the end of a turn, re-evaluate the current Task if it's still viable.  If not, replan.
+
+Let's make PrimitiveTask.Do return an IEnumerator, so it's like our own coroutines.
+So when executing a plan it'll look like:
+
+foreach (ITask task in plan.Decompose(start, goal)) {
+    while (task.ArePreconditionsMet()) {
+        yield return task.Do();
+    }
+}
+
+Where the task overrides look like:
+
+public bool ArePreconditionsMet() {
+    return _walk.GetAreaOfEffect().Contains(_player.Position);
+}
+
+public IEnumerator Do() {
+    walk.Target = Target;
+    foreach (MoveAction move in walk.Fire()) {
+        _pawn.PushAction(move);
+        yield return null;
+    }
+}
+
+Or something
