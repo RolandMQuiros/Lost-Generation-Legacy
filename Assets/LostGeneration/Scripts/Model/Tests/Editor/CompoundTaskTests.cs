@@ -7,6 +7,11 @@ using LostGen;
 
 namespace Tests.Integration {
     public class CompoundTaskTests {
+        private class Wallet {
+            public int Money = 0;
+            public int Things = 0;
+        }
+
         private class GoToForest : PrimitiveTask {
             private WorldState _preconditions, _postconditions;
             public override WorldState Preconditions { get { return _preconditions; } }
@@ -26,12 +31,11 @@ namespace Tests.Integration {
 
             public override bool ArePreconditionsMet() { return true; }
 
-            public override IEnumerator Do(WorldState goal) {
+            public override IEnumerator Do(WorldState start, WorldState goal) {
                 Console.WriteLine("Went to the forest");
                 yield break;
             }
         }
-GoToForest, ChopWood, GoToCity, SellWood
         private class ChopWood : PrimitiveTask {
             private WorldState _preconditions, _postconditions;
             public override WorldState Preconditions { get { return _preconditions; } }
@@ -51,7 +55,7 @@ GoToForest, ChopWood, GoToCity, SellWood
 
             public override bool ArePreconditionsMet() { return true; }
 
-            public override IEnumerator Do(WorldState goal) {
+            public override IEnumerator Do(WorldState start, WorldState goal) {
                 Console.WriteLine("Chopped wood");
                 yield break;
             }
@@ -76,7 +80,7 @@ GoToForest, ChopWood, GoToCity, SellWood
 
             public override bool ArePreconditionsMet() { return true; }
 
-            public override IEnumerator Do(WorldState goal) {
+            public override IEnumerator Do(WorldState start, WorldState goal) {
                 Console.WriteLine("Went to city");
                 yield break;
             }
@@ -86,9 +90,9 @@ GoToForest, ChopWood, GoToCity, SellWood
             private WorldState _preconditions, _postconditions;
             public override WorldState Preconditions { get { return _preconditions; } }
             public override WorldState Postconditions { get { return _postconditions; } }
-            private object _money;
+            private Wallet _wallet;
 
-            public SellWood(object money) {
+            public SellWood(Wallet wallet) {
                 _preconditions = new WorldState() {
                     { "Has Wood", true },
                     { "In City", true },
@@ -99,43 +103,95 @@ GoToForest, ChopWood, GoToCity, SellWood
                     { "Has Money", true }
                 };
                 
-                _money = money;
+                _wallet = wallet;
             }
 
-            public override bool ArePreconditionsMet() { return (int)_money < 10; }
+            public override bool ArePreconditionsMet() { return true; }
 
-            public override IEnumerator Do(WorldState goal) {
+            public override IEnumerator Do(WorldState start, WorldState goal) {
                 Console.WriteLine("Sold wood");
+                _wallet.Money++;
                 yield break;
             }
         }
+
+        private class BuyThing : PrimitiveTask {
+            private WorldState _preconditions, _postconditions;
+            public override WorldState Preconditions { get { return _preconditions; } }
+            public override WorldState Postconditions { get { return _postconditions; } }
+            private Wallet _wallet;
+
+            public BuyThing(Wallet wallet) {
+                _preconditions = new WorldState() {
+                    { "Has Money", true },
+                    { "Has Thing", false }
+                };
+
+                _postconditions = new WorldState() {
+                    { "Has Money", false },
+                    { "Has Thing", true }
+                };
+                
+                _wallet = wallet;
+            }
+
+            public override bool ArePreconditionsMet() { return true; }
+
+            public override IEnumerator Do(WorldState start, WorldState goal) {
+                if (_wallet.Money >= 10) {
+                    _wallet.Money -= 10;
+                    _wallet.Things++;
+                    Console.WriteLine("Bought Thing");
+                } else {
+                    yield return null;
+                }
+            } 
+        }
         
         [Test]
-        public void Pathing() {
+        public void PathingAndReplanning() {
             CompoundTask planner = new CompoundTask((from, to) => 1);
-            int money = 0;
+            Wallet wallet = new Wallet();
 
-            planner.AddSubtask(new GoToForest());
-            planner.AddSubtask(new GoToCity());
-            planner.AddSubtask(new ChopWood());
-            planner.AddSubtask(new GoToCity());
-            planner.AddSubtask(new SellWood(money));
+            planner.Add(new GoToForest());
+            planner.Add(new GoToCity());
+            planner.Add(new ChopWood());
+            planner.Add(new GoToCity());
+            planner.Add(new SellWood(wallet));
+            planner.Add(new BuyThing(wallet));
 
+            // Starting state is generated by sensors, and should be fairly comprehensive and consistent
+            // with those of tasks.
             WorldState start = new WorldState() {
                 { "In City", true },
                 { "In Forest", false },
                 { "Has Axe", true },
                 { "Has Wood", false },
+                { "Has Money", false },
+                { "Has Thing", false }
             };
 
             WorldState goal = new WorldState() {
-                { "Has Money", true }
+                { "Has Thing", true }
             };
 
-            Console.WriteLine(planner.Preconditions);
+            // Console.WriteLine(planner.Preconditions);
 
             IEnumerator plan = planner.Do(start, goal);
-            while (plan.MoveNext());
+            while (plan.MoveNext()) {
+                Console.Write("Money: " + wallet.Money + "; ");
+                if (plan.Current == null) {
+                    plan = planner.Do(start, goal);
+                }
+            }
+
+            Assert.AreEqual(1, wallet.Things);
+        }
+
+        [Test]
+        public void Nesting() {
+            CompoundTask getMoney = new CompoundTask((from, to) => 1);
+            CompoundTask getThing = new CompoundTask((from, to) => 1);
         }
     }
 }

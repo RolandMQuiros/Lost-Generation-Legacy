@@ -7,6 +7,6 @@ namespace LostGen {
         WorldState Postconditions { get; }
         bool ArePreconditionsMet();
         IEnumerable<ITask> Decompose(WorldState from, WorldState to);
-        IEnumerator Do(WorldState goal);
+        IEnumerator Do(WorldState start, WorldState goal);
     }
 }
