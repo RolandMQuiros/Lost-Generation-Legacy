@@ -31,7 +31,7 @@ namespace LostGen {
                     _neighbors = new Dictionary<StateNode, ITask>();
                     foreach (ITask task in _taskPool.Where(t => t.Preconditions.IsSubsetOf(_state))) {
                         StateNode newNode = new StateNode(
-                            _state + task.Postconditions,
+                            _state * task.Postconditions,
                             task,
                             _taskPool.Where(t => t != task),
                             _edgeCost
@@ -57,8 +57,8 @@ namespace LostGen {
         
         private HashSet<ITask> _subtasks = new HashSet<ITask>();
         private StateScore _transitionScore;
-        private WorldState _preconditions = null;
-        private WorldState _postconditions = null;
+        private WorldState _preconditions = new WorldState();
+        private WorldState _postconditions = new WorldState();
 
         public WorldState Preconditions { get { return _preconditions; } }
         public WorldState Postconditions { get { return _postconditions; } }
@@ -66,26 +66,26 @@ namespace LostGen {
         public CompoundTask(StateScore transitionScore) {
             _transitionScore = transitionScore;
         }
-
+        
+        #region IEnumerable
         public bool Add(ITask subtask) {
             bool added = _subtasks.Add(subtask);
-            // if (added) {
-            //     if (_preconditions == null) {
-            //         _preconditions = new WorldState(subtask.Preconditions);
-            //     } else {
-            //         foreach (KeyValuePair<string, object> pair in _preconditions.Intersect(subtask.Preconditions)) {
-                        
-            //         }
-            //     }
-            // }
+            if (added) {
+                _preconditions += subtask.Preconditions;
+                _postconditions += subtask.Postconditions;
+            }
             return added;
         }
 
         public bool Remove(ITask subtask) {
-            return _subtasks.Remove(subtask);
+            bool removed = _subtasks.Remove(subtask);
+            if (removed) {
+                _preconditions = new WorldState(_subtasks.SelectMany( s => s.Preconditions ));
+                _postconditions = new WorldState(_subtasks.SelectMany( s => s.Preconditions ));
+            }
+            return removed;
         }
 
-        #region IEnumerable
         public IEnumerator<ITask> GetEnumerator() {
             return _subtasks.GetEnumerator();
         }
@@ -116,6 +116,10 @@ namespace LostGen {
                     }
                 }
             }
+        }
+
+        public bool ArePreconditionsMet() {
+            return _subtasks.Any(s => s.ArePreconditionsMet());
         }
         #endregion ITask
 

@@ -175,7 +175,8 @@ namespace Tests.Integration {
                 { "Has Thing", true }
             };
 
-            // Console.WriteLine(planner.Preconditions);
+            Console.WriteLine("Planner preconditions: " + planner.Preconditions);
+            Console.WriteLine("Planner postconditions: " + planner.Postconditions);
 
             IEnumerator plan = planner.Do(start, goal);
             while (plan.MoveNext()) {

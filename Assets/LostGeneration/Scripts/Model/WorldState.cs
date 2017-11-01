@@ -4,50 +4,38 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace LostGen {
-    public class WorldState : Dictionary<string, object> {
+    public class WorldState : HashSet<KeyValuePair<string, object>> {
         public WorldState() { }
-        public WorldState(IDictionary<string, object> dictionary) : base(dictionary) { }
-        public WorldState(IEnumerable<KeyValuePair<string, object>> pairs) {
-            foreach (KeyValuePair<string, object> pair in pairs) {
-                Add(pair.Key, pair.Value);
-            }
-        }
-
-        public object Get(string key, object defaultValue) {
-            object value;
-            if (!TryGetValue(key, out value)) {
-                value = defaultValue;
-            }
-            return value;
-        }
-
-        public bool IsSubsetOf(WorldState other) {
-            if (Count > 0) {
-                foreach (KeyValuePair<string, object> pair in this) {
-                    object otherValue;
-                    if (!other.TryGetValue(pair.Key, out otherValue) || !otherValue.Equals(pair.Value)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            return false;
+        public WorldState(IEnumerable<KeyValuePair<string, object>> other) : base (other) { }
+        
+        public bool Add(string key, object value) {
+            return Add(new KeyValuePair<string, object>(key, value));
         }
 
         public static WorldState operator + (WorldState s1, WorldState s2) {
-            WorldState sum = new WorldState(s1);
+            return new WorldState(s1.Union(s2));
+        }
 
-            foreach (string key in s2.Keys) {
-                sum[key] = s2[key];
-            }
-
-            return sum;
+        public static WorldState operator * (WorldState s1, WorldState s2) {
+            // Select the difference between s1 and s2, plus the pairs in s2 that have keys
+            // in s1
+            return new WorldState(
+                s1.Except(s2)
+                  .Union(
+                      s1.Join(
+                          s2,
+                          left => left.Key,
+                          right => right.Key,
+                          (left, right) => right
+                      )
+                  )
+            );
         }
 
         public override string ToString() {
             string buffer = "{ ";
             foreach (KeyValuePair<string, object> pair in this) {
-                buffer += "{ " + pair.Key + " : " + pair.Value + " } ";
+                buffer += "{ " + pair.Key + " : " + pair.Value.ToString() + " } ";
             }
             buffer += "}";
 
