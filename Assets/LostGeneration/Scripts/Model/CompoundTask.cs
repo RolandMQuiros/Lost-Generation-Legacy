@@ -99,8 +99,24 @@ namespace LostGen {
         }
 
         public IEnumerator Do(WorldState start, WorldState goal) {
-            foreach (ITask task in Decompose(start, goal)) {
-                IEnumerator runner = task.Do(start, goal);
+            WorldState current = new WorldState(start);
+
+            List<ITask> plan = new List<ITask>(Decompose(current, goal));
+            for (int i = 0; i < plan.Count; i++) {
+                ITask task = plan[i];
+
+                WorldState next;
+                if (i + 1 < plan.Count) {
+                    next = plan[i + 1].Preconditions;
+                } else {
+                    next = goal;
+                }
+
+                // If we have a CompoundTask in the plan, we want to provide it the preconditions of the following
+                // task, since CompoundTasks won't necessarily deal with the final goal directly.
+                // PrimitiveTasks, otoh, shouldn't be too concerned with the start and goal states, and should just Do
+                // their thing.
+                IEnumerator runner = task.Do(current, next);
                 while (runner.MoveNext()) {
                     if (task.ArePreconditionsMet() && runner.Current != null) {
                         yield return runner.Current;
@@ -109,6 +125,9 @@ namespace LostGen {
                         break;
                     }
                 }
+
+                // Apply the task's effects onto the running world state
+                current *= task.Postconditions;
             }
         }
 
@@ -122,7 +141,7 @@ namespace LostGen {
             // We only want a minimal number of requirements before attempting to decompose this Task
             _preconditions = new WorldState( 
                 _subtasks.Select(s => s.Preconditions.AsEnumerable())
-                            .Aggregate((accumulator, next) => accumulator.Intersect(next))
+                         .Aggregate((accumulator, next) => accumulator.Intersect(next))
             );
 
             // Get a union of all postconditions, since we want a large number of possible outcomes so a following

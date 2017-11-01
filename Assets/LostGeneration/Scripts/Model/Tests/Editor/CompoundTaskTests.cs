@@ -155,7 +155,6 @@ namespace Tests.Integration {
                 new GoToForest(),
                 new GoToCity(),
                 new ChopWood(),
-                new GoToCity(),
                 new SellWood(wallet),
                 new BuyThing(wallet)
             };
@@ -197,7 +196,6 @@ namespace Tests.Integration {
                 new GoToForest(),
                 new GoToCity(),
                 new ChopWood(),
-                new GoToCity(),
                 new SellWood(wallet)
             };
 
@@ -219,8 +217,8 @@ namespace Tests.Integration {
                 { "Has Thing", true }
             };
 
-            Console.WriteLine("getMoney preconditions: " + getThing.Preconditions);
-            Console.WriteLine("getMoney postconditions: " + getThing.Postconditions);
+            Console.WriteLine("getMoney preconditions: "  + getMoney.Preconditions);
+            Console.WriteLine("getMoney postconditions: " + getMoney.Postconditions);
 
             Console.WriteLine("getThing preconditions: " + getThing.Preconditions);
             Console.WriteLine("getThing postconditions: " + getThing.Postconditions);
@@ -228,6 +226,7 @@ namespace Tests.Integration {
             IEnumerator plan = getThing.Do(start, goal);
             while (plan.MoveNext()) {
                 if (plan.Current == null) {
+                    Console.WriteLine("Plan failed. Rerouting.");
                     plan = getThing.Do(start, goal);
                 }
             }
