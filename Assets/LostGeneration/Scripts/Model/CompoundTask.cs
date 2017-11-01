@@ -27,7 +27,7 @@ namespace LostGen {
                 return _edgeCost(_state, neighbor._state);
             }
             public IEnumerable<StateNode> GetNeighbors() {
-            if (_neighbors == null) {
+                if (_neighbors == null) {
                     _neighbors = new Dictionary<StateNode, ITask>();
                     foreach (ITask task in _taskPool.Where(t => t.Preconditions.IsSubsetOf(_state))) {
                         StateNode newNode = new StateNode(
@@ -70,19 +70,13 @@ namespace LostGen {
         #region IEnumerable
         public bool Add(ITask subtask) {
             bool added = _subtasks.Add(subtask);
-            if (added) {
-                _preconditions += subtask.Preconditions;
-                _postconditions += subtask.Postconditions;
-            }
+            if (added) { UpdateConditions(); }
             return added;
         }
 
         public bool Remove(ITask subtask) {
             bool removed = _subtasks.Remove(subtask);
-            if (removed) {
-                _preconditions = new WorldState(_subtasks.SelectMany( s => s.Preconditions ));
-                _postconditions = new WorldState(_subtasks.SelectMany( s => s.Preconditions ));
-            }
+            if (removed) { UpdateConditions(); }
             return removed;
         }
 
@@ -122,6 +116,19 @@ namespace LostGen {
             return _subtasks.Any(s => s.ArePreconditionsMet());
         }
         #endregion ITask
+        
+        private void UpdateConditions() {
+            // Get the intersection of all subtask preconditions
+            // We only want a minimal number of requirements before attempting to decompose this Task
+            _preconditions = new WorldState( 
+                _subtasks.Select(s => s.Preconditions.AsEnumerable())
+                            .Aggregate((accumulator, next) => accumulator.Intersect(next))
+            );
+
+            // Get a union of all postconditions, since we want a large number of possible outcomes so a following
+            // task's preconditions can be subset to a large space
+            _postconditions = new WorldState(_subtasks.SelectMany(s => s.Postconditions));
+        }
 
         private int Heuristic(StateNode start, StateNode end) {
             //return WorldState.Heuristic(start.State, end.State);
