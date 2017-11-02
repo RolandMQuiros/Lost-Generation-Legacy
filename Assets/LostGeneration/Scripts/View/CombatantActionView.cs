@@ -38,7 +38,7 @@ public class CombatantActionView : MonoBehaviour {
 	}
 
 	public void OnActionsAdded(IEnumerable<PawnAction> actions) {
-		Coroutine coroutine = StartCoroutine(RunActions(actions));
+		StartCoroutine(RunActions(actions));
 	}
 	
 	private IEnumerator RunActions(IEnumerable<PawnAction> actions) {

@@ -11,8 +11,7 @@ namespace LostGen {
         private WalkNode _walkNode;
         private HashSet<Point> _neighbors;
 
-        public WalkSkill(Pawn owner)
-        : base(owner, "Walk", "Move to an adjacent tile") { }
+        public WalkSkill() : base("Walk", "Move to an adjacent tile") { }
 
         public override IEnumerable<Point> GetRange() {
             yield return Pawn.Position;

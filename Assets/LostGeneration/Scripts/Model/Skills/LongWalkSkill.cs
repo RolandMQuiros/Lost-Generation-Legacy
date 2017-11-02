@@ -29,8 +29,10 @@ namespace LostGen {
         private List<Point> _path;
         private ActionPoints _ownerPoints;
 
-        public LongWalkSkill(Pawn owner)
-            : base(owner, "Walk", "Move across tiles within a limited range") {
+        public LongWalkSkill()
+        : base("Walk", "Move across tiles within a limited range") { }
+
+        protected override void Awake() {
             _board = Pawn.Board;
             _ownerPoints = Pawn.GetComponent<ActionPoints>();
         }

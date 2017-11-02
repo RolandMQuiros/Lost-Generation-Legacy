@@ -7,7 +7,6 @@ namespace LostGen {
         public ActionPoints ActionPoints { get { return _actionPoints; } }
         public PawnStats Stats { get { return _stats; } }
         public Health Health { get { return _health; } }
-        public SkillSet SkillSet { get { return _skillSet; } }
 
         public Team Team;
         #endregion Stats
@@ -24,7 +23,6 @@ namespace LostGen {
         private ActionPoints _actionPoints;
         private PawnStats _stats;
         private Health _health;
-        private SkillSet _skillSet;
 
         private List<Gear> _gear = new List<Gear>();
         
@@ -43,7 +41,6 @@ namespace LostGen {
             _actionPoints = Pawn.RequireComponent<ActionPoints>();
             _health = Pawn.RequireComponent<Health>();
             _stats = Pawn.RequireComponent<PawnStats>();
-            _skillSet = Pawn.RequireComponent<SkillSet>();
 
             _health.Maximum = _stats.Base.Health;
             // _supplies = Pawn.RequireComponent<Supplies>();

@@ -11,12 +11,8 @@ public class PlayerSkillController : MonoBehaviour
 {
 
     [System.Serializable]
-    public class SkillEvent : UnityEvent<ISkill> { }
-    public SkillSet SkillSet
-    {
-        get { return _skillSet; }
-    }
-    public ISkill ActiveSkill {
+    public class SkillEvent : UnityEvent<Skill> { }
+    public Skill ActiveSkill {
         get { return _activeSkill; }
     }
 
@@ -26,17 +22,14 @@ public class PlayerSkillController : MonoBehaviour
     private PlayerCombatantController _playerController;
     private PlayerTimelineController _timelineController;
 
-    private SkillSet _skillSet;
     private Combatant _combatant;
     private Timeline _timeline;
-    private ISkill _activeSkill;
+    private Skill _activeSkill;
     [SerializeField]
     private int _activationStep;
 
-    public void SetActiveSkill(ISkill skill)
-    {
-        if (_skillSet.HasSkill(skill))
-        {
+    public void SetActiveSkill(Skill skill) {
+        if (skill.Pawn == _combatant.Pawn) {
             _activeSkill = skill;
             
             // Save the timeline step when skill was activated
@@ -64,7 +57,6 @@ public class PlayerSkillController : MonoBehaviour
     public void OnCombatantActivated(Combatant combatant)
     {
         _combatant = combatant;
-        _skillSet = _combatant.Pawn.GetComponent<SkillSet>();
         _timeline = _combatant.Pawn.GetComponent<Timeline>();
     }
 

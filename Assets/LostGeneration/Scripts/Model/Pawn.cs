@@ -82,7 +82,7 @@ namespace LostGen {
 
 
         /// <summary>Contains components, keyed by type.  Allows us to access components by type, and to only contain a single component of each type.</summary>
-        private Dictionary<Type, PawnComponent> _components = new Dictionary<Type, PawnComponent>();
+        private Dictionary<Type, List<PawnComponent>> _components = new Dictionary<Type, List<PawnComponent>>();
         /// <summary>Contains components in the order they should be called, which is the same order as they were added.</summary>
         private List<PawnComponent> _componentOrder = new List<PawnComponent>();
 
@@ -215,9 +215,14 @@ namespace LostGen {
 
         public T GetComponent<T>() where T : PawnComponent {
             Type componentType = typeof(T);
-            PawnComponent component;
-            _components.TryGetValue(componentType, out component);
-            return component as T;
+            List<PawnComponent> typeList;
+            _components.TryGetValue(componentType, out typeList);
+            return typeList.FirstOrDefault() as T;
+        }
+
+        public IEnumerable<T> GetComponents<T>() where T : PawnComponent {
+            return _componentOrder.Where(c => c is T)
+                                  .Cast<T>();
         }
 
         public T RequireComponent<T>() where T : PawnComponent {
@@ -230,13 +235,15 @@ namespace LostGen {
 
         public PawnComponent AddComponent(PawnComponent component) {
             Type componentType = component.GetType();
-            if (_components.ContainsKey(componentType)) {
-                throw new ArgumentException("This Pawn already contains a Component of type " + componentType, "component");
-            } else {
-                _components.Add(componentType, component);
-                _componentOrder.Add(component);
-                component.OnAdded(this);
+            List<PawnComponent> typeList;
+            if (!_components.TryGetValue(componentType, out typeList)) {
+                typeList = new List<PawnComponent>();
+                _components[componentType] = typeList;
             }
+
+            typeList.Add(component);
+            _componentOrder.Add(component);
+            component.OnAdded(this);
             
             return component;
         }

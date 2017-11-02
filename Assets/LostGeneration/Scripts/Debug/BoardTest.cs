@@ -61,10 +61,10 @@ public class BoardTest : MonoBehaviour
 
     private void Start() {
         Pawn combatant1 = MakeCombatant(new Pawn("Test Combatant 1", _boardRef.Board, _boardRef.Board.Blocks.Size / 2 + Point.Right), 5);
-        combatant1.GetComponent<SkillSet>().AddSkill(new LongWalkSkill(combatant1) { CanWalkDiagonally = true });
+        combatant1.AddComponent(new LongWalkSkill() { CanWalkDiagonally = true });
         
         Pawn combatant2 = MakeCombatant(new Pawn("Test Combatant 2", _boardRef.Board, _boardRef.Board.Blocks.Size / 2 + Point.Left), 6);
-        combatant2.GetComponent<SkillSet>().AddSkill(new LongWalkSkill(combatant2) { CanWalkDiagonally = false });
+        combatant2.AddComponent(new LongWalkSkill() { CanWalkDiagonally = false });
         
         _boardRef.Board.Pawns.Add(combatant1);
         _boardRef.Board.Pawns.Add(combatant2);
@@ -98,15 +98,9 @@ public class BoardTest : MonoBehaviour
         pawn.AddComponent(new ActionPoints(5));
         pawn.AddComponent(new Combatant());
         
-        SkillSet skillSet = new SkillSet();
-        pawn.AddComponent(skillSet);
-        for (int i = 0; i < 5; i++) {
-            skillSet.AddSkill(new WalkSkill(pawn));
-        }
+        for (int i = 0; i < 5; i++) { pawn.AddComponent(new WalkSkill()); }
 
-        for (int i = 0; i < 5; i++) {
-            skillSet.AddSkill(new MeleeAttackSkill(pawn, 2, new Point[] { Point.Right, Point.Right * 2}));
-        }
+        for (int i = 0; i < 5; i++) { pawn.AddComponent(new MeleeAttackSkill(2, new Point[] { Point.Right, Point.Right * 2})); }
 
         pawn.AddComponent(new Timeline());
 

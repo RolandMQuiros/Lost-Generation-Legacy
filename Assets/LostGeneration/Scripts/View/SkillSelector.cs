@@ -6,7 +6,7 @@ using LostGen;
 
 public class SkillSelector : MonoBehaviour {
     
-	private ISkill _skill;
+	private Skill _skill;
 	private AreaOfEffectSkill _aoe;
 	private RangedSkill _ranged;
 	private DirectionalSkill _directional;
@@ -15,12 +15,12 @@ public class SkillSelector : MonoBehaviour {
     [SerializeField]private BlockMesh _rangeMesh;
     [SerializeField]private BlockMesh _pathMesh;
 
-	public ISkill Skill {
+	public Skill Skill {
         get { return _skill; }
         set { SetSkill(value); }
     }
 
-	public void SetSkill(ISkill skill)
+	public void SetSkill(Skill skill)
 	{
 		if (skill == null)
 		{

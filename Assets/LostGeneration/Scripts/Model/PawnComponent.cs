@@ -5,7 +5,10 @@
 		
 		public void OnAdded(Pawn to) {
 			Pawn = to;
+			Awake();
 		}
+
+		protected virtual void Awake() { }
 
 		/// <summary>
         /// Called when the owning Pawn is completely constructed.  Use this to cache

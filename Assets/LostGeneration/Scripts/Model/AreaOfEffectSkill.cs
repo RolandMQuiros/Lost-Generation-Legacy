@@ -4,35 +4,27 @@ using System.Linq;
 using System.Text;
 
 namespace LostGen {
-    public abstract class AreaOfEffectSkill : ISkill {
-        public Pawn Pawn { get; private set; }
-        public string Name { get; private set; }
-        public string Description { get; private set; }
-        public virtual int ActionPoints { get; protected set; }
+    public abstract class AreaOfEffectSkill : Skill {
+        public override abstract int ActionPoints { get; }
         public event Action AreaOfEffectChanged;
         private Combatant _combatant;
 
-        public AreaOfEffectSkill(Pawn owner, string name, string description) {
-            Pawn = owner;
-            Name = name;
-            Description = description;
+        public AreaOfEffectSkill(string name, string description)
+        : base(name, description) { }
+
+        protected override void Awake() {
             _combatant = Pawn.GetComponent<Combatant>();
-        }
+        } 
 
         public abstract IEnumerable<Point> GetAreaOfEffect();
-        public abstract IEnumerable<PawnAction> Fire();
+        public override abstract IEnumerable<PawnAction> Fire();
         
-        public virtual bool IsUsable()
-        {
+        public override bool IsUsable() {
             return _combatant.ActionPoints.Current >= 1;
         }
 
-        protected void InvokeAreaOfEffectChange()
-        {
-            if (AreaOfEffectChanged != null)
-            {
-                AreaOfEffectChanged();
-            }
+        protected void InvokeAreaOfEffectChange() {
+            if (AreaOfEffectChanged != null) { AreaOfEffectChanged(); }
         }
     }
 }

@@ -11,7 +11,7 @@ namespace LostGen {
         public event Action<CardinalDirection> DirectionChanged;
         private CardinalDirection _direction;
 
-        public DirectionalSkill(Pawn owner, string name, string description) : base(owner, name, description) { }
+        public DirectionalSkill(string name, string description) : base(name, description) { }
 
         public void SetDirection(CardinalDirection direction) {
             if (_direction != direction) {

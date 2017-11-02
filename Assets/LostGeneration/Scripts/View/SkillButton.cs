@@ -8,14 +8,14 @@ using LostGen;
 public class SkillButton : MonoBehaviour,
                            IPointerClickHandler
 {
-    public ISkill Skill {
+    public Skill Skill {
         get { return _skill; }
         set { _skill = value; }
     }
 
-    public event Action<ISkill> SkillActivated; 
+    public event Action<Skill> SkillActivated; 
 
-    private ISkill _skill;
+    private Skill _skill;
     private Button _button;
 
     public void OnPointerClick(PointerEventData eventData)

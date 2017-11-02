@@ -22,8 +22,8 @@ namespace LostGen {
         /// These offsets are rotated based on this skill's Direction attribute, and are defined based on the
         /// attacker facing east.
         /// </param>
-        public MeleeAttackSkill(Pawn attacker, int actionPoints, IEnumerable<Point> areaOfEffect = null)
-        : base(attacker, "Melee Attack", "Attack an adjacent space") {
+        public MeleeAttackSkill(int actionPoints, IEnumerable<Point> areaOfEffect = null)
+        : base("Melee Attack", "Attack an adjacent space") {
             
             _actionPoints = actionPoints;
 

@@ -25,7 +25,6 @@ namespace LostGen {
             bool isOpaque = true;
             
             if (_blocks.InBounds(point)) {
-                BoardBlock block = _blocks.At(point);
                 isOpaque = _blocks.At(point).IsOpaque ||
                            _pawns.At(point).Where(p => p.IsOpaque).Any();
             }

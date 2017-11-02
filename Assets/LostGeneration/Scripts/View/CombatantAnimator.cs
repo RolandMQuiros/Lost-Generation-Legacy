@@ -24,7 +24,6 @@ public class CombatantAnimator : MonoBehaviour {
 			rotTo = Quaternion.LookRotation((vTo - vFrom).normalized, Vector3.up);
 		}
 
-		Vector3 step = (vTo - vFrom) / duration;
 		float time = 0f;
 
 		//_animator.SetFloat("Run", 1f);

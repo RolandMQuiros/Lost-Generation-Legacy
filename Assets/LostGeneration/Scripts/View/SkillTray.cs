@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,13 +14,13 @@ public class SkillTray : MonoBehaviour
 
     public void SetupButtons(Combatant combatant)
     {
-        SkillSet skillSet = combatant.Pawn.GetComponent<SkillSet>();
-        if (skillSet == null) {
+        IEnumerable<Skill> skills = combatant.Pawn.GetComponents<Skill>();
+        if (!skills.Any()) {
             _buttons.ForEach(button => button.gameObject.SetActive(false));
         }
         else {
             int buttonIdx = 0;
-            foreach (ISkill skill in skillSet.Skills) {
+            foreach (Skill skill in combatant.Pawn.GetComponents<Skill>()) {
                 SkillButton skillButton;
                 if (buttonIdx < _buttons.Count) {
                     skillButton = _buttons[buttonIdx];
