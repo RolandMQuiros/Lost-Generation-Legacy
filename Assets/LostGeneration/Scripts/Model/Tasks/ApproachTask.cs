@@ -33,10 +33,6 @@ namespace LostGen {
             };
         }
 
-        public override bool IsValid() {
-            return true;
-        }
-
         public override IEnumerator Do() {
             // Roll downhill until out of range
             Queue<Point> path = new Queue<Point>(_approachMap.Downhill(_pawn.Position));

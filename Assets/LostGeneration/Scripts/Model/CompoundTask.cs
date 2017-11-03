@@ -118,7 +118,7 @@ namespace LostGen {
                 // their thing.
                 IEnumerator runner = task.Do(current, next);
                 while (runner.MoveNext()) {
-                    if (task.IsValid() && runner.Current != null) {
+                    if (runner.Current != null) {
                         yield return runner.Current;
                     } else {
                         yield return null; // Precondition check failed
@@ -129,10 +129,6 @@ namespace LostGen {
                 // Apply the task's effects onto the running world state
                 current *= task.Postconditions;
             }
-        }
-
-        public bool IsValid() {
-            return _subtasks.Any(s => s.IsValid());
         }
         #endregion ITask
         
