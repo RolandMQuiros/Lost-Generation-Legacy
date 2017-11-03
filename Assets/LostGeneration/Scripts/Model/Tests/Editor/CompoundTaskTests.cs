@@ -31,7 +31,7 @@ namespace Tests.Integration {
 
             public override bool IsValid() { return true; }
 
-            public override IEnumerator Do(WorldState start, WorldState goal) {
+            public override IEnumerator Do() {
                 Console.WriteLine("Went to the forest");
                 yield break;
             }
@@ -55,7 +55,7 @@ namespace Tests.Integration {
 
             public override bool IsValid() { return true; }
 
-            public override IEnumerator Do(WorldState start, WorldState goal) {
+            public override IEnumerator Do() {
                 Console.WriteLine("Chopped wood");
                 yield break;
             }
@@ -80,7 +80,7 @@ namespace Tests.Integration {
 
             public override bool IsValid() { return true; }
 
-            public override IEnumerator Do(WorldState start, WorldState goal) {
+            public override IEnumerator Do() {
                 Console.WriteLine("Went to city");
                 yield break;
             }
@@ -108,7 +108,7 @@ namespace Tests.Integration {
 
             public override bool IsValid() { return true; }
 
-            public override IEnumerator Do(WorldState start, WorldState goal) {
+            public override IEnumerator Do() {
                 Console.WriteLine("Sold wood");
                 _wallet.Money++;
                 yield break;
@@ -137,7 +137,7 @@ namespace Tests.Integration {
 
             public override bool IsValid() { return true; }
 
-            public override IEnumerator Do(WorldState start, WorldState goal) {
+            public override IEnumerator Do() {
                 if (_wallet.Money >= 10) {
                     _wallet.Money -= 10;
                     _wallet.Things++;

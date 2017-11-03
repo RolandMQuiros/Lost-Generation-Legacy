@@ -3,10 +3,12 @@ using System.Linq;
 using NUnit.Framework;
 using LostGen;
 
+using UnityEngine;
+
 namespace Tests {
 
 	public class DijkstraMapTests {
-		private void PrintArray(int[,,] array, Predicate<Point> filter) {
+		public static void PrintArray(int[,,] array, Predicate<Point> filter) {
 			string display = string.Empty;
 			for (int y = 0; y < array.GetLength(0); y++) {
 				for (int z = 0; z < array.GetLength(1); z++) {
@@ -15,7 +17,7 @@ namespace Tests {
 						if (filter(point)) {
 							display += '█';
 						} else {
-							display += Math.Abs(array[y, z, x]).ToString("X");
+							display += (char)((int)'A' + array[y, z, x]);
 						}
 					}
 					display += '\n';
@@ -25,7 +27,7 @@ namespace Tests {
 			Console.WriteLine(display);
 		}
 
-		private void PrintMap(DijkstraMap map, Predicate<Point> filter) {
+		public static void PrintMap(DijkstraMap map, Predicate<Point> filter) {
 			string display = string.Empty;
 			for (int y = 0; y < map.Size.Y; y++) {
 				for (int z = 0; z < map.Size.Z; z++) {
@@ -34,7 +36,7 @@ namespace Tests {
 						if (filter(point)) {
 							display += '█';
 						} else {
-							display += Math.Abs(map.GetValue(point)).ToString("X");
+							display += (char)((int)'A' + map.GetValue(point));
 						}
 					}
 					display += '\n';
@@ -42,6 +44,48 @@ namespace Tests {
 				display += "\n\n";
 			}
 			Console.WriteLine(display);
+		}
+
+		private static void PrintArrayRich(int[,,] array, Predicate<Point> filter) {
+			string display = string.Empty;
+			for (int y = 0; y < array.GetLength(0); y++) {
+				for (int z = 0; z < array.GetLength(1); z++) {
+					for (int x = 0; x < array.GetLength(2); x++) {
+						Point point = new Point(x, y, z);
+						Color color = Color.Lerp(Color.blue, Color.red, Mathf.Clamp01(array[y,z,x]/16f));
+
+						if (filter(point)) {
+							display += '█';
+						} else {
+							display += "<color=#" + ColorUtility.ToHtmlStringRGBA(color) + ">█</color>";//Math.Abs(array[y, z, x]).ToString("X");
+						}
+					}
+					display += '\n';
+				}
+				display += "\n\n";
+			}
+			Debug.Log(display);
+		}
+
+		public static void PrintMapRich(DijkstraMap map, Predicate<Point> filter) {
+			string display = string.Empty;
+			for (int y = 0; y < map.Size.Y; y++) {
+				for (int z = 0; z < map.Size.Z; z++) {
+					for (int x = 0; x < map.Size.X; x++) {
+						Point point = new Point(x, y, z);
+						Color color = Color.Lerp(Color.green, Color.red, Mathf.Clamp01(map.GetValue(point)/32f));
+
+						if (filter(point)) {
+							display += '█';
+						} else {
+							display += "<color=#" + ColorUtility.ToHtmlStringRGB(color) + ">█</color>";
+						}
+					}
+					display += '\n';
+				}
+				display += "\n\n";
+			}
+			Debug.Log(display);
 		}
 
 		[Test]
@@ -143,17 +187,7 @@ namespace Tests {
             do {
 				Console.WriteLine("Moved from " + current + " to " + next);
                 current = next;
-                int min = map.GetValue(current);
-                foreach (Point offset in Point.Neighbors) {
-                    Point neighbor = current + offset;
-                    if (map.InBounds(neighbor)) {
-                        int mapValue = map.GetValue(neighbor);
-                        if (mapValue < min) {
-                            min = mapValue;
-                            next = neighbor;
-                        }
-                    }
-                }
+                next = map.DownhillFrom(current);
 				loops++;
             } while (current != next && loops < 100);
 

@@ -20,9 +20,11 @@ namespace Tests {
             }
         };
 
-        public static string PrintBoard(Board board, IEnumerable<Point> path = null, IEnumerable<Point> pawns = null) {
+        public static string BoardString(Board board, IEnumerable<Point> path = null, IEnumerable<Point> pawns = null) {
             string str = string.Empty;
-            HashSet<Point> pathPoints = new HashSet<Point>(path);
+            HashSet<Point> pathPoints;
+            if (path == null) { pathPoints = new HashSet<Point>(); }
+            else { pathPoints = new HashSet<Point>(path); }
             
             for (int y = 0; y < board.Blocks.Size.Y; y++) {
                 str += "y = " + y + "\n";
@@ -67,6 +69,45 @@ namespace Tests {
                         board.Blocks.Set(block);
                     }
                 }
+            }
+
+            return board;
+        }
+
+        public static Board StringsToBoard(string[] map) {
+            List<BoardBlock> blocksToAdd = new List<BoardBlock>();
+            Point point = new Point();
+            Point size = new Point(0, map.Length, 0);
+            for (int y = 0; y < map.Length; y++) {
+                point.X = 0;
+                point.Y = y;
+                point.Z = 0;
+
+                for (int i = 0; i < map[y].Length; i++) {
+                    switch (map[y][i]) {
+                        case '#':
+                            blocksToAdd.Add(new BoardBlock() {
+                                Point = point,
+                                IsSolid = true,
+                                IsOpaque = true
+                            });
+                            point.X++;
+                            break;
+                        case '\n':
+                            point.X = 0;
+                            point.Z++;
+                            break;
+                        default:
+                            point.X++;
+                            break;
+                    }
+                    if (point.X > size.X) { size.X = point.X; }
+                    if (point.Z > size.Z) { size.Z = point.Z; }
+                }
+            }
+            Board board = StandardBoard(size);
+            for (int i = 0; i < blocksToAdd.Count; i++) {
+                board.Blocks.Set(blocksToAdd[i]);
             }
 
             return board;

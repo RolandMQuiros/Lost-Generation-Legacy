@@ -8,7 +8,8 @@ namespace LostGen {
         public abstract WorldState Preconditions { get; }
         public abstract WorldState Postconditions { get; }
         public abstract bool IsValid();
-        public abstract IEnumerator Do(WorldState start, WorldState goal);
+        public abstract IEnumerator Do();
+        public IEnumerator Do(WorldState start, WorldState goal) { return Do(); }
         public IEnumerable<ITask> Decompose(WorldState from, WorldState to) { return Enumerable.Empty<ITask>(); }
     }
 }

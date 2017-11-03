@@ -133,17 +133,30 @@ namespace LostGen {
 		}
 
 		public Point DownhillFrom(Point from) {
-			int minScore = int.MaxValue;
+			int minScore = GetValue(from);
 			Point to = from;
 			for (int i = 0; i < Point.Neighbors.Length; i++) {
-				Point neighbor = Point.Neighbors[i] + to;
-				int neighborScore = GetValue(from);
-				if (neighborScore < minScore) {
-					minScore = neighborScore;
-					to = neighbor; 
+				Point neighbor = Point.Neighbors[i] + from;
+				if (InBounds(neighbor) && !_filter(neighbor)) {
+					int neighborScore = GetValue(neighbor);
+					if (neighborScore < minScore) {
+						minScore = neighborScore;
+						to = neighbor; 
+					}
 				}
 			}
 			return to;
+		}
+
+		public IEnumerable<Point> Downhill(Point from, int steps = -1) {
+			Point current;
+			Point next = from;
+			do {
+				current = next;
+				next = DownhillFrom(current);
+				if (steps > 0) { steps--; }
+				yield return next;
+			} while (current != next && steps != 0);
 		}
 
 		public IEnumerable<Point> DownhillUntil(Point from, Func<Point, bool> until) {
@@ -152,7 +165,7 @@ namespace LostGen {
 				Point next = from;
 				do {
 					current = next;
-					next = DownhillFrom(from);
+					next = DownhillFrom(current);
 					yield return next;
 				} while (current != next && !until(next));
 			}

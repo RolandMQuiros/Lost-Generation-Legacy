@@ -214,10 +214,15 @@ namespace LostGen {
         }
 
         public T GetComponent<T>() where T : PawnComponent {
-            Type componentType = typeof(T);
+            PawnComponent component;
             List<PawnComponent> typeList;
-            _components.TryGetValue(componentType, out typeList);
-            return typeList.FirstOrDefault() as T;
+            if (_components.TryGetValue(typeof(T), out typeList)) {
+                component = typeList.FirstOrDefault();
+            } else {
+                component = null;
+            }
+
+            return component != null ? component as T : null;
         }
 
         public IEnumerable<T> GetComponents<T>() where T : PawnComponent {

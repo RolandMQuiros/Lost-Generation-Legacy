@@ -51,7 +51,7 @@ namespace Tests.PawnComponents {
             board.Step(messages);
 
             Console.Write(string.Join("\n", messages.Select(m => m.Text).ToArray()));
-            Console.WriteLine(BoardCommon.PrintBoard(board, new Point[] { faller.Position }));
+            Console.WriteLine(BoardCommon.BoardString(board, new Point[] { faller.Position }));
 
             Assert.AreEqual(new Point(2, 1, 2), faller.Position);
         }
@@ -74,7 +74,7 @@ namespace Tests.PawnComponents {
             board.Step(messages);
 
             Console.Write(string.Join("\n", messages.Select(m => m.Text).ToArray()));
-            Console.WriteLine(BoardCommon.PrintBoard(board, new Point[] { faller.Position }, new Point[] { squashed.Position }));
+            Console.WriteLine(BoardCommon.BoardString(board, new Point[] { faller.Position }, new Point[] { squashed.Position }));
 
             Assert.AreEqual(new Point(2, 2, 2), faller.Position);
         }
