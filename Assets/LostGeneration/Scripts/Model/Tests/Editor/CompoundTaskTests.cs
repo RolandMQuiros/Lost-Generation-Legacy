@@ -29,7 +29,7 @@ namespace Tests.Integration {
                 };
             }
 
-            public override bool ArePreconditionsMet() { return true; }
+            public override bool IsValid() { return true; }
 
             public override IEnumerator Do(WorldState start, WorldState goal) {
                 Console.WriteLine("Went to the forest");
@@ -53,7 +53,7 @@ namespace Tests.Integration {
                 };
             }
 
-            public override bool ArePreconditionsMet() { return true; }
+            public override bool IsValid() { return true; }
 
             public override IEnumerator Do(WorldState start, WorldState goal) {
                 Console.WriteLine("Chopped wood");
@@ -78,7 +78,7 @@ namespace Tests.Integration {
                 };
             }
 
-            public override bool ArePreconditionsMet() { return true; }
+            public override bool IsValid() { return true; }
 
             public override IEnumerator Do(WorldState start, WorldState goal) {
                 Console.WriteLine("Went to city");
@@ -106,7 +106,7 @@ namespace Tests.Integration {
                 _wallet = wallet;
             }
 
-            public override bool ArePreconditionsMet() { return true; }
+            public override bool IsValid() { return true; }
 
             public override IEnumerator Do(WorldState start, WorldState goal) {
                 Console.WriteLine("Sold wood");
@@ -135,7 +135,7 @@ namespace Tests.Integration {
                 _wallet = wallet;
             }
 
-            public override bool ArePreconditionsMet() { return true; }
+            public override bool IsValid() { return true; }
 
             public override IEnumerator Do(WorldState start, WorldState goal) {
                 if (_wallet.Money >= 10) {
