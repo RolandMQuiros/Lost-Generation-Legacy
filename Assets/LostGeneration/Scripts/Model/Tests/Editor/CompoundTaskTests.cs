@@ -29,8 +29,6 @@ namespace Tests.Integration {
                 };
             }
 
-            public override bool IsValid() { return true; }
-
             public override IEnumerator Do() {
                 Console.WriteLine("Went to the forest");
                 yield break;
@@ -52,8 +50,6 @@ namespace Tests.Integration {
                     { "Has Wood", true }
                 };
             }
-
-            public override bool IsValid() { return true; }
 
             public override IEnumerator Do() {
                 Console.WriteLine("Chopped wood");
@@ -77,8 +73,6 @@ namespace Tests.Integration {
                     { "In Forest", false }
                 };
             }
-
-            public override bool IsValid() { return true; }
 
             public override IEnumerator Do() {
                 Console.WriteLine("Went to city");
@@ -106,8 +100,6 @@ namespace Tests.Integration {
                 _wallet = wallet;
             }
 
-            public override bool IsValid() { return true; }
-
             public override IEnumerator Do() {
                 Console.WriteLine("Sold wood");
                 _wallet.Money++;
@@ -134,8 +126,6 @@ namespace Tests.Integration {
                 
                 _wallet = wallet;
             }
-
-            public override bool IsValid() { return true; }
 
             public override IEnumerator Do() {
                 if (_wallet.Money >= 10) {
