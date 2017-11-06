@@ -1,34 +1,34 @@
 fileFormatVersion: 2
-guid: b800edfe3c4ee9244a2616b3a525193d
-timeCreated: 1496259367
+guid: f3f62188302ce2047a10f5ee55dec2c9
+timeCreated: 1509861364
 licenseType: Free
 ModelImporter:
-  serializedVersion: 19
+  serializedVersion: 21
   fileIDToRecycleName:
-    100000: //RootNode
-    100002: Body
-    100004: Calf_L
-    100006: Calf_R
-    100008: Eyebrows
-    100010: Fingers_1_L
-    100012: Fingers_1_R
-    100014: Fingers_2_L
-    100016: Fingers_2_R
-    100018: Foot_L
-    100020: Foot_R
-    100022: FootControl_L
-    100024: FootControl_R
-    100026: Forearm_L
-    100028: Forearm_R
-    100030: Hand_L
-    100032: Hand_R
-    100034: Head
-    100036: HeelRoll_L
-    100038: HeelRoll_R
-    100040: IndexFinger_1_L
-    100042: IndexFinger_1_R
-    100044: IndexFinger_2_L
-    100046: IndexFinger_2_R
+    100000: Body
+    100002: Calf_L
+    100004: Calf_R
+    100006: Eyebrows
+    100008: Fingers_1_L
+    100010: Fingers_1_R
+    100012: Fingers_2_L
+    100014: Fingers_2_R
+    100016: Foot_L
+    100018: Foot_R
+    100020: FootControl_L
+    100022: FootControl_R
+    100024: Forearm_L
+    100026: Forearm_R
+    100028: Hand_L
+    100030: Hand_R
+    100032: Head
+    100034: HeelRoll_L
+    100036: HeelRoll_R
+    100038: IndexFinger_1_L
+    100040: IndexFinger_1_R
+    100042: IndexFinger_2_L
+    100044: IndexFinger_2_R
+    100046: //RootNode
     100048: Mouth
     100050: Neck
     100052: Pelvis
@@ -51,30 +51,34 @@ ModelImporter:
     100086: UpperArm_R
     100088: Weapon_L
     100090: Weapon_R
-    400000: //RootNode
-    400002: Body
-    400004: Calf_L
-    400006: Calf_R
-    400008: Eyebrows
-    400010: Fingers_1_L
-    400012: Fingers_1_R
-    400014: Fingers_2_L
-    400016: Fingers_2_R
-    400018: Foot_L
-    400020: Foot_R
-    400022: FootControl_L
-    400024: FootControl_R
-    400026: Forearm_L
-    400028: Forearm_R
-    400030: Hand_L
-    400032: Hand_R
-    400034: Head
-    400036: HeelRoll_L
-    400038: HeelRoll_R
-    400040: IndexFinger_1_L
-    400042: IndexFinger_1_R
-    400044: IndexFinger_2_L
-    400046: IndexFinger_2_R
+    100092: Eye_Bounds
+    100094: Pupil_L
+    100096: Pupil_R
+    100098: Head 1
+    400000: Body
+    400002: Calf_L
+    400004: Calf_R
+    400006: Eyebrows
+    400008: Fingers_1_L
+    400010: Fingers_1_R
+    400012: Fingers_2_L
+    400014: Fingers_2_R
+    400016: Foot_L
+    400018: Foot_R
+    400020: FootControl_L
+    400022: FootControl_R
+    400024: Forearm_L
+    400026: Forearm_R
+    400028: Hand_L
+    400030: Hand_R
+    400032: Head
+    400034: HeelRoll_L
+    400036: HeelRoll_R
+    400038: IndexFinger_1_L
+    400040: IndexFinger_1_R
+    400042: IndexFinger_2_L
+    400044: IndexFinger_2_R
+    400046: //RootNode
     400048: Mouth
     400050: Neck
     400052: Pelvis
@@ -97,21 +101,28 @@ ModelImporter:
     400086: UpperArm_R
     400088: Weapon_L
     400090: Weapon_R
+    400092: Eye_Bounds
+    400094: Pupil_L
+    400096: Pupil_R
+    400098: Head 1
     4300000: Mouth
     4300002: Eyebrows
     4300004: Body
+    4300006: Head
     7400000: Skeleton|idle_2hsword_1
-    7400002: Skeleton|idle_basic
-    7400004: Skeleton|run_1_lower
+    7400002: Skeleton|run_1_lower
+    7400004: Skeleton|run_1_lower.001
     7400006: Skeleton|run_1_test
     7400008: Skeleton|run_1_upper
     7400010: Skeleton|run_1_upper_2hsword_1
     7400012: Skeleton|run_1_upper_2hsword_2
     7400014: Skeleton|run_1_upper_2hsword_3
+    7400016: Skeleton|walk_sway
     9500000: //RootNode
     13700000: Body
     13700002: Eyebrows
     13700004: Mouth
+    13700006: Head
   materials:
     importMaterials: 0
     materialName: 0
@@ -122,6 +133,8 @@ ModelImporter:
     resampleCurves: 1
     optimizeGameObjects: 0
     motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -132,6 +145,7 @@ ModelImporter:
     animationScaleError: 0.5
     animationWrapMode: 0
     extraExposedTransformPaths: []
+    extraUserProperties: []
     clipAnimations: []
     isReadable: 1
   meshes:
@@ -139,7 +153,10 @@ ModelImporter:
     globalScale: 1
     meshCompression: 0
     addColliders: 0
+    importVisibility: 0
     importBlendShapes: 1
+    importCameras: 0
+    importLights: 0
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
@@ -155,6 +172,7 @@ ModelImporter:
     normalSmoothAngle: 60
     normalImportMode: 0
     tangentImportMode: 3
+    normalCalculationMode: 4
   importAnimation: 1
   copyAvatar: 0
   humanDescription:
