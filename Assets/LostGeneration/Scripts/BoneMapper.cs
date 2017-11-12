@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BoneMapper : MonoBehaviour {
+	public Transform RootBone;
 	public SkinnedMeshRenderer Source;
 	public SkinnedMeshRenderer[] Targets;
 
@@ -27,6 +28,12 @@ public class BoneMapper : MonoBehaviour {
 				}
 				
 				target.bones = newBones;
+				target.rootBone = RootBone;
+				target.transform.localPosition = Vector3.zero;
+
+				Transform oldParent= target.transform.parent;
+				target.transform.parent = transform;
+				GameObject.Destroy(oldParent.gameObject);
 			}
 		}
 	}
