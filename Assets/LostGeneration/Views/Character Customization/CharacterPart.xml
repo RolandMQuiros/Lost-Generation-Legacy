@@ -1,0 +1,8 @@
+<CharacterPart Id="{Name}" xmlns="MarkLight">
+    <List Items="{Weights}" Orientation="Vertical" CanSelect="True">
+        <ListItem IsTemplate="True">
+            <Label Width="40%" Text="{#Item.Key}" Alignment="Left"/> 
+            <Slider Width="60%" Value="{#Item.Value}" Min="0.0" Max="1.0" Alignment="Right"/>
+        </ListItem> 
+    </List>
+</CharacterPart>
