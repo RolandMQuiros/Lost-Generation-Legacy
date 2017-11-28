@@ -18,7 +18,6 @@ public class CharacterBody : MonoBehaviour {
     }
 
     [SerializeField]private Transform _skeleton;
-    [SerializeField]private SkinnedMeshRenderer _bodyMeshes;
     private Dictionary<string, float> _blendShapes = new Dictionary<string, float>();
     private HashSet<SkinnedMeshRenderer> _attachments = new HashSet<SkinnedMeshRenderer>();
 
@@ -32,7 +31,7 @@ public class CharacterBody : MonoBehaviour {
         _attachments.Add(mesh);
 
         if (destroyOldParent && oldParent != null) {
-            GameObject.Destroy(oldParent);
+            GameObject.DestroyImmediate(oldParent);
         }
     }
 
@@ -47,6 +46,10 @@ public class CharacterBody : MonoBehaviour {
                 _blendShapes.Remove(blendShapeName);
             }
         }
+    }
+
+    public bool IsAttached(SkinnedMeshRenderer mesh) {
+        return _attachments.Contains(mesh);
     }
 
     public void SetBlendShapeWeight(string name, float weight) {
@@ -91,7 +94,6 @@ public class CharacterBody : MonoBehaviour {
     }
 
     #region MonoBehaviour
-
     private void Awake() {
         if (_skeleton == null) {
             throw new NullReferenceException("This CharacterModel needs a skeleton root bone!");
