@@ -69,20 +69,21 @@ public class CharacterBodyEditor : Editor {
     private void ShowBlendWeights() {
         bool unfolded = true;
         foreach (string path in _blendShapeNames) {
+            string parent = _blendShapeNames.GetParent(path);
             string label = _blendShapeNames.GetName(path);
-            if (_blendShapeNames.IsLeaf(label)) {
-                if (unfolded) {
+            if (_unfolded.Contains(parent)) {
+                if (_blendShapeNames.IsLeaf(path)) {
                     float oldWeight = _target.BlendShapes[path];
                     float newWeight = Mathf.Clamp(EditorGUILayout.FloatField(label, oldWeight), 0f, 100f);
                     if (oldWeight != newWeight) {
                         _target.SetBlendShapeWeight(path, newWeight);
                     }
-                }
-            } else {
-                if (unfolded = EditorGUILayout.Foldout(_unfolded.Contains(path), label)) {
-                    _unfolded.Add(path);
                 } else {
-                    _unfolded.Remove(path);
+                    if (unfolded = EditorGUILayout.Foldout(_unfolded.Contains(path), label)) {
+                        _unfolded.Add(path);
+                    } else {
+                        _unfolded.Remove(path);
+                    }
                 }
             }
         }
