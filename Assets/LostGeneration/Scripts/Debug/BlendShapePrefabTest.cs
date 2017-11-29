@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,12 +10,9 @@ public class BlendShapePrefabTest : MonoBehaviour {
 		for (int i = 0; i < 1000; i++) {
 			GameObject newObj = GameObject.Instantiate(Mesh, Random.Range(0f, 100f) * Random.insideUnitSphere, Quaternion.identity);
 
-			SkinnedMeshRenderer[] skinnedMeshes = newObj.GetComponentsInChildren<SkinnedMeshRenderer>();
-			for (int m = 0; m < skinnedMeshes.Length; m++) {
-				SkinnedMeshRenderer mesh = skinnedMeshes[m];
-				for (int s = 0; s < mesh.sharedMesh.blendShapeCount; s++) {
-					mesh.SetBlendShapeWeight(s, Random.Range(0f, 100f));
-				}
+			CharacterBody body = newObj.GetComponent<CharacterBody>();
+			foreach (string key in body.BlendShapes.Keys.ToList()) {
+				body.SetBlendShapeWeight(key, Random.Range(0f, 100f));
 			}
 
 			Color r1 = Random.ColorHSV();

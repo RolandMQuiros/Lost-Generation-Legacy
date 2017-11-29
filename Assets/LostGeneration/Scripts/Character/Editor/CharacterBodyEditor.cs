@@ -9,13 +9,14 @@ public class CharacterBodyEditor : Editor {
     private SkinnedMeshRenderer _newAttachment = null;
     private Vector2 _attachmentScroll = new Vector2();
     private HashSet<string> _unfoldedBlendShapes = new HashSet<string>();
-    private HashSet<Transform> _unfoldedControlBones = new HashSet<Transform>();
 
     private void OnEnable() {
         _target = (CharacterBody)target;
     }
 
     public override void OnInspectorGUI() {
+        Undo.RecordObject(_target, "Anything on the Character Body");
+
         Transform skeleton = (Transform)EditorGUILayout.ObjectField("Skeleton Root", _target.Skeleton, typeof(Transform), true);
         if (skeleton) {
             if (skeleton != _target.Skeleton) {
@@ -75,22 +76,12 @@ public class CharacterBodyEditor : Editor {
 
         EditorGUI.indentLevel++;
         foreach (Transform control in _target.ControlBones) {
-            bool foldout = EditorGUILayout.Foldout(_unfoldedControlBones.Contains(control), control.name);
-            if (foldout) {
-                _unfoldedControlBones.Add(control);
-
-                EditorGUI.indentLevel++;
-                Vector3 position = EditorGUILayout.Vector3Field("Position", control.localPosition);
-                Vector3 eulers = EditorGUILayout.Vector3Field("Rotation", control.localEulerAngles);
-                Vector3 scale = EditorGUILayout.Vector3Field("Scale", control.localScale);
-                EditorGUI.indentLevel--;
-
-                if (position != control.localPosition) { control.localPosition = position; }
-                if (eulers != control.localEulerAngles) { control.localEulerAngles = eulers; }
-                if (scale != control.localScale) { control.localScale = scale; }
-            } else {
-                _unfoldedControlBones.Remove(control);
+            Undo.RecordObject(control, "Control bone changes");
+            EditorGUI.indentLevel++;
+            if (GUILayout.Button(control.name)) {
+                Selection.objects = new Object[] { control.gameObject };
             }
+            EditorGUI.indentLevel--;
         }
         EditorGUI.indentLevel--;
     }
