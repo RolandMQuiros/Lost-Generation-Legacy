@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CharacterBody : MonoBehaviour {
+public class CharacterBody : MonoBehaviour, ISerializationCallbackReceiver {
     public Transform Skeleton {
         get { return _skeleton; }
         set { _skeleton = value; }
@@ -18,9 +18,10 @@ public class CharacterBody : MonoBehaviour {
     }
 
     [SerializeField]private Transform _skeleton;
+    [SerializeField]private List<SkinnedMeshRenderer> _attachments = new List<SkinnedMeshRenderer>();
+    [SerializeField]private List<string> _blendShapeNames = new List<string>();
+    [SerializeField]private List<float> _blendShapeWeights = new List<float>();
     private Dictionary<string, float> _blendShapes = new Dictionary<string, float>();
-    private HashSet<SkinnedMeshRenderer> _attachments = new HashSet<SkinnedMeshRenderer>();
-
     public void Attach(SkinnedMeshRenderer mesh, bool destroyOldParent = true) {
         GameObject oldParent = mesh.transform.parent.gameObject;
 
@@ -92,6 +93,26 @@ public class CharacterBody : MonoBehaviour {
             }
         }
     }
+
+    #region ISerializationCallbackReceiver
+    public void OnBeforeSerialize() {
+        _blendShapeNames.Clear();
+        _blendShapeWeights.Clear();
+
+        foreach (KeyValuePair<string, float> pair in _blendShapes) {
+            _blendShapeNames.Add(pair.Key);
+            _blendShapeWeights.Add(pair.Value);
+        }
+    }
+
+    public void OnAfterDeserialize() {
+        _blendShapes = new Dictionary<string, float>();
+        for (int s = 0; s < _blendShapeNames.Count; s++) {
+            _blendShapes.Add(_blendShapeNames[s], _blendShapeWeights[s]);
+        }
+    }
+    
+    #endregion
 
     #region MonoBehaviour
     private void Awake() {

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -24,15 +25,17 @@ public class NameTree : IEnumerable<string> {
         string[] tokens = path.Split(_delimiter);
         _rootChildren.Add(tokens[0]);
 
-        string partPath;
-        for (int t = 0; t < tokens.Length; t++) {
+        string partPath = tokens[0];
+        for (int t = 1; t <= tokens.Length; t++) {
             HashSet<string> children;
-            if (!_groups.TryGetValue(path, out children)) {
+            if (!_groups.TryGetValue(partPath, out children)) {
                 children = new HashSet<string>();
-                _groups.Add(path, children);
+                _groups.Add(partPath, children);
             }
-            path += ':' + tokens[t];
-            children.Add(path);
+            if (t < tokens.Length) {
+                partPath += ':' + tokens[t];
+                children.Add(partPath);
+            }
         }
     }
 
@@ -42,9 +45,14 @@ public class NameTree : IEnumerable<string> {
         }
     }
 
+    public string GetParent(string path) {
+        int lastDelimiter = Math.Max(path.LastIndexOf(_delimiter), 0);
+        return path.Substring(0, lastDelimiter); 
+    }
+
     public string GetName(string path) {
-        int lastDelimiter = path.LastIndexOf(_delimiter);
-        return path.Substring(lastDelimiter + 1);
+        int lastDelimiter = Math.Max(path.LastIndexOf(_delimiter) + 1, 0);
+        return path.Substring(lastDelimiter);
     }
 
     public IEnumerator<string> GetEnumerator() {
