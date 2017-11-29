@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -33,7 +34,7 @@ public class NameTree : IEnumerable<string> {
                 _groups.Add(partPath, children);
             }
             if (t < tokens.Length) {
-                partPath += ':' + tokens[t];
+                partPath += _delimiter + tokens[t];
                 children.Add(partPath);
             }
         }
@@ -55,6 +56,10 @@ public class NameTree : IEnumerable<string> {
         return path.Substring(lastDelimiter);
     }
 
+    public int GetLevel(string path) {
+        return path.Count(c => c == _delimiter);
+    }
+
     public IEnumerator<string> GetEnumerator() {
         Stack<string> open = new Stack<string>();
         
@@ -68,7 +73,7 @@ public class NameTree : IEnumerable<string> {
 
             HashSet<string> children;
             if (_groups.TryGetValue(path, out children)) {
-                foreach (string child in children) {
+                foreach (string child in children.OrderByDescending(s => s)) {
                     open.Push(child);
                 }
             }
