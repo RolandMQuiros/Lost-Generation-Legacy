@@ -57,7 +57,7 @@ public class CharacterBodyEditor : Editor {
         EditorGUILayout.BeginHorizontal();
         _newAttachment = (SkinnedMeshRenderer)EditorGUILayout.ObjectField(_newAttachment, typeof(SkinnedMeshRenderer), true);
         if (GUILayout.Button("+", GUILayout.MaxWidth(16f)) && _newAttachment != null) {
-            _target.Attach(_newAttachment, false);
+            _target.Attach(_newAttachment);
             _newAttachment = null;
             scrollToBottom = true;
         }
@@ -67,20 +67,27 @@ public class CharacterBodyEditor : Editor {
     }
 
     private void ShowControlBones() {
-        GUILayout.BeginHorizontal();
+        bool resetBones = false;
+        EditorGUILayout.BeginHorizontal();
         GUILayout.Label("Control Bones");
         if (GUILayout.Button("Reset")) {
-            _target.ResetControlBones();
+            resetBones = true;
         }
-        GUILayout.EndHorizontal();
+        EditorGUILayout.EndHorizontal();
 
         EditorGUI.indentLevel++;
-        foreach (Transform control in _target.ControlBones) {
+        foreach (ControlBone control in _target.ControlBones) {
             Undo.RecordObject(control, "Control bone changes");
+
             EditorGUI.indentLevel++;
+            EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button(control.name)) {
                 Selection.objects = new Object[] { control.gameObject };
             }
+            if (resetBones || GUILayout.Button("*", GUILayout.Width(16f))) {
+                control.Reset();
+            }
+            EditorGUILayout.EndHorizontal();
             EditorGUI.indentLevel--;
         }
         EditorGUI.indentLevel--;

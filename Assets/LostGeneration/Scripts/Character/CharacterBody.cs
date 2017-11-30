@@ -4,37 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CharacterBody : MonoBehaviour, ISerializationCallbackReceiver {
-    [Serializable]
-    private struct InitialControl {
-        public Vector3 Position;
-        public Vector3 Eulers;
-        public Vector3 Scale;
-    }
-
     public Transform Skeleton {
         get { return _skeleton; }
-        set {
-            _skeleton = value;
-            if (_skeleton == null) {
-                ResetControlBones();
-                _controlBones.Clear();
-            } else {
-                _controlBones = new List<Transform>(_skeleton.GetComponentsInChildren<Transform>().Where(b => b.name.StartsWith("C_")));
-                _initialControls = new List<InitialControl>();
-                for (int c = 0; c < _controlBones.Count; c++) {
-                    Transform control = _controlBones[c];
-                    _initialControls.Add(new InitialControl() {
-                        Position = control.localPosition,
-                        Eulers = control.localEulerAngles,
-                        Scale = control.localScale
-                    });
-                }
-            }
-        }
+        set { _skeleton = value; }
     }
 
-    public IEnumerable<Transform> ControlBones {
-        get { return _controlBones; }
+    public IEnumerable<ControlBone> ControlBones {
+        get { return GetComponentsInChildren<ControlBone>(); }
     }
 
     public IEnumerable<SkinnedMeshRenderer> Attachments {
@@ -51,9 +27,8 @@ public class CharacterBody : MonoBehaviour, ISerializationCallbackReceiver {
     
     [SerializeField]private Transform _skeleton;
     [SerializeField]private List<Transform> _controlBones = new List<Transform>();
-    [SerializeField]private List<InitialControl> _initialControls = new List<InitialControl>();
 
-    #region SerializedArchives
+    #region SerializableCollections
     [SerializeField]private List<SkinnedMeshRenderer> _serialAttachments = new List<SkinnedMeshRenderer>();
     [SerializeField]private List<string> _serialBlendShapeKeys = new List<string>();
     [SerializeField]private List<float> _serialBlendShapeWeights = new List<float>();
@@ -69,7 +44,7 @@ public class CharacterBody : MonoBehaviour, ISerializationCallbackReceiver {
             AddBlendShapes(mesh);
             _attachments.Add(mesh);
 
-            if (destroyOldParent && oldParent != null) {
+            if (destroyOldParent && oldParent != null && !oldParent.transform.IsChildOf(transform)) {
                 GameObject.DestroyImmediate(oldParent);
             }
         }
@@ -115,16 +90,7 @@ public class CharacterBody : MonoBehaviour, ISerializationCallbackReceiver {
             SetBlendShapeWeight(key, 0f);
         }
     }
-
-    public void ResetControlBones() {
-        for (int b = 0; b < _controlBones.Count; b++) {
-            Transform bone = _controlBones[b];
-            bone.localPosition = _initialControls[b].Position;
-            bone.localEulerAngles = _initialControls[b].Eulers;
-            bone.localScale = _initialControls[b].Scale;
-        };
-    }
-
+    
     private void MapBonesToSkeleton(SkinnedMeshRenderer mesh) {
         Dictionary<string, Transform> skeletonBones = GetComponentsInChildren<Transform>().ToDictionary(b => b.name, b => b);
         Transform[] newBones = new Transform[mesh.bones.Length];
