@@ -9,8 +9,8 @@ public class CharacterBody : MonoBehaviour, ISerializationCallbackReceiver {
         set { _skeleton = value; }
     }
 
-    public IEnumerable<ControlBone> ControlBones {
-        get { return GetComponentsInChildren<ControlBone>(); }
+    public IEnumerable<TransformReset> ControlBones {
+        get { return GetComponentsInChildren<TransformReset>(); }
     }
 
     public IEnumerable<SkinnedMeshRenderer> Attachments {
@@ -72,22 +72,27 @@ public class CharacterBody : MonoBehaviour, ISerializationCallbackReceiver {
         return _attachments.Contains(mesh);
     }
 
-    public void SetBlendShapeWeight(string name, float weight) {
+    public bool SetBlendShapeWeight(string name, float weight) {
+        bool meshFound = false;
         if (_blendShapes.ContainsKey(name)) {
             _blendShapes[name] = weight;
 
             foreach (SkinnedMeshRenderer mesh in _attachments) {
                 int blendShapeIndex = mesh.sharedMesh.GetBlendShapeIndex(name);
                 if (blendShapeIndex != -1) {
+                    meshFound = true;
                     mesh.SetBlendShapeWeight(blendShapeIndex, weight);
                 }
             }
         }
+        return meshFound;
     }
 
     public void ClearWeights() {
         foreach (string key in _blendShapes.Keys.ToList()) {
-            SetBlendShapeWeight(key, 0f);
+            if (!SetBlendShapeWeight(key, 0f)) {
+                _blendShapes.Remove(key);
+            }
         }
     }
     
