@@ -97,7 +97,7 @@ public class CharacterBody : MonoBehaviour, ISerializationCallbackReceiver {
     }
     
     private void MapBonesToSkeleton(SkinnedMeshRenderer mesh) {
-        Dictionary<string, Transform> skeletonBones = GetComponentsInChildren<Transform>().ToDictionary(b => b.name, b => b);
+        Dictionary<string, Transform> skeletonBones = _skeleton.GetComponentsInChildren<Transform>().ToDictionary(b => b.name, b => b);
         Transform[] newBones = new Transform[mesh.bones.Length];
         for (int m = 0; m < newBones.Length; m++) {
             Transform skeletonBone;
