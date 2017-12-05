@@ -31,13 +31,7 @@ public class CharacterBodyEditor : Editor {
     private void ShowAttachments() {
         bool scrollToBottom = false;
 
-        GUILayout.BeginHorizontal();
         GUILayout.Label("Attachments");
-        if (GUILayout.Button("Clear")) {
-            _target.Clear();
-        }
-        GUILayout.EndHorizontal();
-
         EditorGUI.indentLevel++;
         List<SkinnedMeshRenderer> toDetach = new List<SkinnedMeshRenderer>();
         foreach (SkinnedMeshRenderer attachment in _target.Attachments) {
@@ -76,7 +70,7 @@ public class CharacterBodyEditor : Editor {
         EditorGUILayout.EndHorizontal();
 
         EditorGUI.indentLevel++;
-        foreach (ControlBone control in _target.ControlBones) {
+        foreach (TransformReset control in _target.ControlBones) {
             Undo.RecordObject(control, "Control bone changes");
 
             EditorGUI.indentLevel++;

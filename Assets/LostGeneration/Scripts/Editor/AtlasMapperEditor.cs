@@ -13,12 +13,9 @@ public class AtlasMapperEditor : Editor {
 
 		EditorGUI.BeginChangeCheck();
 			_target.Sprite = EditorGUILayout.ObjectField("Sprite", _target.Sprite, typeof(Sprite), false) as Sprite;
-			_target.ColorR1 = EditorGUILayout.ColorField("Color R1", _target.ColorR1);
-			_target.ColorR2 = EditorGUILayout.ColorField("Color R2", _target.ColorR2);
-			_target.ColorG1 = EditorGUILayout.ColorField("Color G1", _target.ColorG1);
-			_target.ColorG2 = EditorGUILayout.ColorField("Color G2", _target.ColorG2);
-			_target.ColorB1 = EditorGUILayout.ColorField("Color B1", _target.ColorB1);
-			_target.ColorB2 = EditorGUILayout.ColorField("Color B2", _target.ColorB2);
+			_target.TintRed = EditorGUILayout.ColorField("Tint Red", _target.TintRed);
+			_target.TintGreen = EditorGUILayout.ColorField("Tint Green", _target.TintGreen);
+			_target.TintBlue = EditorGUILayout.ColorField("Tint Blue", _target.TintBlue);
 
 		if (EditorGUI.EndChangeCheck()) {
 			_target.ApplyMaterial();

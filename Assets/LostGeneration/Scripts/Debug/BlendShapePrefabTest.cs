@@ -15,20 +15,14 @@ public class BlendShapePrefabTest : MonoBehaviour {
 				body.SetBlendShapeWeight(key, Random.Range(0f, 100f));
 			}
 
-			Color r1 = Random.ColorHSV();
-			Color r2 = Random.ColorHSV();
-			Color g1 = Random.ColorHSV();
-			Color g2 = Random.ColorHSV();
-			Color b1 = Random.ColorHSV();
-			Color b2 = Random.ColorHSV();
+			Color r = Random.ColorHSV();
+			Color g = Random.ColorHSV();
+			Color b = Random.ColorHSV();
 
 			foreach (AtlasMaterial atlas in newObj.GetComponentsInChildren<AtlasMaterial>()) {
-				atlas.ColorR1 = r1;
-				atlas.ColorR2 = r2;
-				atlas.ColorG1 = g1;
-				atlas.ColorG2 = g2;
-				atlas.ColorB1 = b1;
-				atlas.ColorB2 = b2;
+				atlas.TintRed = r;
+				atlas.TintGreen = g;
+				atlas.TintBlue = b;
 				atlas.ApplyMaterial();
 			}
 		}

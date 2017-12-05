@@ -7,15 +7,11 @@ Shader "Lost Generation/Tinted Toon" {
         _Texture ("Texture", 2D) = "white" {}
         _UVOffset ("UVOffset", Vector) = (0,0,0,0)
         _Smoothing ("Smoothing", Range(0, 1)) = 0.0
-        _DarkColor ("Dark Color", Color) = (0.1570069,0.1788271,0.3235294,1)
         _OutlineCoefficient ("Outline Coefficient", Float ) = 0.01
         _OutlineDarkening ("Outline Darkening", Range(0, 1)) = 0.6
-        _ColorR1 ("Color R1", Color) = (0.6617647,0.175173,0.4872629,1)
-        _ColorR2 ("Color R2", Color) = (1,0.007352948,0.3975661,1)
-        _ColorG1 ("Color G1", Color) = (0.5,0.5,0.5,1)
-        _ColorG2 ("Color G2", Color) = (0.5,0.5,0.5,1)
-        _ColorB1 ("Color B1", Color) = (0.5,0.5,0.5,1)
-        _ColorB2 ("Color B2", Color) = (0.5,0.5,0.5,1)
+        _TintRed ("Red Tint", Color) = (1, 0, 0, 1)
+        _TintGreen ("Color G1", Color) = (0, 1, 0, 1)
+        _TintBlue ("Color B1", Color) = (0, 0, 1, 1)
     }
     SubShader {
         Tags {
@@ -45,11 +41,11 @@ Shader "Lost Generation/Tinted Toon" {
             uniform float4 _DarkColor;
             uniform float _OutlineCoefficient;
             uniform float _OutlineDarkening;
-            uniform float4 _ColorR1;
+            uniform float4 _TintRed;
             uniform float4 _ColorR2;
-            uniform float4 _ColorG1;
+            uniform float4 _TintGreen;
             uniform float4 _ColorG2;
-            uniform float4 _ColorB1;
+            uniform float4 _TintBlue;
             uniform float4 _ColorB2;
             struct VertexInput {
                 float4 vertex : POSITION;
@@ -79,15 +75,16 @@ Shader "Lost Generation/Tinted Toon" {
             float4 frag(VertexOutput i) : COLOR {
                 i.normalDir = normalize(i.normalDir);
                 float3 normalDirection = i.normalDir;
-                float2 node_9752 = (float2(_UVOffset.r,_UVOffset.g)+(i.uv0*float2(_UVOffset.b,_UVOffset.a)));
-                float4 _Texture_var = tex2D(_Texture,TRANSFORM_TEX(node_9752, _Texture));
+                float2 uvTransform = (float2(_UVOffset.r,_UVOffset.g)+(i.uv0*float2(_UVOffset.b,_UVOffset.a)));
+                float4 _Texture_var = tex2D(_Texture,TRANSFORM_TEX(uvTransform, _Texture));
                 clip(_Texture_var.a - 0.5);
                 float3 lightDirection = normalize(lerp(_WorldSpaceLightPos0.xyz, _WorldSpaceLightPos0.xyz - i.posWorld.xyz,_WorldSpaceLightPos0.w));
                 float3 lightColor = _LightColor0.rgb;
-                float node_3837 = (2.0*_Texture_var.r);
-                float node_62 = (2.0*_Texture_var.g);
-                float node_9366 = (2.0*_Texture_var.b);
-                float3 tinting = (lerp(lerp((_DarkColor.rgb*_Texture_var.r),_ColorR1.rgb,saturate(node_3837)),_ColorR2.rgb,saturate((node_3837-1.0)))+lerp(lerp((_DarkColor.rgb*_Texture_var.g),_ColorG1.rgb,saturate(node_62)),_ColorG2.rgb,saturate((node_62-1.0)))+lerp(lerp((_DarkColor.rgb*_Texture_var.b),_ColorB1.rgb,saturate(node_9366)),_ColorB2.rgb,saturate((node_9366-1.0))));
+                
+                float3 redTint = lerp(0, _TintRed.rgb, _Texture_var.r);
+                float3 greenTint = lerp(0, _TintGreen.rgb, _Texture_var.g);
+                float3 blueTint = lerp(0, _TintBlue.rgb, _Texture_var.b);
+                float3 tinting = redTint + blueTint + greenTint;
 
                 float up = saturate(i.normalDir.y);
                 float down = saturate(-i.normalDir.y);
@@ -125,11 +122,11 @@ Shader "Lost Generation/Tinted Toon" {
             uniform float4 _UVOffset;
             uniform float _Smoothing;
             uniform float4 _DarkColor;
-            uniform float4 _ColorR1;
+            uniform float4 _TintRed;
             uniform float4 _ColorR2;
-            uniform float4 _ColorG1;
+            uniform float4 _TintGreen;
             uniform float4 _ColorG2;
-            uniform float4 _ColorB1;
+            uniform float4 _TintBlue;
             uniform float4 _ColorB2;
             struct VertexInput {
                 float4 vertex : POSITION;
@@ -158,18 +155,19 @@ Shader "Lost Generation/Tinted Toon" {
             float4 frag(VertexOutput i) : COLOR {
                 i.normalDir = normalize(i.normalDir);
                 float3 normalDirection = i.normalDir;
-                float2 node_9752 = (float2(_UVOffset.r,_UVOffset.g)+(i.uv0*float2(_UVOffset.b,_UVOffset.a)));
-                float4 _Texture_var = tex2D(_Texture,TRANSFORM_TEX(node_9752, _Texture));
+                float2 uvTransform = (float2(_UVOffset.r,_UVOffset.g)+(i.uv0*float2(_UVOffset.b,_UVOffset.a)));
+                float4 _Texture_var = tex2D(_Texture,TRANSFORM_TEX(uvTransform, _Texture));
                 clip(_Texture_var.a - 0.5);
                 float3 lightDirection = normalize(_WorldSpaceLightPos0.xyz);
                 float3 lightColor = _LightColor0.rgb;
 ////// Lighting:
                 float attenuation = LIGHT_ATTENUATION(i);
 ////// Emissive:
-                float node_3837 = (2.0*_Texture_var.r);
-                float node_62 = (2.0*_Texture_var.g);
-                float node_9366 = (2.0*_Texture_var.b);
-                float3 tinting = (lerp(lerp((_DarkColor.rgb*_Texture_var.r),_ColorR1.rgb,saturate(node_3837)),_ColorR2.rgb,saturate((node_3837-1.0)))+lerp(lerp((_DarkColor.rgb*_Texture_var.g),_ColorG1.rgb,saturate(node_62)),_ColorG2.rgb,saturate((node_62-1.0)))+lerp(lerp((_DarkColor.rgb*_Texture_var.b),_ColorB1.rgb,saturate(node_9366)),_ColorB2.rgb,saturate((node_9366-1.0))));
+
+                float3 redTint = lerp(0, _TintRed.rgb, _Texture_var.r);
+                float3 greenTint = lerp(0, _TintGreen.rgb, _Texture_var.g);
+                float3 blueTint = lerp(0, _TintBlue.rgb, _Texture_var.b);
+                float3 tinting = redTint + blueTint + greenTint;
 
                 float up = saturate(i.normalDir.y);
                 float down = saturate(-i.normalDir.y);
@@ -210,11 +208,11 @@ Shader "Lost Generation/Tinted Toon" {
             uniform float4 _UVOffset;
             uniform float _Smoothing;
             uniform float4 _DarkColor;
-            uniform float4 _ColorR1;
+            uniform float4 _TintRed;
             uniform float4 _ColorR2;
-            uniform float4 _ColorG1;
+            uniform float4 _TintGreen;
             uniform float4 _ColorG2;
-            uniform float4 _ColorB1;
+            uniform float4 _TintBlue;
             uniform float4 _ColorB2;
             struct VertexInput {
                 float4 vertex : POSITION;
@@ -243,17 +241,19 @@ Shader "Lost Generation/Tinted Toon" {
             float4 frag(VertexOutput i) : COLOR {
                 i.normalDir = normalize(i.normalDir);
                 float3 normalDirection = i.normalDir;
-                float2 node_9752 = (float2(_UVOffset.r,_UVOffset.g)+(i.uv0*float2(_UVOffset.b,_UVOffset.a)));
-                float4 _Texture_var = tex2D(_Texture,TRANSFORM_TEX(node_9752, _Texture));
+                float2 uvTransform = (float2(_UVOffset.r,_UVOffset.g)+(i.uv0*float2(_UVOffset.b,_UVOffset.a)));
+                float4 _Texture_var = tex2D(_Texture,TRANSFORM_TEX(uvTransform, _Texture));
                 clip(_Texture_var.a - 0.5);
                 float3 lightDirection = normalize(lerp(_WorldSpaceLightPos0.xyz, _WorldSpaceLightPos0.xyz - i.posWorld.xyz,_WorldSpaceLightPos0.w));
                 float3 lightColor = _LightColor0.rgb;
 ////// Lighting:
                 float attenuation = LIGHT_ATTENUATION(i);
-                float node_3837 = (2.0*_Texture_var.r);
-                float node_62 = (2.0*_Texture_var.g);
-                float node_9366 = (2.0*_Texture_var.b);
-                float3 tinting = (lerp(lerp((_DarkColor.rgb*_Texture_var.r),_ColorR1.rgb,saturate(node_3837)),_ColorR2.rgb,saturate((node_3837-1.0)))+lerp(lerp((_DarkColor.rgb*_Texture_var.g),_ColorG1.rgb,saturate(node_62)),_ColorG2.rgb,saturate((node_62-1.0)))+lerp(lerp((_DarkColor.rgb*_Texture_var.b),_ColorB1.rgb,saturate(node_9366)),_ColorB2.rgb,saturate((node_9366-1.0))));
+
+                float3 redTint = lerp(0, _TintRed.rgb, _Texture_var.r);
+                float3 greenTint = lerp(0, _TintGreen.rgb, _Texture_var.g);
+                float3 blueTint = lerp(0, _TintBlue.rgb, _Texture_var.b);
+                float3 tinting = redTint + greenTint + blueTint;
+                
                 float nDotL = dot(lightDirection,i.normalDir);
                 float3 tintAndLight = (tinting*smoothstep(0, _Smoothing, nDotL)*(_LightColor0.rgb*attenuation));
                 float3 finalColor = tintAndLight;
@@ -300,8 +300,8 @@ Shader "Lost Generation/Tinted Toon" {
                 return o;
             }
             float4 frag(VertexOutput i) : COLOR {
-                float2 node_9752 = (float2(_UVOffset.r,_UVOffset.g)+(i.uv0*float2(_UVOffset.b,_UVOffset.a)));
-                float4 _Texture_var = tex2D(_Texture,TRANSFORM_TEX(node_9752, _Texture));
+                float2 uvTransform = (float2(_UVOffset.r,_UVOffset.g)+(i.uv0*float2(_UVOffset.b,_UVOffset.a)));
+                float4 _Texture_var = tex2D(_Texture,TRANSFORM_TEX(uvTransform, _Texture));
                 clip(_Texture_var.a - 0.5);
                 SHADOW_CASTER_FRAGMENT(i)
             }

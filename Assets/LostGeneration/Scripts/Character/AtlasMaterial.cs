@@ -6,12 +6,9 @@ using UnityEngine;
 public class AtlasMaterial : MonoBehaviour {
 	public Sprite Sprite;
 	public Color DarkColor;
-	public Color ColorR1 = new Color(0.5f, 0f, 0f);
-	public Color ColorR2 = new Color(1f, 0f, 0f);
-	public Color ColorG1 = new Color(0f, 0.5f, 0f);
-	public Color ColorG2 = new Color(0f, 1f, 0f);
-	public Color ColorB1 = new Color(0f, 0f, 0.5f);
-	public Color ColorB2 = new Color(0f, 0f, 1f);
+	public Color TintRed = new Color(1f, 0f, 0f);
+	public Color TintGreen = new Color(0f, 1f, 0f);
+	public Color TintBlue = new Color(0f, 0f, 1f);
 	private Renderer _renderer;
 	private MaterialPropertyBlock _matBlock;
 
@@ -28,12 +25,9 @@ public class AtlasMaterial : MonoBehaviour {
 			_matBlock.SetVector("_UVOffset", uvOffset);
 		}
 
-		_matBlock.SetColor("_ColorR1", ColorR1);
-		_matBlock.SetColor("_ColorR2", ColorR2);
-		_matBlock.SetColor("_ColorG1", ColorG1);
-		_matBlock.SetColor("_ColorG2", ColorG2);
-		_matBlock.SetColor("_ColorB1", ColorB1);
-		_matBlock.SetColor("_ColorB2", ColorB2);
+		_matBlock.SetColor("_TintRed", TintRed);
+		_matBlock.SetColor("_TintGreen", TintGreen);
+		_matBlock.SetColor("_TintBlue", TintBlue);
 		_renderer.SetPropertyBlock(_matBlock);
 	}
 
