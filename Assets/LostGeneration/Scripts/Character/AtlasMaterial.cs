@@ -5,10 +5,10 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class AtlasMaterial : MonoBehaviour {
 	public Sprite Sprite;
-	public Color DarkColor;
 	public Color TintRed = new Color(1f, 0f, 0f);
 	public Color TintGreen = new Color(0f, 1f, 0f);
 	public Color TintBlue = new Color(0f, 0f, 1f);
+
 	private Renderer _renderer;
 	private MaterialPropertyBlock _matBlock;
 
@@ -35,6 +35,12 @@ public class AtlasMaterial : MonoBehaviour {
 	private void OnEnable() {
 		_renderer = GetComponent<Renderer>();
 		_matBlock = new MaterialPropertyBlock();
+	}
+
+	private void OnValidate() {
+		_renderer = GetComponent<Renderer>();
+		_matBlock = new MaterialPropertyBlock();
+		ApplyMaterial();
 	}
 
 	private void Start() {
