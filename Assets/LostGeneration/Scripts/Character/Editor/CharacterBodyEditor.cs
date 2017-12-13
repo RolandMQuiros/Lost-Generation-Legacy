@@ -49,7 +49,7 @@ public class CharacterBodyEditor : Editor {
         toDetach.ForEach(a => _target.Detach(a) );
         
         EditorGUILayout.BeginHorizontal();
-        _newAttachment = (SkinnedMeshRenderer)EditorGUILayout.ObjectField(_newAttachment, typeof(SkinnedMeshRenderer), true);
+        _newAttachment = (SkinnedMeshRenderer)EditorGUILayout.ObjectField(_newAttachment, typeof(SkinnedMeshRenderer), false);
         if (GUILayout.Button("+", GUILayout.MaxWidth(16f)) && _newAttachment != null) {
             _target.Attach(_newAttachment);
             _newAttachment = null;

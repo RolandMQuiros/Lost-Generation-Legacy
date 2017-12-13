@@ -1,0 +1,14 @@
+<BlendShapeGroup xmlns="MarkLight">
+    <List Items="{Sliders}" Orientation="Vertical" CanSelect="True">
+        <ListItem IsTemplate="True">
+            <Label Width="40%" Text="{#Item.Name}" Alignment="Left"/> 
+            <Slider Width="60%" Value="{#Item.Value}" Min="0.0" Max="1.0" Alignment="Right"/>
+        </ListItem> 
+    </List>
+    <List Items="{Buttons}" Orientation="Vertical" CanSelect="True">
+        <ListItem IsTemplate="True">
+            <Label Width="40%" Text="{#Item.Name}" Alignment="Left"/> 
+            <Button Width="60%" Alignment="Right" Click="ButtonClick"/>
+        </ListItem> 
+    </List>
+</BlendShapeGroup>

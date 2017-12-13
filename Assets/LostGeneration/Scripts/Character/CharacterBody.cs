@@ -2,8 +2,9 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using Sirenix.OdinInspector;
 
-public class CharacterBody : MonoBehaviour, ISerializationCallbackReceiver {
+public class CharacterBody : SerializedMonoBehaviour {
     public Transform Skeleton {
         get { return _skeleton; }
         set { _skeleton = value; }
@@ -14,27 +15,22 @@ public class CharacterBody : MonoBehaviour, ISerializationCallbackReceiver {
     }
 
     public IEnumerable<SkinnedMeshRenderer> Attachments {
-        get { return _attachments; }
+        get { return _attachments.Where(a => a != null); }
     }
 
     public IDictionary<string, float> BlendShapes {
         get { return _blendShapes; }
     }
 
-    private HashSet<SkinnedMeshRenderer> _attachments = new HashSet<SkinnedMeshRenderer>();
-    private Dictionary<string, float> _blendShapes = new Dictionary<string, float>();
-
-    
+    [SerializeField]private HashSet<SkinnedMeshRenderer> _attachments = new HashSet<SkinnedMeshRenderer>();
+    [SerializeField]private Dictionary<string, float> _blendShapes = new Dictionary<string, float>();
     [SerializeField]private Transform _skeleton;
     [SerializeField]private List<Transform> _controlBones = new List<Transform>();
 
-    #region SerializableCollections
-    [SerializeField]private List<SkinnedMeshRenderer> _serialAttachments = new List<SkinnedMeshRenderer>();
-    [SerializeField]private List<string> _serialBlendShapeKeys = new List<string>();
-    [SerializeField]private List<float> _serialBlendShapeWeights = new List<float>();
-    #endregion
-
     public void Attach(SkinnedMeshRenderer mesh, bool destroyOldParent = true) {
+        if (mesh == null) {
+            throw new NullReferenceException();
+        }
         if (!_attachments.Contains(mesh)) {
             GameObject oldParent = mesh.transform.parent.gameObject;
 
@@ -123,28 +119,6 @@ public class CharacterBody : MonoBehaviour, ISerializationCallbackReceiver {
             }
         }
     }
-
-    #region ISerializationCallbackReceiver
-    public void OnBeforeSerialize() {
-        _serialBlendShapeKeys.Clear();
-        _serialBlendShapeWeights.Clear();
-
-        foreach (KeyValuePair<string, float> pair in _blendShapes) {
-            _serialBlendShapeKeys.Add(pair.Key);
-            _serialBlendShapeWeights.Add(pair.Value);
-        }
-        _serialAttachments = new List<SkinnedMeshRenderer>(_attachments);
-    }
-
-    public void OnAfterDeserialize() {
-        _blendShapes = new Dictionary<string, float>();
-        for (int s = 0; s < _serialBlendShapeKeys.Count; s++) {
-            _blendShapes.Add(_serialBlendShapeKeys[s], _serialBlendShapeWeights[s]);
-        }
-        _attachments = new HashSet<SkinnedMeshRenderer>(_serialAttachments);
-    }
-    
-    #endregion
 
     #region MonoBehaviour
     private void Awake() {
