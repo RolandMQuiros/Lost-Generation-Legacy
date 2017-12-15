@@ -5,17 +5,22 @@ using UnityEngine.EventSystems;
 using MarkLight;
 using MarkLight.Views.UI;
 
-public class BlendShapeGroup : UIView {
-    public _string Path;
-    public _string Name;
-    public _bool IsWeight;
-    public _float Weight;
-    public ObservableList<BlendShapeGroup> Sliders = new ObservableList<BlendShapeGroup>();
-    public ObservableList<BlendShapeGroup> Buttons = new ObservableList<BlendShapeGroup>();
+public class BlendShapeData {
+    public string Path;
+    public string Name;
+    public bool IsWeight;
+    public float Weight;
+    public List<BlendShapeData> Sliders = new List<BlendShapeData>();
+    public List<BlendShapeData> Buttons = new List<BlendShapeData>();
     
-    public BlendShapeGroup(string path, string name, bool isWeight, float weight = 0f) {
-        Path = new _string() { Value = path };
-        Name = new _string() { Value = name };
-        IsWeight = new _bool() { Value = isWeight };
+    public BlendShapeData(string path, string name, bool isWeight, float weight = 0f) {
+        Path = path;
+        Name = name;
+        IsWeight = isWeight;
+        Weight = weight;
     }
+}
+
+public class BlendShapeGroup : UIView {
+    public BlendShapeData Data;
 }

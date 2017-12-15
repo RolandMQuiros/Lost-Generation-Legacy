@@ -5,43 +5,41 @@ using UnityEngine.EventSystems;
 using MarkLight;
 using MarkLight.Views.UI;
 
-public class CharacterCustomizer : UIView {
+public class CharacterCustomizer : View {
     public BlendShapeGroup ActiveGroup;
-    public CharacterBody Body;
-
-    private Dictionary<string, BlendShapeGroup> _groups = new Dictionary<string, BlendShapeGroup>();
+    [SerializeField]private CharacterBody _body;
+    private Dictionary<string, BlendShapeData> _groups = new Dictionary<string, BlendShapeData>();
     
     public void ButtonClick() {
         Debug.Log("Clicked");
     }
 
-    #region MonoBehaviour
-    private void Awake() {
-        NameTree nameTree = new NameTree('.', Body.BlendShapes.Keys);
+    public override void LayoutChanged() {
+        Dictionary<string, BlendShapeData> data = new Dictionary<string, BlendShapeData>();
+        NameTree nameTree = new NameTree('.', _body.BlendShapes.Keys);
 
-        Stack<BlendShapeGroup> parentStack = new Stack<BlendShapeGroup>();
-        ActiveGroup = new BlendShapeGroup("_", "", false);
-        parentStack.Push(ActiveGroup);
+        ActiveGroup.Data = new BlendShapeData("_", "_", false);
+        data["_"] = ActiveGroup.Data;
 
         foreach (string path in nameTree) {
-            string parent = nameTree.GetParent(path);
+            string parentPath = nameTree.GetParent(path);
+            if (parentPath.Length == 0) {
+                parentPath = "_";
+            }
+
             string name = nameTree.GetName(path);
-            bool isWeight = !nameTree.IsLeaf(path);
-            
-            BlendShapeGroup group = new BlendShapeGroup(path, name, isWeight);
+            bool isWeight = nameTree.IsLeaf(path);
+            BlendShapeData current = new BlendShapeData(path, name, isWeight);
+            data[path] = current;
 
-            if (parentStack.Count > 0 && parent == nameTree.GetParent(parentStack.Peek().Path)) {
-                parentStack.Pop();
+            BlendShapeData parent;
+            if (data.TryGetValue(parentPath, out parent)) {
+                if (isWeight) {
+                    parent.Sliders.Add(current);
+                } else {
+                    parent.Buttons.Add(current);
+                }
             }
-
-            if (isWeight) {
-                parentStack.Peek().Sliders.Add(group);
-            } else {
-                parentStack.Peek().Buttons.Add(group);
-                parentStack.Push(group);
-            }
-            _groups[path] = group;
         }
     }
-    #endregion
 }
