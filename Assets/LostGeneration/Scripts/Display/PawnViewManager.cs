@@ -23,6 +23,7 @@ namespace LostGen.Display {
         [SerializeField]private PlayerTimelineController _timelines;
         public PawnViewEvent PawnViewAdded;
         public PawnViewEvent PawnViewRemoved;
+        public UnityEvent MessagesFinished;
 
         #endregion EditorFields
 
@@ -110,9 +111,14 @@ namespace LostGen.Display {
         /// Runs every Pawn's HandleMessage coroutine simultaneously
         /// </summary>
         public void HandleMessages() {
-            this.WaitForCoroutines(
+            StartCoroutine(RunMessageCoroutines());
+        }
+
+        private IEnumerator RunMessageCoroutines() {
+            yield return this.WaitForCoroutines(
                 _pawnViews.Values.Select(v => v.ProcessMessages())
             );
+            MessagesFinished.Invoke();
         }
     }
 }

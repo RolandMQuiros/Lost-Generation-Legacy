@@ -11,38 +11,39 @@ namespace LostGen.Display {
         [SerializeField]private PlayerSkillController _skillController;
         [SerializeField]private GameObject _buttonPrefab;
         [SerializeField]private Transform _buttonParent;
-        private List<SkillButton> _buttons = new List<SkillButton>();
+        private List<GameObject> _pool = new List<GameObject>();
+        private Dictionary<Skill, Button> _buttons = new Dictionary<Skill, Button>(); 
 
         public void Build(Combatant combatant)
         {
             IEnumerable<Skill> skills = combatant.Pawn.GetComponents<Skill>();
             if (!skills.Any()) {
-                _buttons.ForEach(button => button.gameObject.SetActive(false));
+                _pool.ForEach(button => button.SetActive(false));
             }
             else {
-                int buttonIdx = 0;
                 foreach (Skill skill in combatant.Pawn.GetComponents<Skill>()) {
-                    SkillButton skillButton;
-                    if (buttonIdx < _buttons.Count) {
-                        skillButton = _buttons[buttonIdx];
-                    } else {
-                        GameObject buttonObj = GameObject.Instantiate(_buttonPrefab, _buttonParent);
-                        skillButton = buttonObj.GetComponent<SkillButton>();
-                        skillButton.SkillActivated += _skillController.SetActiveSkill;
-                        _buttons.Add(skillButton);
+                    Button button;
+                    if (_buttons.TryGetValue(skill, out button)) {
+                        GameObject buttonObj = _pool.FirstOrDefault(b => !b.activeSelf) ??
+                            GameObject.Instantiate(_buttonPrefab, _buttonParent);
+                        button = buttonObj.GetComponent<Button>();
+                        button.onClick.AddListener(() => { _skillController.SetActiveSkill(skill); });
+                        _buttons[skill] = button;
                     }
                     
-                    skillButton.Skill = skill;
-                    skillButton.gameObject.SetActive(true);
-                    buttonIdx++;
+                    button.gameObject.SetActive(true);
                 }
-
-                _buttons.ForEach(button => button.CheckActionPoints());
+                CheckActionPoints();
             }
         }
 
         public void CheckActionPoints() {
-            _buttons.ForEach(button => button.CheckActionPoints());
+            foreach (KeyValuePair<Skill, Button> pair in _buttons) {
+                ActionPoints actionPoints = pair.Key.Pawn.GetComponent<ActionPoints>();
+                if (actionPoints != null) {
+                    pair.Value.interactable = pair.Key.ActionPoints <= actionPoints.Current;
+                }
+            }
         }
 
         #region MonoBehaviour

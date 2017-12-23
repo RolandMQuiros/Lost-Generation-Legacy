@@ -35,20 +35,16 @@ namespace LostGen.Model {
                 SortNode<T> current = open.Min();
                 open.Remove(current);
 
-                if ((maxDepth == -1 || current.Level < maxDepth)) {
+                if ((maxDepth == -1 || current.Level < maxDepth) &&
+                    (maxCost == -1 || current.GScore <= maxCost)) {
                     foreach (T neighbor in current.Node.GetNeighbors()) {
-                        if (domain.Contains(neighbor)) {
-                            continue;
-                        }
-
+                        if (domain.Contains(neighbor)) { continue; }
                         int tentativeGScore = current.GScore + current.Node.GetEdgeCost(neighbor);
-
                         if (maxCost == -1 || tentativeGScore <= maxCost) {
-                            domain.Add(neighbor);                            
+                            domain.Add(neighbor);
                             open.Add(new SortNode<T>() {
                                 Node = neighbor,
                                 GScore = tentativeGScore,
-                                FScore = tentativeGScore,
                                 Level = current.Level + 1
                             });
                         }
@@ -63,8 +59,7 @@ namespace LostGen.Model {
             HashSet<T> visited = new HashSet<T>();
             
             HashSet<SortNode<T>> openSet = new HashSet<SortNode<T>>();
-            Dictionary<T, SortNode<T>> openGraphNodes = new Dictionary<T, SortNode<T>>();
-            
+            Dictionary<T, SortNode<T>> openGraphNodes = new Dictionary<T, SortNode<T>>();          
             Dictionary<T, T> cameFrom = new Dictionary<T, T>();
 
             Stack<T> path = new Stack<T>();

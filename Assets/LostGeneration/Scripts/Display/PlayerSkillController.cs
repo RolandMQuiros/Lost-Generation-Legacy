@@ -16,7 +16,6 @@ namespace LostGen.Display {
         public Skill ActiveSkill {
             get { return _activeSkill; }
         }
-
         public SkillEvent SkillActivated;
         public SkillEvent SkillFired;
 
