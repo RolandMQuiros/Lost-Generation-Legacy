@@ -230,6 +230,10 @@ namespace LostGen.Model {
                                   .Cast<T>();
         }
 
+        public IEnumerable<PawnComponent> GetComponents() {
+            return _componentOrder;
+        }
+
         public T RequireComponent<T>() where T : PawnComponent {
             T component = GetComponent<T>();
             if (component == null) {

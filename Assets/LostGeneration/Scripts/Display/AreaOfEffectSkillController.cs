@@ -6,7 +6,7 @@ using LostGen.Model;
 
 namespace LostGen.Display {
 
-	public class SkillSelector : MonoBehaviour {
+	public class AreaOfEffectSkillController : MonoBehaviour {
 		private Skill _skill;
 		private AreaOfEffectSkill _aoe;
 		private RangedSkill _ranged;

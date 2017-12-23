@@ -10,7 +10,7 @@ namespace LostGen.Display {
 	/// instead of events.
 	/// </summary>
 	[RequireComponent(typeof(CombatantAnimator))]
-	public class CombatantActionView : MonoBehaviour {
+	public class PawnActionPreviewer : MonoBehaviour {
 		#region EditorFields
 		[SerializeField] float _moveDuration = 0.1f;
 		#endregion EditorFields

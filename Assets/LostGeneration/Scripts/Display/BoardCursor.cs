@@ -25,13 +25,17 @@ namespace LostGen.Display {
 		[Tooltip("The cursor's current Point on the Board")]
 		[SerializeField]private Point _boardPoint;
 		[Tooltip("Called when the player taps and releases")]
-		[SerializeField]private BoardCursorEvent Clicked;
+		[SerializeField]private BoardCursorEvent _clicked;
+		public event Action<Point> Clicked;
 		[Tooltip("Called when the player taps down")]
-		[SerializeField]private BoardCursorEvent TappedDown;
+		[SerializeField]private BoardCursorEvent _tappedDown;
+		public event Action<Point> TappedDown;
 		[Tooltip("Called when the player releases a tap")]
-		[SerializeField]private BoardCursorEvent TappedUp;
+		[SerializeField]private BoardCursorEvent _tappedUp;
+		public event Action<Point> TappedUp;
 		[Tooltip("Called when the cursor's position moves")]
-		[SerializeField]private BoardCursorEvent Moved;
+		[SerializeField]private BoardCursorEvent _moved;
+		public event Action<Point> Moved;
 		private BoxCollider _clickCollider;
 		
 		/// <summary>This cursor's <see cref="Point"/> on the <see cref="Board"/></summary>
@@ -56,7 +60,8 @@ namespace LostGen.Display {
 
 		private void OnMoved(Point point) {
 			_boardPoint = point;
-			Moved.Invoke(_boardPoint);
+			_moved.Invoke(_boardPoint);
+			if (Moved != null) { Moved(_boardPoint); }
 			if (_pointer != null) {
 				_pointer.transform.position = PointVector.ToVector(_boardPoint);
 			}
@@ -66,9 +71,13 @@ namespace LostGen.Display {
 		private void Awake() {
 			_clickCollider = GetComponent<BoxCollider>();
 			foreach (IBoardCursorController controller in GetComponents<IBoardCursorController>()) {
-				controller.Clicked    += Clicked.Invoke;
-				controller.TappedDown += TappedDown.Invoke;
-				controller.TappedUp   += TappedUp.Invoke;
+				controller.Clicked    += p => { if (Clicked != null) Clicked(p); };
+				controller.TappedDown += p => { if (TappedDown != null) TappedDown(p); };
+				controller.TappedUp   += p => { if (TappedUp != null) TappedUp(p); };
+
+				controller.Clicked    += _clicked.Invoke;
+				controller.TappedDown += _tappedDown.Invoke;
+				controller.TappedUp   += _tappedUp.Invoke;
 				controller.Moved      += OnMoved;
 			}
 		}

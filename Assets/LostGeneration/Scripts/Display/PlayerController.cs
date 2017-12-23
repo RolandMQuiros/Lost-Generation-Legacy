@@ -20,7 +20,7 @@ namespace LostGen.Display {
         [SerializeField]private BoardCamera _camera;
         [SerializeField]private BoardCursor _cursor;
         [SerializeField]private SkillTray _skillTray;
-        [SerializeField]private SkillSelector _skillSelector;
+        [SerializeField]private AreaOfEffectSkillController _areaOfEffectController;
         [SerializeField]private PawnViewManager _pawnViewManager;
         [SerializeField]private Button _goButton;
 
@@ -38,15 +38,21 @@ namespace LostGen.Display {
             _timelineController.ActionsAdded += OnActionsAdded;
             _timelineController.ActionInterrupted += OnActionInterrupted;
             _timelineController.AllPointsSpent += OnAllPointsSpent;
+
+            _cursor.Moved += _areaOfEffectController.SetTarget;
+            _cursor.TappedDown += _areaOfEffectController.SetTarget;
+            _cursor.TappedUp += p => { _skillController.FireActiveSkill(); };
+
+            _goButton.onClick.AddListener(Go);
         }
 
         private void OnCombatantActivated(Combatant combatant) {
             _skillTray.Build(combatant);
-            _skillSelector.ClearSkill();
+            _areaOfEffectController.ClearSkill();
         }
 
         private void OnSkillActivated(Skill skill) {
-            _skillSelector.SetSkill(skill);
+            _areaOfEffectController.SetSkill(skill);
         }
 
         private void OnSkillFired(Skill skill) {
