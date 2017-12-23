@@ -28,6 +28,7 @@ public class PlayerTimelineController : MonoBehaviour {
 		public event Action<IEnumerable<PawnAction>> ActionsAdded;
 		public event Action<PawnAction> ActionInterrupted;
 		public event Action AllPointsSpent;
+		
 		private Dictionary<Pawn, Timeline> _timelines = new Dictionary<Pawn, Timeline>();
 		private int _step = 0;
 
