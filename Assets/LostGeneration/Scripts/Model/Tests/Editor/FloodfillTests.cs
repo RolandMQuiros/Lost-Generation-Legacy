@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
-using LostGen;
+using LostGen.Model;
 
 namespace Tests {
     public class FloodfillTests {

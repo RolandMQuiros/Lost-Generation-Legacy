@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LostGen {
+namespace LostGen.Model {
     public class MoveAction : PawnAction {
         public override int Cost { get { return _cost; } }
         public Point Start { get { return _start; } }

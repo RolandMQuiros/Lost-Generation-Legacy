@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace LostGen {
+namespace LostGen.Model {
     public class DigAction : PawnAction {
         private List<Point> _pointsToDig;
         private List<BoardBlock> _blocksDug;

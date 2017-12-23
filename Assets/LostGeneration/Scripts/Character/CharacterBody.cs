@@ -126,5 +126,11 @@ public class CharacterBody : SerializedMonoBehaviour {
             throw new NullReferenceException("This CharacterModel needs a skeleton root bone!");
         }
     }
+    
+    private void OnEnable() {
+        foreach (SkinnedMeshRenderer bodyMesh in GetComponentsInChildren<SkinnedMeshRenderer>()) {
+            Attach(bodyMesh, false);
+        }
+    }
     #endregion
 }

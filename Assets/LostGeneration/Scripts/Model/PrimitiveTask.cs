@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Model {
     public abstract class PrimitiveTask : ITask {
         public abstract WorldState Preconditions { get; }
         public abstract WorldState Postconditions { get; }

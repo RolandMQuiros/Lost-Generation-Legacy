@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Model {
     /// <summary>
     /// A Skill that allows Combatants to traverse the Board in a continuous path.
     /// This class provides a graph model of the board and a method of setting the destination,

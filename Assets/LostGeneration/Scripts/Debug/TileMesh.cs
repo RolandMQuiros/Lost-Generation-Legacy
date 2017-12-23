@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using LostGen.Display;
+
 [ExecuteInEditMode]
 [RequireComponent(typeof(MeshFilter))]
 public class TileMesh : MonoBehaviour {

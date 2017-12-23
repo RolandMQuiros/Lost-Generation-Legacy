@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace LostGen {
+namespace LostGen.Model {
     public class Board {
         public IBlockManager Blocks { get { return _blocks; } }
         public IPawnManager Pawns { get { return _pawns; } }

@@ -1,52 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
-using LostGen;
+using LostGen.Model;
 
-/// <summary>
-/// Buffers messages from the LostGen model, so messages are delegated out to the view at a controllable rate.
-/// That is, this class makes sure that messages that depend on the order of actions are displayed as such.
-/// </summary>
-public class MessageBuffer {
-    public bool HasMessages {
-        get {
-            return _messages.Count > 0;
+namespace LostGen.Display {
+    /// <summary>
+    /// Buffers messages from the LostGen model, so messages are delegated out to the view at a controllable rate.
+    /// That is, this class makes sure that messages that depend on the order of actions are displayed as such.
+    /// </summary>
+    public class MessageBuffer {
+        public bool HasMessages {
+            get {
+                return _messages.Count > 0;
+            }
         }
-    }
-    private Queue<IPawnMessage> _messages = new Queue<IPawnMessage>();
+        private Queue<IPawnMessage> _messages = new Queue<IPawnMessage>();
 
-    public void HandleMessage(object sender, IPawnMessage message) {
-        _messages.Enqueue(message);
-    }
-
-    public void PushMessages(IEnumerable<IPawnMessage> messages) {
-        foreach (IPawnMessage message in messages) {
+        public void HandleMessage(object sender, IPawnMessage message) {
             _messages.Enqueue(message);
         }
-    }
 
-    public void PopMessages(Queue<IPawnMessage> popped = null) {
-        HashSet<Pawn> actingPawns = new HashSet<Pawn>();
-        bool stopPopping = false;
-
-        while(_messages.Count > 0 && !stopPopping) {
-            IPawnMessage next = _messages.Dequeue();
-
-            if (next.Source != null) {
-                actingPawns.Add(next.Source);
+        public void PushMessages(IEnumerable<IPawnMessage> messages) {
+            foreach (IPawnMessage message in messages) {
+                _messages.Enqueue(message);
             }
+        }
 
-            // If the next message is critical or one of the previous messages acted on the same target,
-            // then stop popping
-            if (next.IsCritical ||
-                (next.Target != null && !actingPawns.Add(next.Target))) {
-                stopPopping = true;
-            }
+        public void PopMessages(Queue<IPawnMessage> popped = null) {
+            HashSet<Pawn> actingPawns = new HashSet<Pawn>();
+            bool stopPopping = false;
 
-            if (popped != null)
-            {
-                popped.Enqueue(next);
+            while(_messages.Count > 0 && !stopPopping) {
+                IPawnMessage next = _messages.Dequeue();
+
+                if (next.Source != null) {
+                    actingPawns.Add(next.Source);
+                }
+
+                // If the next message is critical or one of the previous messages acted on the same target,
+                // then stop popping
+                if (next.IsCritical ||
+                    (next.Target != null && !actingPawns.Add(next.Target))) {
+                    stopPopping = true;
+                }
+
+                if (popped != null)
+                {
+                    popped.Enqueue(next);
+                }
             }
         }
     }
 }
-

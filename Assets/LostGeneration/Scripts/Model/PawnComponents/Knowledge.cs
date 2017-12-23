@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using LostGen.Model;
 
 namespace LostGen.Component {
     public class Knowledge : PawnComponent {

@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Model {
 	public class StandardBlockManager : IBlockManager {
 		private BoardBlock[,,] _blocks;
 		public Point Size {

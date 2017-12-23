@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace LostGen {
+namespace LostGen.Model {
     public class Pawn : IComparable<Pawn> {
         /// <summary>Counter used to generate unique Pawn ID</summary>
         private static ulong _idCounter;

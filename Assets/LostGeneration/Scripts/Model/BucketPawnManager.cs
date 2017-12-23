@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Model {
     public class BucketPawnManager : IPawnManager {
         private class Bucket {
             private HashSet<Pawn> _pawns = new HashSet<Pawn>();

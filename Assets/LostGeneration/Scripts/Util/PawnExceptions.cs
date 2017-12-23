@@ -1,4 +1,5 @@
 using System;
+using LostGen.Model;
 
 namespace LostGen {
     /// <summary>

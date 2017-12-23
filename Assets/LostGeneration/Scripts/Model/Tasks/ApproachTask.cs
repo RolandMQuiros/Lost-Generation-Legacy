@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Model {
     // Rolls downhill until it hits a local minima
     public class ApproachTask : PrimitiveTask {
         private Pawn _pawn;

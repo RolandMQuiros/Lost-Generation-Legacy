@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using NUnit.Framework;
-using LostGen;
+using LostGen.Model;
 
 using UnityEngine;
 

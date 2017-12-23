@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Model {
     public class FallMessage : IPawnMessage {
         public Pawn Source { get; private set; }
         public Pawn Target { get; private set; }

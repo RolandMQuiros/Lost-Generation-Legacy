@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using NUnit.Framework;
-using LostGen;
+using LostGen.Model;
 
 namespace Tests {
     public class TeamTests {

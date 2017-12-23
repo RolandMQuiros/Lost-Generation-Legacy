@@ -1,6 +1,6 @@
 using System;
 
-namespace LostGen {
+namespace LostGen.Model {
     public class ActionPoints : PawnComponent {
         public int Current {
             get { return _current; }

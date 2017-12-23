@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace LostGen
+namespace LostGen.Model
 {
     /// <summary>
     /// A buffer of PawnActions that the player can scroll through, previewing the results of each action.

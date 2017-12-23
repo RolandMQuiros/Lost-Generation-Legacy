@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Model {
     public class WorldState : HashSet<KeyValuePair<string, object>> {
         public WorldState() { }
         public WorldState(IEnumerable<KeyValuePair<string, object>> other) : base (other) { }

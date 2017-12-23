@@ -1,4 +1,4 @@
-﻿namespace LostGen {
+﻿namespace LostGen.Model {
 	public class PawnComponent {
 		public Pawn Pawn { get; private set; }
 		public bool IsEnabled = true;

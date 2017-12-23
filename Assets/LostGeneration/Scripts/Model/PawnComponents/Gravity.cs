@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Model {
     public class Gravity : PawnComponent {
         public bool HasGravity = true;
         public AxisDirection GravityDirection {

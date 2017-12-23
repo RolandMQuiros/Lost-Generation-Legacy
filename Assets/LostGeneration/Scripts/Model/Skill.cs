@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace LostGen {
+namespace LostGen.Model {
     /// <summary>
     /// Base class for Combatant Skills.  Skills generate the Actions that Pawns execute with every step of the board.
     /// 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Model {
     public abstract class RangedSkill : AreaOfEffectSkill {
         public virtual Point Target {
             get { return _target; }

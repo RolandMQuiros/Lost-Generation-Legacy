@@ -1,6 +1,0 @@
-<CharacterCustomizer xmlns="MarkLight">
-    <UserInterface>
-        <BlendShapeGroup Id="ActiveGroup"/>
-    </UserInterface>
-    <EventSystem/>
-</CharacterCustomizer>

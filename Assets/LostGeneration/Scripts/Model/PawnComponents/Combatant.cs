@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Model {
     public class Combatant : PawnComponent {
         #region Stats
         public ActionPoints ActionPoints { get { return _actionPoints; } }

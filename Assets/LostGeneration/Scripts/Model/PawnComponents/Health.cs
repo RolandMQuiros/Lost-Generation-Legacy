@@ -1,6 +1,6 @@
 using System;
 
-namespace LostGen {
+namespace LostGen.Model {
     public class Health : PawnComponent {
         public int Current {
             get { return _current; }

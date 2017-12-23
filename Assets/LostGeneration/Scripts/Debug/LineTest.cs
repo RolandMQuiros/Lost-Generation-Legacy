@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using LostGen;
+
+using LostGen.Model;
+using LostGen.Display;
 
 public class LineTest : MonoBehaviour {
 	private BlockMesh _mesh;

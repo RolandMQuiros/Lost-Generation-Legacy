@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace LostGen {
+namespace LostGen.Model {
     public static class GraphMethods {
         public delegate int Heuristic<T>(T start, T end);
 

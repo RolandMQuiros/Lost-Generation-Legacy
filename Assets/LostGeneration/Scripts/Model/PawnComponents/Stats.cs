@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Model {
     public class PawnStats : PawnComponent {
         public Stats Base {
             get { return _baseStats; }

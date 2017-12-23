@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace LostGen {
+namespace LostGen.Model {
     public class DamageMessage : IPawnMessage {
         public Pawn Source { get; private set; }
         public Pawn Target { get; private set; }

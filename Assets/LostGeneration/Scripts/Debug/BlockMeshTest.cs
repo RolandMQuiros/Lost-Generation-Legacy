@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
-using LostGen;
+using LostGen.Model;
+using LostGen.Display;
 
 public class BlockMeshTest : MonoBehaviour {
 	[SerializeField]private BlockMesh _blockMesh;

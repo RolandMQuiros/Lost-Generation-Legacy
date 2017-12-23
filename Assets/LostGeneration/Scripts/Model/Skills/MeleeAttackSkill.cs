@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Model {
     public class MeleeAttackSkill : DirectionalSkill {
         private List<Point> _areaOfEffect;
         private Dictionary<CardinalDirection, Point[]> _transforms = new Dictionary<CardinalDirection, Point[]>();

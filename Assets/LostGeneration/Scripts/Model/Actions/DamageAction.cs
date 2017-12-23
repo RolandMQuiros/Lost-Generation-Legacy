@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Model {
     public class DamageAction : PawnAction {
         public int Amount { get; private set; }
         public Pawn Target { get; private set; }

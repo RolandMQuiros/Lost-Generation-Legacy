@@ -1,6 +1,6 @@
 using System;
 
-namespace LostGen {
+namespace LostGen.Model {
     public struct BoardBlock : IEquatable<BoardBlock> {
         public Point Point {
             get { return _point; }

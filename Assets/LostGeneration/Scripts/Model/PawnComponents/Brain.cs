@@ -115,7 +115,7 @@ coded in.
 
 -------
 */
-namespace LostGen {
+namespace LostGen.Model {
     public class Brain : PawnComponent {
 
     }

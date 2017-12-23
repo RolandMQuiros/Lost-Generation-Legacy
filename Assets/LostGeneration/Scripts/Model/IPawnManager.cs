@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Model {
     public interface IPawnManager {
         IEnumerable<Pawn> Ordered { get; }
         event Action<Pawn> Added;

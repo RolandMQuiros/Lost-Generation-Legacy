@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
 
-using LostGen;
+using LostGen.Model;
 
 namespace Tests.Tasks {
 

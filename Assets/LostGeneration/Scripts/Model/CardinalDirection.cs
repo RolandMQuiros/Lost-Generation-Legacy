@@ -1,4 +1,4 @@
-﻿namespace LostGen {
+﻿namespace LostGen.Model {
     public enum Direction {
         East = 0,
         SouthEast = 1,

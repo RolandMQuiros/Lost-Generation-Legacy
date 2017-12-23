@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Model {
     public abstract class PawnAction {
         public virtual Pawn Owner { get; protected set; }
         public virtual int Cost { get; protected set; }

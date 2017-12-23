@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using LostGen;
+using LostGen.Model;
 
 namespace Tests.Integration {
     [TestFixture]

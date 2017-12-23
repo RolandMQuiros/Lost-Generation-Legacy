@@ -1,4 +1,4 @@
-﻿namespace LostGen {
+﻿namespace LostGen.Model {
     public interface IPawnMessage {
         Pawn Source { get; }
         Pawn Target { get; }

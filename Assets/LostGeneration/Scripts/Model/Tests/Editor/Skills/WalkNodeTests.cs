@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using System.Linq;
 using System.Collections.Generic;
-using LostGen;
+using LostGen.Model;
 
 namespace Tests {
 	public class WalkNodeTests {

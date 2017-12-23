@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Model {
     public class AttackAction : PawnAction {
         public override int Cost { get { return 2; } } // TODO: Change this shit when Inventory is implemented
         private List<Point> _areaOfEffect;

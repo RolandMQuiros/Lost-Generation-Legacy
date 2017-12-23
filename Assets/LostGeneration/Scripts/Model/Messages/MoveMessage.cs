@@ -1,6 +1,6 @@
 using System;
 
-namespace LostGen {
+namespace LostGen.Model {
     public class MoveMessage : IPawnMessage {
         public Pawn Source { get; private set; }
         public Pawn Target { get; private set; }

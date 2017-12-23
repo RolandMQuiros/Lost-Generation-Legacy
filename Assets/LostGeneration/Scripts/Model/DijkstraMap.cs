@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Model {
 
 	/// <summary>
 	/// 	A general purpose heatmap algorithm used to rate positions on the <see cref="Board"/> by some measure of

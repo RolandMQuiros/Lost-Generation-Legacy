@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Model {
     public interface IBlockManager {
         Point Size { get; }
         event Action<Dictionary<BoardBlock, BoardBlock>> Changed;

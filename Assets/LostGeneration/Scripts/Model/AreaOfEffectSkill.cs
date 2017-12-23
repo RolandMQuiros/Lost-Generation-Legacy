@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace LostGen {
+namespace LostGen.Model {
     public abstract class AreaOfEffectSkill : Skill {
         public override abstract int ActionPoints { get; }
         public event Action AreaOfEffectChanged;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using LostGen;
+using LostGen.Model;
 
 namespace Tests {
     public class BoardCommon {

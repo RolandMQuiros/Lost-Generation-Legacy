@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
-using LostGen;
+using LostGen.Model;
+using LostGen.Display;
+
 public class BoardTest : MonoBehaviour
 {   
     public Point BoardSize;

@@ -5,7 +5,7 @@ using UnityEditor;
 using NUnit.Framework;
 using System.Collections.Generic;
 
-using LostGen;
+using LostGen.Model;
 
 namespace Tests.PawnComponents
 {

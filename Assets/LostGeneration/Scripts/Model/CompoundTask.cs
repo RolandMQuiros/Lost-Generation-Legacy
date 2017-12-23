@@ -4,7 +4,7 @@ using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Model {
     public class CompoundTask : ITask, IEnumerable<ITask> {
         public delegate int StateScore(WorldState from, WorldState to); 
         private class StateNode : IGraphNode<StateNode> {

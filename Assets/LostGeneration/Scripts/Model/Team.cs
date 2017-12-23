@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace LostGen {
+namespace LostGen.Model {
     public struct Team {
         private long _team;
         private long _friendly;

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Model {
     public class WalkNode : BlockNode {
         private bool _canWalkDiagonally;
         private Dictionary<Point, WalkNode> _neighbors = new Dictionary<Point, WalkNode>();

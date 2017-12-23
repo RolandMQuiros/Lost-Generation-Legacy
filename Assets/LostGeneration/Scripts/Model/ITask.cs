@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Model {
     public interface ITask {
         WorldState Preconditions { get; }
         WorldState Postconditions { get; }

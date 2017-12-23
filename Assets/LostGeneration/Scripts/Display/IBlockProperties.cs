@@ -1,3 +1,5 @@
-public interface IBlockProperties {
-    AutoTile[] SideTiles { get; }
+namespace LostGen.Display {
+    public interface IBlockProperties {
+        AutoTile[] SideTiles { get; }
+    }
 }

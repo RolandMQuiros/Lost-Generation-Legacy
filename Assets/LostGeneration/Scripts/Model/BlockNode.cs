@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Model {
     public abstract class BlockNode : IGraphNode<BlockNode> {
         public Board Board { get; private set; }
         public Point Point { get; protected set; }

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Model {
     public class DigMessage : IPawnMessage {
         public Pawn Source { get; private set; }
         public Pawn Target { get; private set; }

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 /*
-namespace LostGen {
+namespace LostGen.Model {
     public class CharacterController {
         private Planner _planner = new Planner(StateOffset.Heuristic);
         private Combatant _owner;
