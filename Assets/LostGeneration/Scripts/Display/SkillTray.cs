@@ -17,24 +17,27 @@ namespace LostGen.Display {
         public void Build(Combatant combatant)
         {
             IEnumerable<Skill> skills = combatant.Pawn.GetComponents<Skill>();
-            if (!skills.Any()) {
-                _pool.ForEach(button => button.SetActive(false));
-            }
-            else {
-                foreach (Skill skill in combatant.Pawn.GetComponents<Skill>()) {
-                    Button button;
-                    if (_buttons.TryGetValue(skill, out button)) {
-                        GameObject buttonObj = _pool.FirstOrDefault(b => !b.activeSelf) ??
-                            GameObject.Instantiate(_buttonPrefab, _buttonParent);
-                        button = buttonObj.GetComponent<Button>();
-                        button.onClick.AddListener(() => { _skillController.SetActiveSkill(skill); });
-                        _buttons[skill] = button;
+            
+            _pool.ForEach(button => button.SetActive(false));
+            foreach (Skill skill in combatant.Pawn.GetComponents<Skill>()) {
+                Button button;
+                if (!_buttons.TryGetValue(skill, out button)) {
+                    GameObject buttonObj = _pool.FirstOrDefault(b => !b.activeInHierarchy);
+                    if (buttonObj == null) {
+                        buttonObj = GameObject.Instantiate(_buttonPrefab, _buttonParent);
+                        _pool.Add(buttonObj);
                     }
-                    
-                    button.gameObject.SetActive(true);
+                    button = buttonObj.GetComponent<Button>();
+                    button.onClick.AddListener(() => { _skillController.SetActiveSkill(skill); });
+                    _buttons[skill] = button;
+
+                    Text text = button.GetComponentInChildren<Text>();
+                    text.text = skill.Name;
                 }
-                CheckActionPoints();
+                
+                button.gameObject.SetActive(true);
             }
+            CheckActionPoints();
         }
 
         public void CheckActionPoints() {

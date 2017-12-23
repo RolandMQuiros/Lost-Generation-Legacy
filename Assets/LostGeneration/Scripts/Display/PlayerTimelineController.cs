@@ -23,12 +23,11 @@ public class PlayerTimelineController : MonoBehaviour {
 				return maxStep;
 			}
 		}
-		[SerializeField]private PawnActionEvent _actionDone;
-		[SerializeField]private PawnActionEvent _actionUndone;
-		[SerializeField]private PawnActionsEvent _actionsAdded;
-		[SerializeField]private PawnActionEvent _actionInterrupted;
-		[SerializeField]private BooleanEvent _allPointsSpent;
-
+		public event Action<PawnAction> ActionDone;
+		public event Action<PawnAction> ActionUndone;
+		public event Action<IEnumerable<PawnAction>> ActionsAdded;
+		public event Action<PawnAction> ActionInterrupted;
+		public event Action AllPointsSpent;
 		private Dictionary<Pawn, Timeline> _timelines = new Dictionary<Pawn, Timeline>();
 		private int _step = 0;
 
@@ -84,7 +83,7 @@ public class PlayerTimelineController : MonoBehaviour {
 				{
 					pawn.RequireComponent<ActionPoints>().Current -= undone[i].Cost;
 					// Unwind the deleted actions
-					_actionUndone.Invoke(undone[i]);
+					if (ActionUndone != null) { ActionUndone(undone[i]); }
 				}
 			}
 		}
@@ -100,7 +99,7 @@ public class PlayerTimelineController : MonoBehaviour {
 
 					for (int i = 0; i < undone.Count; i++) {
 						// Unwind the deleted actions
-						_actionUndone.Invoke(undone[i]);
+						if (ActionUndone != null) { ActionUndone(undone[i]); }
 					}
 
 					// Push the new action
@@ -117,7 +116,7 @@ public class PlayerTimelineController : MonoBehaviour {
 			}
 
 			if (added.Count > 0) {
-				_actionsAdded.Invoke(added);
+				if (ActionsAdded != null) { ActionsAdded(added); }
 				CheckPointsSpent();
 			}
 		}
@@ -148,7 +147,7 @@ public class PlayerTimelineController : MonoBehaviour {
 						else {
 							undone.Undo();
 							actionPoints.Current += undone.Cost;
-							_actionUndone.Invoke(undone);
+							if (ActionUndone != null) { ActionUndone(undone); }
 						}
 					}
 
@@ -158,7 +157,7 @@ public class PlayerTimelineController : MonoBehaviour {
 						else {
 							done.Do();
 							actionPoints.Current -= done.Cost;
-							_actionDone.Invoke(done);
+							if (ActionDone != null) { ActionDone(done); }
 						}
 					}
 				}
@@ -166,15 +165,15 @@ public class PlayerTimelineController : MonoBehaviour {
 		}
 
 		public void AttachActionView(CombatantActionView view) {
-			_actionDone.AddListener(view.OnActionDone);
-			_actionUndone.AddListener(view.OnActionUndone);
-			_actionsAdded.AddListener(view.OnActionsAdded);
+			ActionDone += view.OnActionDone;
+			ActionUndone += view.OnActionUndone;
+			ActionsAdded += view.OnActionsAdded;
 		}
 
 		public void DetachActionView(CombatantActionView view) {
-			_actionDone.RemoveListener(view.OnActionDone);
-			_actionUndone.RemoveListener(view.OnActionUndone);
-			_actionsAdded.RemoveListener(view.OnActionsAdded);
+			ActionDone -= view.OnActionDone;
+			ActionUndone -= view.OnActionUndone;
+			ActionsAdded -= view.OnActionsAdded;
 		}
 
 		/// <summary>
@@ -193,7 +192,7 @@ public class PlayerTimelineController : MonoBehaviour {
 				}
 			}
 
-			_allPointsSpent.Invoke(allPointsSpent);
+			if (allPointsSpent && AllPointsSpent != null) { AllPointsSpent(); }
 		}
 
 		#region MonoBehaviour

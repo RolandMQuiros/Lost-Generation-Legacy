@@ -10,14 +10,12 @@ namespace LostGen.Display {
     [RequireComponent(typeof(PlayerTimelineController))]
     public class PlayerSkillController : MonoBehaviour
     {
-
-        [System.Serializable]
-        public class SkillEvent : UnityEvent<Skill> { }
         public Skill ActiveSkill {
             get { return _activeSkill; }
         }
-        public SkillEvent SkillActivated;
-        public SkillEvent SkillFired;
+
+        public event Action<Skill> SkillActivated;
+        public event Action<Skill> SkillFired;
 
         private PlayerCombatantController _playerController;
         private PlayerTimelineController _timelineController;
@@ -36,8 +34,7 @@ namespace LostGen.Display {
                 //_activationStep = Math.Min(Math.Max(0, _timeline.Count), _timelineController.Step);
                 // Move forward all timelines for Combatants that are slower than the active Combatant
                 //_timelineController.SetSlowerStep(_activationStep + 1, _activeSkill.Pawn);
-
-                SkillActivated.Invoke(_activeSkill);
+                if (SkillActivated != null) { SkillActivated(_activeSkill); }
             }
         }
 
@@ -51,7 +48,7 @@ namespace LostGen.Display {
 
         public void DeactivateSkill() {
             _activeSkill = null;
-            SkillActivated.Invoke(null);
+            if (SkillActivated != null) { SkillActivated(null); }
         }
         
         public void OnCombatantActivated(Combatant combatant)
@@ -65,7 +62,7 @@ namespace LostGen.Display {
             if (_activeSkill != null) {
                 IEnumerable<PawnAction> actions = _activeSkill.Fire();
                 _timelineController.SetStepActions(actions);
-                SkillFired.Invoke(_activeSkill);
+                if (SkillFired != null) { SkillFired(_activeSkill); }
                 DeactivateSkill();
             }
         }

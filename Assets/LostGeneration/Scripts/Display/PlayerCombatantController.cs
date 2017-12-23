@@ -9,10 +9,7 @@ namespace LostGen.Display {
     [RequireComponent(typeof(PlayerSkillController))]
     [RequireComponent(typeof(PlayerTimelineController))]
     public class PlayerCombatantController : MonoBehaviour {
-        [Serializable]
-        public class CombatantEvent : UnityEvent<Combatant> { }
-
-        public CombatantEvent CombatantActivated;
+        public event Action<Combatant> CombatantActivated; 
         
         private PlayerSkillController _skillController;
         private PlayerTimelineController _timelines;
@@ -49,15 +46,13 @@ namespace LostGen.Display {
                         int step = Math.Min(_timelines.Step, timeline.Count);
                         _timelines.SetAllStep(step);
                     }
-
-                    CombatantActivated.Invoke(_activeCombatant);
                 }
             }
             else if (_activeCombatant != null) {
                 _activeCombatant = null;
                 _skillController.DeactivateSkill();
-                CombatantActivated.Invoke(null);
             }
+            if (CombatantActivated != null) { CombatantActivated(_activeCombatant); }
 
             return _activeCombatant;
         }
