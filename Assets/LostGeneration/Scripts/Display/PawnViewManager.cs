@@ -20,11 +20,10 @@ namespace LostGen.Display {
     public class PawnViewManager : MonoBehaviour {
         [SerializeField]private PawnView _pawnViewPrefab;
 
-        [Serializable]private class PawnViewEvent : UnityEvent<PawnView> { }
-        [SerializeField]private PawnViewEvent _pawnViewAdded;
-        [SerializeField]private PawnViewEvent _pawnViewRemoved;
-        [SerializeField]private UnityEvent _messagesFinished;
-        
+        [Serializable]public class PawnViewEvent : UnityEvent<PawnView> { }
+        public PawnViewEvent PawnViewAdded;
+        public PawnViewEvent PawnViewRemoved;
+        public UnityEvent MessagesFinished;
 
         private List<PawnViewBuilder> _builders;
         private Dictionary<Pawn, PawnView> _pawnViews = new Dictionary<Pawn, PawnView>();
@@ -53,7 +52,7 @@ namespace LostGen.Display {
             if (_pawnViews.TryGetValue(pawn, out pawnView)) {
                 _pawnViews.Remove(pawn);
                 _builders.ForEach(b => b.Detach(pawnView.gameObject, pawn));
-                _pawnViewRemoved.Invoke(pawnView);
+                PawnViewRemoved.Invoke(pawnView);
             }
         }
 
@@ -89,7 +88,7 @@ namespace LostGen.Display {
             yield return this.WaitForCoroutines(
                 _pawnViews.Values.Select(v => v.ProcessMessages())
             );
-            _messagesFinished.Invoke();
+            MessagesFinished.Invoke();
         }
     }
 }

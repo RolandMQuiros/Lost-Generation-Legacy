@@ -19,6 +19,16 @@ namespace LostGen.Model {
     /// </summary>
     public class LongWalkSkill : RangedSkill {
         public override int ActionPoints { get { return 0; } }
+        public override bool IsUsable {
+            get {
+                WalkNode currentNode = new WalkNode(_board, Pawn.Position, CanWalkDiagonally, true);
+                return
+                    currentNode
+                        .GetNeighbors()
+                        .Where(n => WalkNode.GetCost(currentNode.Point, n.Point) < _ownerPoints.Current)
+                        .Any();
+            }
+        }
         public bool CanWalkDiagonally = true;
 
         protected Board _board;

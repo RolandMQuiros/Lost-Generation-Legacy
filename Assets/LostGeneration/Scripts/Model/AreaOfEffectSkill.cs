@@ -6,6 +6,9 @@ using System.Text;
 namespace LostGen.Model {
     public abstract class AreaOfEffectSkill : Skill {
         public override abstract int ActionPoints { get; }
+        public override bool IsUsable {
+            get { return _actionPoints.Current >= 1; }
+        }
         public event Action AreaOfEffectChanged;
         private ActionPoints _actionPoints;
 
@@ -18,10 +21,6 @@ namespace LostGen.Model {
 
         public abstract IEnumerable<Point> GetAreaOfEffect();
         public override abstract IEnumerable<PawnAction> Fire();
-        
-        public override bool IsUsable() {
-            return _actionPoints.Current >= 1;
-        }
 
         protected void InvokeAreaOfEffectChange() {
             if (AreaOfEffectChanged != null) { AreaOfEffectChanged(); }

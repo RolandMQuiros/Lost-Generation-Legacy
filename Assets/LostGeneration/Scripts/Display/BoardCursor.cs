@@ -16,31 +16,30 @@ namespace LostGen.Display {
 	/// </remarks>
 	[RequireComponent(typeof(BoxCollider))]
 	public class BoardCursor : MonoBehaviour {
-		[Serializable]private class BoardCursorEvent : UnityEvent<Point> { }
-
+		#region Fields
 		[Tooltip("The cursor pointer")]
 		[SerializeField]private Transform _pointer;
 		[Tooltip("Reference to the Board")]
 		[SerializeField]private BoardRef _boardRef;
 		[Tooltip("The cursor's current Point on the Board")]
 		[SerializeField]private Point _boardPoint;
+		#endregion
+		#region Events
+		[Serializable]public class BoardCursorEvent : UnityEvent<Point> { }
 		[Tooltip("Called when the player taps and releases")]
-		[SerializeField]private BoardCursorEvent _clicked;
-		public event Action<Point> Clicked;
+		public BoardCursorEvent Clicked;
 		[Tooltip("Called when the player taps down")]
-		[SerializeField]private BoardCursorEvent _tappedDown;
-		public event Action<Point> TappedDown;
+		public BoardCursorEvent TappedDown;
 		[Tooltip("Called when the player releases a tap")]
-		[SerializeField]private BoardCursorEvent _tappedUp;
-		public event Action<Point> TappedUp;
+		public BoardCursorEvent TappedUp;
 		[Tooltip("Called when the cursor's position moves")]
-		[SerializeField]private BoardCursorEvent _moved;
-		public event Action<Point> Moved;
+		public BoardCursorEvent Moved;
+		#endregion
 		private BoxCollider _clickCollider;
 		
 		/// <summary>This cursor's <see cref="Point"/> on the <see cref="Board"/></summary>
 		/// <returns>The current <see cref="Point"/></returns>
-		public Point BoardPoint { get { return _boardPoint; } }
+		public Point BoardPoint { get { return BoardPoint; } }
 		/// <returns>The <see cref="BoardRef"/> this cursor is attached to</returns>
 		public BoardRef BoardRef { get { return _boardRef; } }
 		/// <summary>
@@ -60,8 +59,7 @@ namespace LostGen.Display {
 
 		private void OnMoved(Point point) {
 			_boardPoint = point;
-			_moved.Invoke(_boardPoint);
-			if (Moved != null) { Moved(_boardPoint); }
+			Moved.Invoke(_boardPoint);
 			if (_pointer != null) {
 				_pointer.transform.position = PointVector.ToVector(_boardPoint);
 			}
@@ -71,21 +69,13 @@ namespace LostGen.Display {
 		private void Awake() {
 			_clickCollider = GetComponent<BoxCollider>();
 			foreach (IBoardCursorController controller in GetComponents<IBoardCursorController>()) {
-				controller.Clicked    += p => { if (Clicked != null) Clicked(p); };
-				controller.TappedDown += p => { if (TappedDown != null) TappedDown(p); };
-				controller.TappedUp   += p => { if (TappedUp != null) TappedUp(p); };
-
-				controller.Clicked    += _clicked.Invoke;
-				controller.TappedDown += _tappedDown.Invoke;
-				controller.TappedUp   += _tappedUp.Invoke;
+				controller.Clicked    += Clicked.Invoke;
+				controller.TappedDown += TappedDown.Invoke;
+				controller.TappedUp   += TappedUp.Invoke;
 				controller.Moved      += OnMoved;
 			}
 		}
-
-		private void Start() {
-			ResizeClickCollider();
-		}
-
+		private void Start() { ResizeClickCollider(); }
 		#endregion MonoBehaviour
 	}
 }

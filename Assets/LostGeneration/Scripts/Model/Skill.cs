@@ -33,6 +33,6 @@ namespace LostGen.Model {
         /// Whether or not this Skill is usable based on the Pawn's current state.
         /// </summary>
         /// <returns>True if this Skill is usable, false otherwise.</returns>
-        public abstract bool IsUsable();
+        public abstract bool IsUsable { get; }
     }
 }

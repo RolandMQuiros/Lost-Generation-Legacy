@@ -7,6 +7,11 @@ using LostGen.Model;
 namespace LostGen.Display {
 
 	public class AreaOfEffectSkillController : MonoBehaviour {
+		public Skill Skill {
+			get { return _skill; }
+			set { SetSkill(value); }
+		}
+
 		private Skill _skill;
 		private AreaOfEffectSkill _aoe;
 		private RangedSkill _ranged;
@@ -16,26 +21,9 @@ namespace LostGen.Display {
 		[SerializeField]private BlockMesh _rangeMesh;
 		[SerializeField]private BlockMesh _pathMesh;
 
-		public Skill Skill {
-			get { return _skill; }
-			set { SetSkill(value); }
-		}
-
-		public void SetSkill(Skill skill)
-		{
-			if (skill == null)
-			{
-				_skill = null;
-				_aoe = null;
-				_ranged = null;
-				_directional = null;
-				
-				_areaOfEffectMesh.gameObject.SetActive(false);
-				_rangeMesh.gameObject.SetActive(false);
-				_pathMesh.gameObject.SetActive(false);
-			}
-			else if (_skill != skill)
-			{	
+		public void SetSkill(Skill skill) {
+			if (skill == null) { ClearSkill(); }
+			else {	
 				_areaOfEffectMesh.gameObject.SetActive(false);
 				_rangeMesh.gameObject.SetActive(false);
 				_pathMesh.gameObject.SetActive(false);
@@ -49,62 +37,44 @@ namespace LostGen.Display {
 				{
 					SetBlocks(_rangeMesh, _ranged.GetRange(), 1);
 					_rangeMesh.Build();
-
-					// _rangeMesh.gameObject.GetComponent<TileField>().Build(_ranged.GetRange());
-
 					_rangeMesh.gameObject.SetActive(true);
 				}
 			}
 		}
 
-		public void ClearSkill()
-		{
-			if (_skill != null)
-			{
-				_skill = null;
-				_aoe = null;
-				_ranged = null;
-				_directional = null;
-				
-				_areaOfEffectMesh.gameObject.SetActive(false);
-				_rangeMesh.gameObject.SetActive(false);
-				_pathMesh.gameObject.SetActive(false);
-			}
+		public void ClearSkill() {
+			_skill = null;
+			_aoe = null;
+			_ranged = null;
+			_directional = null;
+			
+			_areaOfEffectMesh.gameObject.SetActive(false);
+			_rangeMesh.gameObject.SetActive(false);
+			_pathMesh.gameObject.SetActive(false);
 		}
 
 		public void SetTarget(Point point)
 		{
-			if (_ranged != null)
-			{
-				if (_ranged.SetTarget(point))
-				{
+			if (_ranged != null) {
+				if (_ranged.SetTarget(point)) {
 					UpdateAreaOfEffect();
 				}
 			}
-			if (_directional != null)
-			{
+			if (_directional != null) {
 				Point delta = point - _directional.Pawn.Position;
 				Point absDelta = Point.Abs(delta);
 
 				CardinalDirection direction = _directional.Direction;
-				if (absDelta.X > absDelta.Y && absDelta.X > absDelta.Z)
-				{
+				if (absDelta.X > absDelta.Y && absDelta.X > absDelta.Z) {
 					if (delta.X > 0) { direction = CardinalDirection.East; }
 					else if (delta.X < 0) { direction = CardinalDirection.West; }
 				}
-				// else if (absDelta.Y > absDelta.X && absDelta.Y > absDelta.Z)
-				// {
-				// 	if (delta.Y > 0) { direction = CardinalDirection.East; }
-				// 	else if (delta.Y < 0) { direction = CardinalDirection.West; }
-				// }
-				else if (absDelta.Z > absDelta.X && absDelta.Z > absDelta.Y)
-				{
+				else if (absDelta.Z > absDelta.X && absDelta.Z > absDelta.Y) {
 					if (delta.Z > 0) { direction = CardinalDirection.North; }
 					else if (delta.Z < 0) { direction = CardinalDirection.South; }
 				}
 				
-				if (direction != _directional.Direction)
-				{
+				if (direction != _directional.Direction) {
 					_directional.SetDirection(direction);
 					UpdateAreaOfEffect();
 				}

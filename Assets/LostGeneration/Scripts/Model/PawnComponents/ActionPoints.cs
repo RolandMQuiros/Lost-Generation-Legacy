@@ -1,7 +1,7 @@
 using System;
 
 namespace LostGen.Model {
-    public class ActionPoints : PawnComponent {
+    public class ActionPoints : PawnComponent, IObservable<ActionPoints> {
         public int Current {
             get { return _current; }
             set { _current = value; }
@@ -11,6 +11,9 @@ namespace LostGen.Model {
             get { return _max; }
             set { _max = value; }
         }
+
+        public event Action<ActionPoints> Changed; 
+        private void Notify() { if (Changed != null) { Changed(this); } }
 
         private int _current;
         private int _max;

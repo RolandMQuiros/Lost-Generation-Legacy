@@ -7,7 +7,7 @@ public class BoardTest : MonoBehaviour
 {   
     public Point BoardSize;
     [SerializeField]private PawnViewManager _pawnManager;
-    [SerializeField]private PlayerCombatantController _playerController;
+    [SerializeField]private PlayerPawnController _playerController;
     [SerializeField]private int _boardTypes = 1;
     private BoardRef _boardRef;
     private Pawn _pawn;
@@ -71,8 +71,8 @@ public class BoardTest : MonoBehaviour
         _boardRef.Board.Pawns.Add(combatant1);
         _boardRef.Board.Pawns.Add(combatant2);
 
-        _playerController.AddCombatant(combatant1.RequireComponent<Combatant>());
-        _playerController.AddCombatant(combatant2.RequireComponent<Combatant>());
+        _playerController.AddPawn(combatant1);
+        _playerController.AddPawn(combatant2);
         _playerController.CycleForward();
     }
 
