@@ -12,7 +12,7 @@ namespace LostGen.Model {
         private int _cost;
         private bool _isContinuous;
         private bool _moveSuccess;
-
+        
         public MoveAction(Pawn owner, Point start, Point end, int cost, bool isContinuous) 
             : base(owner) {
             _start = start;

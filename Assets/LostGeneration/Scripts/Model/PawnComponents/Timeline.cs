@@ -43,11 +43,17 @@ namespace LostGen.Model
         private int _count = 0;
         private int _step = 0;
         private int _cost = 0;
+        private ActionPoints _actionPoints;
 
         public Timeline() {
             _head = new Node();
             _tail = _head;
             _current = _head;
+        }
+
+        public override void Start() {
+            // We might want to merge ActionPoints and Timeline?
+            _actionPoints = Pawn.RequireComponent<ActionPoints>();
         }
 
         /// <summary>
@@ -72,9 +78,7 @@ namespace LostGen.Model
         /// </summary>
         /// <param name="actions"></param>
         public void PushActions(IEnumerable<PawnAction> actions) {
-            foreach (PawnAction action in actions) {
-                PushAction(action);
-            }
+            foreach (PawnAction action in actions) { PushAction(action); }
             if (ActionsAdded != null) { ActionsAdded(actions); }
         }
 
@@ -149,6 +153,7 @@ namespace LostGen.Model
             if (next != null) {
                 next.Do();
                 if (ActionDone != null) { ActionDone(next); }
+                _actionPoints.Current -= next.Cost;
             }
             return next;
         }
@@ -167,6 +172,7 @@ namespace LostGen.Model
             if (previous != null) {
                 previous.Undo();
                 if (ActionUndone != null) { ActionUndone(previous); }
+                _actionPoints.Current += previous.Cost;
             }
             return previous;
         }
