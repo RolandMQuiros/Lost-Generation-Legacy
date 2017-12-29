@@ -29,11 +29,11 @@ namespace LostGen.Display {
         private Dictionary<Pawn, PawnView> _pawnViews = new Dictionary<Pawn, PawnView>();
         private MessageBuffer _messageBuffer = new MessageBuffer();
         private Queue<IPawnMessage> _messages = new Queue<IPawnMessage>();
-
+                    
         public void OnPawnAdded(Pawn pawn) {
             if (!_pawnViews.ContainsKey(pawn)) {
                 GameObject pawnObject = GameObject.Instantiate(
-                    _pawnViewPrefab.gameObject, PointVector.ToVector(pawn.Position), Quaternion.identity
+                    _pawnViewPrefab.gameObject, PointVector.ToVector(pawn.Position), Quaternion.identity, transform
                 );
                 PawnView pawnView = pawnObject.GetComponent<PawnView>();
                 pawnObject.name = pawn.Name;

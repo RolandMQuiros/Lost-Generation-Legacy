@@ -5,21 +5,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using LostGen.Model;
+using LostGen.Util;
+using Sirenix.OdinInspector;
 
 namespace LostGen.Display {
-public class TimelineSync : MonoBehaviour {
+public class TimelineSync : SerializedMonoBehaviour {
 		public int Step {
 			get { return _step; }
 			set { SetStep(value); }
 		}
 		public int Count {
-			get { return (_timelines.Count == 0) ? 0 : _timelines.Select(t => t.Count).Max(); }
+			get { return _max; }
 		}
-		[Serializable]public class StepChangeEvent : UnityEvent<int, int> { }
-		public StepChangeEvent StepChanged;
+		public IntEvent StepChanged;
+		public IntEvent CountChanged;
 		public UnityEvent AllPointsSpent;
 		private List<Timeline> _timelines = new List<Timeline>();
 		private int _step = 0;
+		private int _max = 0;
 		private PlayerSkillController _skillController;
 		[SerializeField]private int _debugStep;
 		public void AddTimeline(Timeline timeline) {
@@ -43,7 +46,7 @@ public class TimelineSync : MonoBehaviour {
 			int to = Math.Min(Math.Max(0, step), Count);
 			_step = to;
 			_timelines.ForEach(t => { t.Step = _step; });
-			StepChanged.Invoke(to, from);
+			StepChanged.Invoke(to);
 		}
 		public void ApplyTimelines() {
 			_timelines.ForEach(t => {
@@ -63,6 +66,13 @@ public class TimelineSync : MonoBehaviour {
 				int timelinePoints = t.Actions.Sum(a => a.Cost);
 				return acc || actionPoints.Max == timelinePoints;
 			});
+
+			// Update the maximum count
+			int newMax = _timelines.Select(t => t.Count).Max();
+			if (_max != newMax) {
+				_max = newMax;
+				CountChanged.Invoke(_max);
+			}
 		}
 
 		#region MonoBehaviour
