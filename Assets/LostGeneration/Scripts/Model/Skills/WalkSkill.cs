@@ -35,11 +35,9 @@ namespace LostGen.Model {
         }
 
         public override IEnumerable<PawnAction> Fire() {
-            PawnAction move = null;
             if (InRange(Target)) {
-                move = new MoveAction(Pawn, Pawn.Position, Target, MoveCost(Pawn.Position, Target), true);
+                yield return new MoveAction(Pawn, Pawn.Position, Target, MoveCost(Pawn.Position, Target), true);
             }
-            yield return move;
         }
 
         public static int MoveCost(Point from, Point to) {

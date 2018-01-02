@@ -10,7 +10,7 @@ namespace Tests.Integration {
         public void CreateWithoutBoard() {
             Assert.Throws(
                 typeof(ArgumentNullException),
-                () => { Pawn pawn = new Pawn("NoBoard", null, Point.Zero); }
+                () => { new Pawn("NoBoard", null, Point.Zero); }
             );
         }
 
@@ -116,7 +116,7 @@ namespace Tests.Integration {
             Assert.Throws(
                 typeof(ArgumentOutOfRangeException),
                 () => {
-                    Pawn pawn = new Pawn(
+                    new Pawn(
                         "Footprint",
                         board,
                         new Point(6, 0, 4),

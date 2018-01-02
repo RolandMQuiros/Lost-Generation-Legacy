@@ -2,9 +2,8 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
-using Sirenix.OdinInspector;
 
-public class CharacterBody : SerializedMonoBehaviour {
+public class CharacterBody : MonoBehaviour {
     public Transform Skeleton {
         get { return _skeleton; }
         set { _skeleton = value; }
@@ -25,7 +24,6 @@ public class CharacterBody : SerializedMonoBehaviour {
     [SerializeField]private HashSet<SkinnedMeshRenderer> _attachments = new HashSet<SkinnedMeshRenderer>();
     [SerializeField]private Dictionary<string, float> _blendShapes = new Dictionary<string, float>();
     [SerializeField]private Transform _skeleton;
-    [SerializeField]private List<Transform> _controlBones = new List<Transform>();
 
     public void Attach(SkinnedMeshRenderer mesh, bool destroyOldParent = true) {
         if (mesh == null) {

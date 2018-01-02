@@ -25,7 +25,7 @@ namespace LostGen.Model {
                 return
                     currentNode
                         .GetNeighbors()
-                        .Where(n => WalkNode.GetCost(currentNode.Point, n.Point) < _ownerPoints.Current)
+                        .Where(n => currentNode.GetEdgeCost(n) <= _ownerPoints.Current)
                         .Any();
             }
         }
@@ -44,7 +44,7 @@ namespace LostGen.Model {
 
         protected override void Awake() {
             _board = Pawn.Board;
-            _ownerPoints = Pawn.GetComponent<ActionPoints>();
+            _ownerPoints = Pawn.RequireComponent<ActionPoints>();
         }
 
         #region PointCollections

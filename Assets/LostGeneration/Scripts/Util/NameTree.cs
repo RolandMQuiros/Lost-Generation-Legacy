@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Util {
     public class NameTree : IEnumerable<string> {
         private char _delimiter;
         private Dictionary<string, HashSet<string>> _groups = new Dictionary<string, HashSet<string>>();

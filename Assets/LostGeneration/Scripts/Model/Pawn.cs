@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace LostGen.Model {
-    public class Pawn : IComparable<Pawn>, IObservable<Pawn> {
+    public class Pawn : IComparable<Pawn> {
         /// <summary>Counter used to generate unique Pawn ID</summary>
         private static ulong _idCounter;
         #region Properties
@@ -46,8 +46,6 @@ namespace LostGen.Model {
         public int ActionCount { get { return _actions.Count; } }
         #endregion Properties
         #region IObservable
-        public event Action<Pawn> Changed;
-        private void Notify() { if (Changed != null) { Changed(this); } }
         #endregion
         #region Fields
         /// <summary>
@@ -137,7 +135,6 @@ namespace LostGen.Model {
 
         public bool SetPosition(Point destination) {
             bool moved = Board.SetPawnPosition(this, destination);
-            if (moved) { Notify(); }
             return moved;
         }
         public bool Offset(Point offset) {
@@ -161,17 +158,14 @@ namespace LostGen.Model {
                 _actions.AddLast(action);
                 CallComponents(c => c.OnPushAction(action));
             }
-            Notify();
         }
         public virtual void PushAction(PawnAction action) {
             _actions.AddLast(action);
             CallComponents(c => c.OnPushAction(action));
-            Notify();
         }
         public virtual void ClearActions() {
             CallComponents(c => c.BeforeClearActions());
             _actions = new LinkedList<PawnAction>();
-            Notify();
         }
         
         public void PushMessage(IPawnMessage message) {

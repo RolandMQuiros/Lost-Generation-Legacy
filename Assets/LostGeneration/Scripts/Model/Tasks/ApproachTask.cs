@@ -6,6 +6,9 @@ using System.Collections.Generic;
 namespace LostGen.Model {
     // Rolls downhill until it hits a local minima
     public class ApproachTask : PrimitiveTask {
+        public override WorldState Preconditions { get { return _preconditions; } }
+        public override WorldState Postconditions { get { return _postconditions; } }
+
         private Pawn _pawn;
         private ActionPoints _actionPoints;
         private LongWalkSkill _moveSkill;
@@ -13,9 +16,8 @@ namespace LostGen.Model {
         private Pawn _target;
         private DijkstraMap _approachMap;
         private string _inRangeKey;
-
-        public override WorldState Preconditions { get; }
-        public override WorldState Postconditions { get; }
+        private WorldState _preconditions;
+        private WorldState _postconditions;
 
         public ApproachTask(Pawn pawn, DijkstraMap approachMap) {
             _pawn = pawn;
@@ -25,10 +27,10 @@ namespace LostGen.Model {
             _moveSkill = _pawn.RequireComponent<LongWalkSkill>();
 
             _inRangeKey = pawn.InstanceID + " in range of target";
-            Preconditions = new WorldState() {
+            _preconditions = new WorldState() {
                 { _inRangeKey, false } 
             };
-            Postconditions = new WorldState() {
+            _postconditions = new WorldState() {
                 { _inRangeKey, true }
             };
         }

@@ -12,15 +12,18 @@ namespace LostGen.Model {
     /// </summary>
     public abstract class Skill : PawnComponent {
         /// <summary>Name displayed to users</summary>
-        public string Name { get; }
+        public string Name { get { return _name; } }
         /// <summary>Description of Skill displayed to users</summary>
-        public string Description { get; }
+        public string Description { get { return _description; } }
         /// <summary>The number of Action Points this Skill will consume when fired</summary>
         public abstract int ActionPoints { get; }
 
+        private string _name;
+        private string _description;
+
         public Skill(string name, string description) {
-            Name = name;
-            Description = description;
+            _name = name;
+            _description = description;
         }
 
         /// <summary>

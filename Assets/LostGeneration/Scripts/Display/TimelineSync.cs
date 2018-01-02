@@ -3,13 +3,12 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 using LostGen.Model;
 using LostGen.Util;
-using Sirenix.OdinInspector;
+using ByteSheep.Events;
 
 namespace LostGen.Display {
-public class TimelineSync : SerializedMonoBehaviour {
+	public class TimelineSync : MonoBehaviour {
 		public int Step {
 			get { return _step; }
 			set { SetStep(value); }
@@ -17,9 +16,10 @@ public class TimelineSync : SerializedMonoBehaviour {
 		public int Count {
 			get { return _max; }
 		}
-		public IntEvent StepChanged;
-		public IntEvent CountChanged;
-		public UnityEvent AllPointsSpent;
+		public QuickIntEvent StepChanged;
+		public QuickIntEvent CountChanged;
+		public QuickEvent PointsNotSpent;
+		public QuickEvent AllPointsSpent;
 		private List<Timeline> _timelines = new List<Timeline>();
 		private int _step = 0;
 		private int _max = 0;
@@ -42,11 +42,10 @@ public class TimelineSync : SerializedMonoBehaviour {
 			return _timelines.Remove(timeline);
 		}
 		public void SetStep(int step) {
-			int from = _step;
-			int to = Math.Min(Math.Max(0, step), Count);
-			_step = to;
+			step = Math.Min(Math.Max(0, step), Count);
+			_step = step;
 			_timelines.ForEach(t => { t.Step = _step; });
-			StepChanged.Invoke(to);
+			StepChanged.Invoke(_step);
 		}
 		public void ApplyTimelines() {
 			_timelines.ForEach(t => {
@@ -63,9 +62,10 @@ public class TimelineSync : SerializedMonoBehaviour {
 			// Check each timeline
 			bool ready = _timelines.Aggregate(true, (acc, t) => {
 				ActionPoints actionPoints = t.Pawn.GetComponent<ActionPoints>();
-				int timelinePoints = t.Actions.Sum(a => a.Cost);
-				return acc || actionPoints.Max == timelinePoints;
+				return acc && actionPoints.Max == t.Cost;
 			});
+			if (ready) {AllPointsSpent.Invoke(); }
+			else { PointsNotSpent.Invoke(); }
 
 			// Update the maximum count
 			int newMax = _timelines.Select(t => t.Count).Max();

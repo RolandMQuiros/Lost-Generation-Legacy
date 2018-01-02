@@ -17,6 +17,13 @@ namespace LostGen.Display {
                 }
             }
         }
+        public bool Interactable {
+            get { return _interactable; }
+            set {
+                _interactable = value;
+                CheckUsability();
+            }
+        }
         #region Fields
         [SerializeField]private GameObject _buttonPrefab;
         [SerializeField]private Transform _buttonParent;
@@ -28,6 +35,7 @@ namespace LostGen.Display {
         private Timeline _timeline = null;
         private List<GameObject> _pool = new List<GameObject>();
         private Dictionary<Skill, Button> _buttons = new Dictionary<Skill, Button>(); 
+        private bool _interactable = true;
 
         private void Bind(Pawn pawn) {
             _pawn = pawn;
@@ -70,7 +78,7 @@ namespace LostGen.Display {
         private void OnTimelineChanged(PawnAction action) { CheckUsability(); }
         private void CheckUsability() {
             foreach (KeyValuePair<Skill, Button> pair in _buttons) {
-                pair.Value.interactable = pair.Key.IsUsable;
+                pair.Value.interactable = _interactable && pair.Key.IsUsable;
             }
         }
         #endregion

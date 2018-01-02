@@ -10,7 +10,7 @@ namespace LostGen.Display {
     /// </summary>
     public abstract class PawnComponentView : MonoBehaviour {
         /// <summary>The <see cref="Pawn"/> this PawnComponentView is attached to</summary>
-        public Pawn Pawn;
+        public Pawn Pawn { get; set; }
         /// <summary>
         /// Adds the given <see cref="IPawnMessage"/> to a collection for later processing by <see cref="ProcessMessages"/>.
         /// </summary>

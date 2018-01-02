@@ -1,7 +1,7 @@
 using System;
 
 namespace LostGen.Model {
-    public class ActionPoints : PawnComponent, IObservable<ActionPoints> {
+    public class ActionPoints : PawnComponent {
         public int Current {
             get { return _current; }
             set { _current = value; }

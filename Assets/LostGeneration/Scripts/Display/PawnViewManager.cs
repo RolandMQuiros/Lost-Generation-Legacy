@@ -37,12 +37,13 @@ namespace LostGen.Display {
                 );
                 PawnView pawnView = pawnObject.GetComponent<PawnView>();
                 pawnObject.name = pawn.Name;
-
-                if (_builders == null) {
-                    _builders = new List<PawnViewBuilder>(GetComponents<PawnViewBuilder>());
-                }
-
+                _builders = _builders ?? new List<PawnViewBuilder>(GetComponents<PawnViewBuilder>());
                 _builders.ForEach(b => b.Attach(pawnObject, pawn));
+                
+                foreach (PawnComponentView componentView in pawnObject.GetComponents<PawnComponentView>()) {
+                    componentView.Pawn = pawn;
+                }
+                
                 _pawnViews[pawn] = pawnView;
             }
         }
@@ -81,6 +82,7 @@ namespace LostGen.Display {
         /// Runs every Pawn's HandleMessage coroutine simultaneously
         /// </summary>
         public void HandleMessages() {
+            DistributeMessages();
             StartCoroutine(RunMessageCoroutines());
         }
 

@@ -21,6 +21,4 @@ namespace LostGen.Util {
             Value = (T)value;
         }
     }
-
-    [Serializable]public class InputValues : InputValue<int> { }
 }

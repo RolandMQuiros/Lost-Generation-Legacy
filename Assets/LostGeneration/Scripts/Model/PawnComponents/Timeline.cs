@@ -152,8 +152,9 @@ namespace LostGen.Model
             }
             if (next != null) {
                 next.Do();
-                if (ActionDone != null) { ActionDone(next); }
+                _cost += next.Cost;
                 _actionPoints.Current -= next.Cost;
+                if (ActionDone != null) { ActionDone(next); }
             }
             return next;
         }
@@ -171,8 +172,9 @@ namespace LostGen.Model
             }
             if (previous != null) {
                 previous.Undo();
-                if (ActionUndone != null) { ActionUndone(previous); }
+                _cost -= previous.Cost;
                 _actionPoints.Current += previous.Cost;
+                if (ActionUndone != null) { ActionUndone(previous); }
             }
             return previous;
         }

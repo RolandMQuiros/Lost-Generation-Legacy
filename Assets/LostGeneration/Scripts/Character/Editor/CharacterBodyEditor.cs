@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-using LostGen;
+using LostGen.Util;
 
 namespace LostGen.Display {
     [CustomEditor(typeof(CharacterBody))]
@@ -98,7 +98,6 @@ namespace LostGen.Display {
             }
             EditorGUILayout.EndHorizontal();
 
-            bool unfolded = true;
             NameTree blendShapeNames = new NameTree('.', _target.BlendShapes.Keys);
             foreach (string path in blendShapeNames) {
                 string parent = blendShapeNames.GetParent(path);
@@ -112,7 +111,7 @@ namespace LostGen.Display {
                             _target.SetBlendShapeWeight(path, newWeight);
                         }
                     } else {
-                        if (unfolded = EditorGUILayout.Foldout(_unfoldedBlendShapes.Contains(path), label)) {
+                        if (EditorGUILayout.Foldout(_unfoldedBlendShapes.Contains(path), label)) {
                             _unfoldedBlendShapes.Add(path);
                         } else {
                             _unfoldedBlendShapes.Remove(path);
