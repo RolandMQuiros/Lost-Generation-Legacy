@@ -20,6 +20,7 @@ namespace LostGen.Display {
         [SerializeField] private Point _boardPoint;
         [SerializeField] private bool _clipThroughSolids = true;
         [SerializeField] private bool _stickToGround = true;
+        [SerializeField] private LayerMask _blockLayer;
         #endregion PrivateFields
 
         #region Private
@@ -55,8 +56,8 @@ namespace LostGen.Display {
                 // Get the point on the Collider beneath the cursor
                 _screenCast = _camera.ScreenPointToRay(_screenPoint);
                 RaycastHit hitInfo;
-                if (_boardCursor.ClickCollider.Raycast(_screenCast, out hitInfo, 100f)) {
-
+                //if (_boardCursor.ClickCollider.Raycast(_screenCast, out hitInfo, 100f)) {
+                if (Physics.Raycast(_screenCast, out hitInfo, 100f, _blockLayer)) {
                     Point entry = Point.Clamp(
                         PointVector.ToPoint(hitInfo.point),
                         Point.Zero,
@@ -110,6 +111,10 @@ namespace LostGen.Display {
         }
 
         private void OnApplicationFocus(bool hasFocus) {
+            // If the cursor just entered the screen
+            if (!_isWindowFocused && hasFocus) {
+
+            }
             _isWindowFocused = hasFocus;
         }
 

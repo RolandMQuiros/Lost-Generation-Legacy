@@ -37,8 +37,10 @@ namespace LostGen.Display {
 
             BlockMesh cell = _cells[cx, cy, cz];
             if (cell == null) {
+                Vector3 lower = PointVector.ToVector(start);
+
                 GameObject cellObj = GameObject.Instantiate(CellPrefab, transform);
-                cellObj.transform.localPosition = PointVector.ToVector(start);
+                cellObj.transform.localPosition = lower;
                 cellObj.name = "cell(" + cx + "," + cy + "," + cz + ")";
 
                 MeshRenderer renderer = cellObj.GetComponent<MeshRenderer>();
@@ -46,6 +48,17 @@ namespace LostGen.Display {
                 cell.Resize(CellSize);
                 cell.BlockProperties = BlockProperties;
                 renderer.sharedMaterial = BlockMaterial;
+
+                BoxCollider collider = cellObj.GetComponent<BoxCollider>();
+                Vector3 upper = lower + PointVector.ToVector(CellSize);
+                Bounds bounds = new Bounds();
+                bounds.SetMinMax(lower - Vector3.one / 2f, upper);
+                collider.center = bounds.center;
+                collider.size = bounds.size;
+
+                Debug.Log(lower - Vector3.one / 2f);
+                Debug.Log(upper);
+                Debug.Log(collider.bounds);
             }
 
             for (blockCoords.X = -1; blockCoords.X <= CellSize.X; blockCoords.X++) {
