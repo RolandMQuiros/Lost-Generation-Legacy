@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using LostGen.Model;
+using LostGen.Util;
 
 namespace LostGen.Display {
 	public class BoardCursorAxisController : MonoBehaviour,
-											IBoardCursorController {
+											 IBoardCursorController {
 		[SerializeField]private BoardRef _boardRef;
 		[SerializeField]private Point _boardPoint;
 		[SerializeField]private string _verticalAxis;

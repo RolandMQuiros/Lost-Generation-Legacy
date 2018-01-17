@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using LostGen.Model;
+using LostGen.Util;
 
 namespace LostGen.Display {
 

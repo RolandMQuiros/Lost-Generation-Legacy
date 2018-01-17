@@ -1,7 +1,7 @@
 using UnityEngine;
 using LostGen.Model;
 
-namespace LostGen {
+namespace LostGen.Util {
     public static class PointVector {
         public static Vector3 Round(Vector3 v) {
             return new Vector3(Mathf.Round(v.x), Mathf.Round(v.y), Mathf.Round(v.z));

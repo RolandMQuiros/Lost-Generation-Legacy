@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using LostGen.Model;
+using LostGen.Util;
 
 namespace LostGen.Display {
     [RequireComponent(typeof(PawnViewManager))]

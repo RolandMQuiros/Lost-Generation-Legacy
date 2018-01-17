@@ -3,14 +3,15 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using LostGen.Model;
+using LostGen.Util;
 
 namespace LostGen.Display {
     [RequireComponent(typeof(BoardCursor))]
     public class BoardCursorMouseController : MonoBehaviour,
-                                            IBoardCursorController,
-                                            IPointerClickHandler,
-                                            IPointerDownHandler,
-                                            IPointerUpHandler
+                                              IBoardCursorController,
+                                              IPointerClickHandler,
+                                              IPointerDownHandler,
+                                              IPointerUpHandler
     {
         #region PrivateFields
         [SerializeField] private Camera _camera;
