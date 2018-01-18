@@ -30,6 +30,7 @@ namespace LostGen.Display {
 
         private Ray _screenCast;
         private Point _entryPoint;
+        private Vector3 _entryV3;
         private Point _exitPoint;
         #endregion Private
 
@@ -63,6 +64,7 @@ namespace LostGen.Display {
                         Point.Zero,
                         _board.Blocks.Size - Point.One
                     );
+                    _entryV3 = hitInfo.point;
 
                     if (entry != _entryPoint) {
                         _entryPoint = entry;
@@ -90,20 +92,18 @@ namespace LostGen.Display {
                         }
 
                         // Cast downward from the found point
-                        BoardBlock downBlock = _board.Blocks.At(previous);
-                        for (Point down = previous + Point.Down; !downBlock.IsSolid; down += Point.Down) {
-                            downBlock = _board.Blocks.At(down);
+                        Point current = previous;
+                        BoardBlock downBlock = new BoardBlock();
+                        while (_board.Blocks.InBounds(current) && !downBlock.IsSolid) {
+                            downBlock = _board.Blocks.At(current);
                             if (downBlock.IsSolid) {
-                                if (_boardPoint != previous) {
-                                    _boardPoint = previous;
-
-                                    if (Moved != null) {
-                                        Moved(_boardPoint);
-                                    }
+                                if (_boardPoint != current) {
+                                    _boardPoint = current;
+                                    if (Moved != null) { Moved(_boardPoint); }
                                 }
                                 break;
                             }
-                            previous = down;
+                            current += Point.Down;
                         }
                     }
                 }
@@ -111,10 +111,6 @@ namespace LostGen.Display {
         }
 
         private void OnApplicationFocus(bool hasFocus) {
-            // If the cursor just entered the screen
-            if (!_isWindowFocused && hasFocus) {
-
-            }
             _isWindowFocused = hasFocus;
         }
 
@@ -134,8 +130,10 @@ namespace LostGen.Display {
             foreach (Point point in Point.Line(_entryPoint, _exitPoint)) {
                 Gizmos.DrawSphere(PointVector.ToVector(point), 0.1f);
             }
-
             Gizmos.DrawSphere(PointVector.ToVector(_boardPoint), 0.5f);
+
+            Gizmos.color = Color.green;
+            Gizmos.DrawSphere(_entryV3, 0.25f);
         }
         #endregion MonoBehaviour
 

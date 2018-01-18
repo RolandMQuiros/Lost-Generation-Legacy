@@ -156,6 +156,12 @@ namespace LostGen.Model
             );
         }
 
+        public static bool WithinBox(Point point, Point lower, Point upper) {
+            return point.X >= lower.X && point.X < upper.X &&
+                   point.Y >= lower.Y && point.Y < upper.Y &&
+                   point.Z >= lower.Z && point.Z < upper.Z;
+        }
+
         public static Point Clamp(Point point, Point lower, Point upper) {
             return new Point(
                 Math.Min(Math.Max(point.X, lower.X), upper.X),
@@ -182,6 +188,16 @@ namespace LostGen.Model
         public static int ChebyshevDistance(Point start, Point end) {
             Point offset = Point.Abs(end - start);
             return Math.Max(Math.Max(offset.X, offset.Y), offset.Z);
+        }
+        
+        public static void ForEachXYZ(Point lower, Point upper, Action<Point> action) {
+            for (int x = lower.X; x < upper.X; x++) {
+                for (int y = lower.Y; y < upper.Y; y++) {
+                    for (int z = lower.Z; z < upper.Z; z++) {
+                        action(new Point(x, y, z));
+                    }
+                }
+            }
         }
 
         public static Point operator +(Point p1, Point p2) {

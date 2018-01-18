@@ -3,33 +3,28 @@ using UnityEngine;
 using LostGen.Model;
 using LostGen.Display;
 
-public class BoardTest : MonoBehaviour
-{   
+public class BoardTest : MonoBehaviour {
     public Point BoardSize;
     [SerializeField]private PawnViewManager _pawnManager;
     [SerializeField]private PlayerPawnController _playerController;
     [SerializeField]private int _boardTypes = 1;
+    [SerializeField]private int _seed = 0;
     private BoardRef _boardRef;
     private Pawn _pawn;
 
     #region MonoBehaviour
-    private void Awake()
-    {
+    private void Awake() {
         _boardRef = GetComponent<BoardRef>();
         _boardRef.Board = new Board(new StandardBlockManager(BoardSize), new BucketPawnManager(BoardSize, 8));
 
         List<BoardBlock> blocks = new List<BoardBlock>();
+        System.Random rand = new System.Random(_seed);
         int y = 0;
-        for (int x = 0; x < _boardRef.Board.Blocks.Size.X; x++)
-        {
-            for (y = 0; y < _boardRef.Board.Blocks.Size.Y / 2; y++)
-            {
-                for (int z = 0; z < _boardRef.Board.Blocks.Size.Z; z++)
-                {
-                    blocks.Add
-                    (
-                        new BoardBlock()
-                        {
+        for (int x = 0; x < _boardRef.Board.Blocks.Size.X; x++) {
+            for (y = 0; y < _boardRef.Board.Blocks.Size.Y / 2; y++) {
+                for (int z = 0; z < _boardRef.Board.Blocks.Size.Z; z++) {
+                    blocks.Add (
+                        new BoardBlock() {
                             Point = new Point(x, y, z),
                             IsSolid = true,
                             IsOpaque = true,
@@ -41,13 +36,12 @@ public class BoardTest : MonoBehaviour
             }
 
             y = _boardRef.Board.Blocks.Size.Y / 2;
-            for (int z = 0; z < _boardRef.Board.Blocks.Size.Z; z++)
-            {
-                byte blockType = (byte)Mathf.RoundToInt(Random.value * _boardTypes);
-                blocks.Add
-                (
-                    new BoardBlock()
-                    {
+            for (int z = 0; z < _boardRef.Board.Blocks.Size.Z; z++) {
+                int r = rand.Next() % _boardTypes;
+                Debug.Log(r);
+                byte blockType = (byte)r;
+                blocks.Add (
+                    new BoardBlock() {
                         Point = new Point(x, y, z),
                         IsSolid = blockType != 0,
                         IsOpaque = blockType != 0,
@@ -62,18 +56,18 @@ public class BoardTest : MonoBehaviour
     }
 
     private void Start() {
-        Pawn combatant1 = MakeCombatant(new Pawn("Test Combatant 1", _boardRef.Board, _boardRef.Board.Blocks.Size / 2 + Point.Right), 5);
-        combatant1.AddComponent(new LongWalkSkill() { CanWalkDiagonally = true });
+        // Pawn combatant1 = MakeCombatant(new Pawn("Test Combatant 1", _boardRef.Board, _boardRef.Board.Blocks.Size / 2 + Point.Right), 5);
+        // combatant1.AddComponent(new LongWalkSkill() { CanWalkDiagonally = true });
         
-        Pawn combatant2 = MakeCombatant(new Pawn("Test Combatant 2", _boardRef.Board, _boardRef.Board.Blocks.Size / 2 + Point.Left), 6);
-        combatant2.AddComponent(new LongWalkSkill() { CanWalkDiagonally = false });
+        // Pawn combatant2 = MakeCombatant(new Pawn("Test Combatant 2", _boardRef.Board, _boardRef.Board.Blocks.Size / 2 + Point.Left), 6);
+        // combatant2.AddComponent(new LongWalkSkill() { CanWalkDiagonally = false });
         
-        _boardRef.Board.Pawns.Add(combatant1);
-        _boardRef.Board.Pawns.Add(combatant2);
+        // _boardRef.Board.Pawns.Add(combatant1);
+        // _boardRef.Board.Pawns.Add(combatant2);
 
-        _playerController.AddPawn(combatant1);
-        _playerController.AddPawn(combatant2);
-        _playerController.CycleForward();
+        // _playerController.AddPawn(combatant1);
+        // _playerController.AddPawn(combatant2);
+        // _playerController.CycleForward();
     }
 
     private void Update() {   
