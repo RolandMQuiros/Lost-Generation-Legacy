@@ -189,12 +189,26 @@ namespace LostGen.Model
             Point offset = Point.Abs(end - start);
             return Math.Max(Math.Max(offset.X, offset.Y), offset.Z);
         }
-        
+
         public static void ForEachXYZ(Point lower, Point upper, Action<Point> action) {
-            for (int x = lower.X; x < upper.X; x++) {
-                for (int y = lower.Y; y < upper.Y; y++) {
-                    for (int z = lower.Z; z < upper.Z; z++) {
-                        action(new Point(x, y, z));
+            Point point = lower;
+            for (point.X = lower.X; point.X < upper.X; point.X++) {
+                for (point.Y = lower.Y; point.Y < upper.Y; point.Y++) {
+                    for (point.Z = lower.Z; point.Z < upper.Z; point.Z++) {
+                        action(point);
+                    }
+                }
+            }
+        }
+
+        public static void ForEachXYZ(Point lower, Point upper, Action<Point> eachX = null, Action<Point> eachXY = null, Action<Point> eachXYZ = null) {
+            Point point = lower;
+            for (point.X = lower.X; point.X < upper.X; point.X++) {
+                if (eachX != null) { eachX(point); }
+                for (point.Y = lower.Y; point.Y < upper.Y; point.Y++) {
+                    if (eachXY != null) { eachXY(point); }
+                    for (point.Z = lower.Z; point.Z < upper.Z; point.Z++) {
+                        if (eachXYZ != null) { eachXYZ(point); }
                     }
                 }
             }
