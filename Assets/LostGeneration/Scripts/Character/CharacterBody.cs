@@ -123,6 +123,10 @@ public class CharacterBody : MonoBehaviour {
         if (_skeleton == null) {
             throw new NullReferenceException("This CharacterModel needs a skeleton root bone!");
         }
+
+        foreach (SkinnedMeshRenderer mesh in GetComponentsInChildren<SkinnedMeshRenderer>()) {
+            Attach(mesh, false);
+        }
     }
     
     private void OnEnable() {

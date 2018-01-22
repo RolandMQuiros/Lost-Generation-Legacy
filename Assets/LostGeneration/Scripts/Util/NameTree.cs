@@ -23,6 +23,10 @@ namespace LostGen.Util {
             return _groups.TryGetValue(path, out children) && children.Count == 0;
         }
 
+        public bool Contains(string path) {
+            return _groups.ContainsKey(path);
+        }
+
         public void Add(string path) {
             string[] tokens = path.Split(_delimiter);
             _rootChildren.Add(tokens[0]);
@@ -55,6 +59,16 @@ namespace LostGen.Util {
         public string GetName(string path) {
             int lastDelimiter = Math.Max(path.LastIndexOf(_delimiter) + 1, 0);
             return path.Substring(lastDelimiter);
+        }
+
+        public IEnumerable<string> GetChildren(string path = "") {
+            HashSet<string> children;
+            if (path.Length == 0) {
+                children = _rootChildren;
+            } else {
+                _groups.TryGetValue(path, out children);
+            }
+            return children;
         }
 
         public int GetLevel(string path) {
