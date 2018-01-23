@@ -6,76 +6,49 @@ using UnityEngine.Events;
 using LostGen.Model;
 
 namespace LostGen.Display {
-    [RequireComponent(typeof(PlayerCombatantController))]
-    [RequireComponent(typeof(PlayerTimelineController))]
-    public class PlayerSkillController : MonoBehaviour
-    {
-
-        [System.Serializable]
-        public class SkillEvent : UnityEvent<Skill> { }
+    [RequireComponent(typeof(PlayerPawnController))]
+    [RequireComponent(typeof(TimelineSync))]
+    public class PlayerSkillController : MonoBehaviour {
         public Skill ActiveSkill {
             get { return _activeSkill; }
+            set { SetActiveSkill(value); }
         }
-
+        [Serializable]public class SkillEvent : UnityEvent<Skill> { }
         public SkillEvent SkillActivated;
         public SkillEvent SkillFired;
-
-        private PlayerCombatantController _playerController;
-        private PlayerTimelineController _timelineController;
-
-        private Combatant _combatant;
         private Timeline _timeline;
+        private TimelineSync _sync;
         private Skill _activeSkill;
-        [SerializeField]
-        private int _activationStep;
 
         public void SetActiveSkill(Skill skill) {
-            if (skill.Pawn == _combatant.Pawn) {
-                _activeSkill = skill;
-                
-                // Save the timeline step when skill was activated
-                //_activationStep = Math.Min(Math.Max(0, _timeline.Count), _timelineController.Step);
-                // Move forward all timelines for Combatants that are slower than the active Combatant
-                //_timelineController.SetSlowerStep(_activationStep + 1, _activeSkill.Pawn);
-
-                SkillActivated.Invoke(_activeSkill);
-            }
-        }
-
-        public void CancelSkill() {
-            if (_activeSkill != null) {
-                // Rewind timeline back to when skill was activated
-                //_timelineController.SetAllStep(_activationStep);
+            if (skill == null) {
                 DeactivateSkill();
+            } else {
+                _activeSkill = skill;
+                _timeline = _activeSkill.Pawn.GetComponent<Timeline>();
+                _sync.Step = _timeline.Step;
+                SkillActivated.Invoke(_activeSkill);
             }
         }
 
         public void DeactivateSkill() {
             _activeSkill = null;
+            _timeline = null;
             SkillActivated.Invoke(null);
         }
-        
-        public void OnCombatantActivated(Combatant combatant)
-        {
-            _combatant = combatant;
-            _timeline = _combatant.Pawn.GetComponent<Timeline>();
-        }
 
-        public void FireActiveSkill()
-        {
+        public void FireActiveSkill() {
             if (_activeSkill != null) {
                 IEnumerable<PawnAction> actions = _activeSkill.Fire();
-                _timelineController.SetStepActions(actions);
+                _timeline.Splice(actions);
+                _timeline.ToLast();
                 SkillFired.Invoke(_activeSkill);
                 DeactivateSkill();
             }
         }
 
-        #region MonoBehaviour
         private void Awake() {
-            _playerController = GetComponent<PlayerCombatantController>();
-            _timelineController = GetComponent<PlayerTimelineController>();
+            _sync = GetComponent<TimelineSync>();
         }
-        #endregion MonoBehaviour
     }
 }

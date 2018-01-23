@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace LostGen {
+namespace LostGen.Util {
     public class NameTree : IEnumerable<string> {
         private char _delimiter;
         private Dictionary<string, HashSet<string>> _groups = new Dictionary<string, HashSet<string>>();
@@ -21,6 +21,10 @@ namespace LostGen {
         public bool IsLeaf(string path) {
             HashSet<string> children;
             return _groups.TryGetValue(path, out children) && children.Count == 0;
+        }
+
+        public bool Contains(string path) {
+            return _groups.ContainsKey(path);
         }
 
         public void Add(string path) {
@@ -55,6 +59,16 @@ namespace LostGen {
         public string GetName(string path) {
             int lastDelimiter = Math.Max(path.LastIndexOf(_delimiter) + 1, 0);
             return path.Substring(lastDelimiter);
+        }
+
+        public IEnumerable<string> GetChildren(string path = "") {
+            HashSet<string> children;
+            if (path.Length == 0) {
+                children = _rootChildren;
+            } else {
+                _groups.TryGetValue(path, out children);
+            }
+            return children;
         }
 
         public int GetLevel(string path) {

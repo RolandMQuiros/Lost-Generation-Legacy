@@ -6,49 +6,84 @@ using UnityEngine.UI;
 using LostGen.Model;
 
 namespace LostGen.Display {
-    public class SkillTray : MonoBehaviour
-    {
-        [SerializeField]private PlayerSkillController _skillController;
+    public class SkillTray : MonoBehaviour {
+        public Pawn Pawn {
+            get { return _pawn; }
+            set {
+                if (value != null && _pawn != value) {
+                    Unbind();
+                    Bind(value);
+                    Build(value);
+                }
+            }
+        }
+        public bool Interactable {
+            get { return _interactable; }
+            set {
+                _interactable = value;
+                CheckUsability();
+            }
+        }
+        #region Fields
         [SerializeField]private GameObject _buttonPrefab;
         [SerializeField]private Transform _buttonParent;
-        private List<SkillButton> _buttons = new List<SkillButton>();
+        [Serializable]public class SkillEvent : UnityEngine.Events.UnityEvent<Skill> { }
+        public SkillEvent SkillActivated;
+        #endregion
+        #region Private Members
+        private Pawn _pawn = null;
+        private Timeline _timeline = null;
+        private List<GameObject> _pool = new List<GameObject>();
+        private Dictionary<Skill, Button> _buttons = new Dictionary<Skill, Button>(); 
+        private bool _interactable = true;
 
-        public void Build(Combatant combatant)
-        {
-            IEnumerable<Skill> skills = combatant.Pawn.GetComponents<Skill>();
-            if (!skills.Any()) {
-                _buttons.ForEach(button => button.gameObject.SetActive(false));
+        private void Bind(Pawn pawn) {
+            _pawn = pawn;
+            _timeline = pawn.GetComponent<Timeline>();
+            _timeline.ActionDone += OnTimelineChanged;
+            _timeline.ActionUndone += OnTimelineChanged;
+        }
+        private void Unbind() {
+            if (_timeline != null) {
+                _timeline.ActionUndone -= OnTimelineChanged;
+                _timeline.ActionDone -= OnTimelineChanged;
             }
-            else {
-                int buttonIdx = 0;
-                foreach (Skill skill in combatant.Pawn.GetComponents<Skill>()) {
-                    SkillButton skillButton;
-                    if (buttonIdx < _buttons.Count) {
-                        skillButton = _buttons[buttonIdx];
-                    } else {
-                        GameObject buttonObj = GameObject.Instantiate(_buttonPrefab, _buttonParent);
-                        skillButton = buttonObj.GetComponent<SkillButton>();
-                        skillButton.SkillActivated += _skillController.SetActiveSkill;
-                        _buttons.Add(skillButton);
+        }
+        private void Build(Pawn pawn) {
+            foreach (Button button in _buttons.Values) {
+                button.gameObject.SetActive(false);
+            }
+            _buttons.Clear();
+
+            foreach (Skill skill in pawn.GetComponents<Skill>()) {
+                Button button;
+                if (!_buttons.TryGetValue(skill, out button)) {
+                    GameObject buttonObj = _pool.FirstOrDefault(b => !b.activeInHierarchy);
+                    if (buttonObj == null) {
+                        buttonObj = GameObject.Instantiate(_buttonPrefab, _buttonParent);
+                        _pool.Add(buttonObj);
                     }
-                    
-                    skillButton.Skill = skill;
-                    skillButton.gameObject.SetActive(true);
-                    buttonIdx++;
-                }
+                    button = buttonObj.GetComponent<Button>();
+                    button.onClick.RemoveAllListeners();
+                    button.onClick.AddListener(() => { SkillActivated.Invoke(skill); });
+                    _buttons[skill] = button;
 
-                _buttons.ForEach(button => button.CheckActionPoints());
+                    Text text = button.GetComponentInChildren<Text>();
+                    text.text = skill.Name;
+                }
+                
+                button.gameObject.SetActive(true);
             }
         }
-
-        public void CheckActionPoints() {
-            _buttons.ForEach(button => button.CheckActionPoints());
+        private void OnTimelineChanged(PawnAction action) { CheckUsability(); }
+        private void CheckUsability() {
+            foreach (KeyValuePair<Skill, Button> pair in _buttons) {
+                pair.Value.interactable = _interactable && pair.Key.IsUsable;
+            }
         }
-
+        #endregion
         #region MonoBehaviour
-        private void Awake() {
-            _buttonPrefab.SetActive(false);
-        }
+        private void Awake() { _buttonPrefab.SetActive(false); }
         #endregion MonoBehaviour
     }
 }

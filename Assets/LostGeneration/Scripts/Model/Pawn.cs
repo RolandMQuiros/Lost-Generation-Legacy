@@ -45,7 +45,8 @@ namespace LostGen.Model {
         public IEnumerable<PawnAction> Actions { get { return _actions; } }
         public int ActionCount { get { return _actions.Count; } }
         #endregion Properties
-
+        #region IObservable
+        #endregion
         #region Fields
         /// <summary>
         /// Sorting priority. Determines what order the Board executes the Pawn steps.
@@ -68,7 +69,7 @@ namespace LostGen.Model {
         /// </summary>
         public bool IsOpaque;
         #endregion Fields
-
+        #region Private Variables
         private bool _isStarted = false;
         private LinkedList<PawnAction> _actions = new LinkedList<PawnAction>();
         /// <summary>
@@ -79,13 +80,12 @@ namespace LostGen.Model {
         private Point _position;
         private Queue<IPawnMessage> _messages = new Queue<IPawnMessage>();
         private delegate void ComponentCall(PawnComponent component);
-
-
         /// <summary>Contains components, keyed by type.  Allows us to access components by type, and to only contain a single component of each type.</summary>
         private Dictionary<Type, List<PawnComponent>> _components = new Dictionary<Type, List<PawnComponent>>();
         /// <summary>Contains components in the order they should be called, which is the same order as they were added.</summary>
         private List<PawnComponent> _componentOrder = new List<PawnComponent>();
-
+        #endregion
+        #region Initialization
         public Pawn(string name, Board board, Point position, IEnumerable<Point> footprint = null, bool isCollidable = true, bool isSolid = false, bool isOpaque = true) {
             InstanceID = _idCounter++;
 
@@ -126,18 +126,22 @@ namespace LostGen.Model {
             _isStarted = true;
             CallComponents(c => c.Start());
         }
-
+        #endregion
+        #region Positioning
         ///<summary>Used by internally by Board. Do not use.</summary>
         public void SetPositionInternal(Point newPosition) {
             _position = newPosition;
         }
 
         public bool SetPosition(Point destination) {
-            return Board.SetPawnPosition(this, destination);
+            bool moved = Board.SetPawnPosition(this, destination);
+            return moved;
         }
         public bool Offset(Point offset) {
             return SetPosition(Position + offset);
         }
+        #endregion
+        #region Component Calls
         public void OnCollisionEnter(Pawn other) {
             CallComponents(c => c.OnCollisionEnter(other));
         }
@@ -147,18 +151,18 @@ namespace LostGen.Model {
         public void OnCollisionExit(Pawn other) {
             CallComponents(c => c.OnCollisionExit(other));
         }
-
+        #endregion
+        #region Action Handling
         public virtual void PushActions(IEnumerable<PawnAction> actions) {
             foreach (PawnAction action in actions) {
-                PushAction(action);
+                _actions.AddLast(action);
+                CallComponents(c => c.OnPushAction(action));
             }
         }
-
         public virtual void PushAction(PawnAction action) {
             _actions.AddLast(action);
             CallComponents(c => c.OnPushAction(action));
         }
-
         public virtual void ClearActions() {
             CallComponents(c => c.BeforeClearActions());
             _actions = new LinkedList<PawnAction>();
@@ -167,7 +171,7 @@ namespace LostGen.Model {
         public void PushMessage(IPawnMessage message) {
             _messages.Enqueue(message);
         }
-
+        
         public void BeginTurn() {
             CallComponents(c => c.BeginTurn());
         }
@@ -201,18 +205,8 @@ namespace LostGen.Model {
 
             return stepAction;
         }
-
-        public int CompareTo(Pawn other) {
-            int compare = 0;
-            if (Priority < other.Priority) {
-                compare = -1;
-            } else if (Priority > other.Priority) {
-                compare = 1;
-            }
-
-            return compare;
-        }
-
+        #endregion
+        #region Component Management
         public T GetComponent<T>() where T : PawnComponent {
             PawnComponent component;
             List<PawnComponent> typeList;
@@ -228,6 +222,10 @@ namespace LostGen.Model {
         public IEnumerable<T> GetComponents<T>() where T : PawnComponent {
             return _componentOrder.Where(c => c is T)
                                   .Cast<T>();
+        }
+
+        public IEnumerable<PawnComponent> GetComponents() {
+            return _componentOrder;
         }
 
         public T RequireComponent<T>() where T : PawnComponent {
@@ -275,9 +273,22 @@ namespace LostGen.Model {
                 }
             }
         }
+        #endregion
+        #region Other
+        public int CompareTo(Pawn other) {
+            int compare = 0;
+            if (Priority < other.Priority) {
+                compare = -1;
+            } else if (Priority > other.Priority) {
+                compare = 1;
+            }
+
+            return compare;
+        }
 
         public override string ToString() {
             return "{ name: \"" + Name + "\", id: " + InstanceID + " }";
         }
+        #endregion
     }
 }

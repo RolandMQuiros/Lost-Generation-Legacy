@@ -19,6 +19,16 @@ namespace LostGen.Model {
     /// </summary>
     public class LongWalkSkill : RangedSkill {
         public override int ActionPoints { get { return 0; } }
+        public override bool IsUsable {
+            get {
+                WalkNode currentNode = new WalkNode(_board, Pawn.Position, CanWalkDiagonally, true);
+                return
+                    currentNode
+                        .GetNeighbors()
+                        .Where(n => currentNode.GetEdgeCost(n) <= _ownerPoints.Current)
+                        .Any();
+            }
+        }
         public bool CanWalkDiagonally = true;
 
         protected Board _board;
@@ -34,7 +44,7 @@ namespace LostGen.Model {
 
         protected override void Awake() {
             _board = Pawn.Board;
-            _ownerPoints = Pawn.GetComponent<ActionPoints>();
+            _ownerPoints = Pawn.RequireComponent<ActionPoints>();
         }
 
         #region PointCollections

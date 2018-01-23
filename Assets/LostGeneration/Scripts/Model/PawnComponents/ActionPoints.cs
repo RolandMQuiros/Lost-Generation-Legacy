@@ -12,6 +12,9 @@ namespace LostGen.Model {
             set { _max = value; }
         }
 
+        public event Action<ActionPoints> Changed; 
+        private void Notify() { if (Changed != null) { Changed(this); } }
+
         private int _current;
         private int _max;
 

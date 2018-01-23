@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using LostGen.Model;
+using LostGen.Util;
 
 namespace LostGen.Display {
 	public class CombatantAnimator : MonoBehaviour {
@@ -10,11 +11,6 @@ namespace LostGen.Display {
 		private Animator _animator;
 		private int _runTrigger = Animator.StringToHash("Base Layer.Grounded");
 
-		#region MonoBehaviour
-		private void Awake() {
-			_animator = GetComponent<Animator>();
-		}
-		#endregion MonoBehaviour
 		public IEnumerator Move(Point from, Point to, float duration, bool rotate = true) {
 			Vector3 vFrom = PointVector.ToVector(from);
 			Vector3 vTo = PointVector.ToVector(to);
@@ -46,5 +42,10 @@ namespace LostGen.Display {
 				transform.rotation = rotTo;
 			}
 		}
+		#region MonoBehaviour
+		private void Awake() {
+			_animator = GetComponent<Animator>();
+		}
+		#endregion
 	}
 }

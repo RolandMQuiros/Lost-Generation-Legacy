@@ -36,7 +36,8 @@ namespace Tests.PawnComponents
 			Assert.AreEqual(action, timeline.Next());
 			
 			List<PawnAction> undone = new List<PawnAction>();
-			timeline.TruncateAt(0, undone);
+			timeline.ActionUndone += a => { undone.Add(a); };
+			timeline.Clear();
 
 			Assert.AreEqual(1, undone.Count);
 			
@@ -64,7 +65,8 @@ namespace Tests.PawnComponents
 			}
 			
 			List<PawnAction> undone = new List<PawnAction>();
-			timeline.TruncateAt(0, undone);
+			timeline.ActionUndone += p => { undone.Add(p); };
+			timeline.Clear();
 
 			Assert.AreEqual(10, undone.Count);
 		}
@@ -80,7 +82,8 @@ namespace Tests.PawnComponents
 				Assert.AreEqual(action, timeline.Next());
 			}
 			List<PawnAction> undone = new List<PawnAction>();
-			timeline.TruncateAt(5, undone);
+			timeline.ActionUndone += a => { undone.Add(a); };
+			timeline.TruncateAt(5);
 
 			Assert.AreEqual(5, undone.Count);
 		}
@@ -110,6 +113,37 @@ namespace Tests.PawnComponents
 			foreach (PawnAction action in timeline.GetPawnActions()) {
 				Assert.NotNull(action);
 				Assert.AreEqual(expectedCost++, action.Cost);
+			}
+		}
+
+		[Test]
+		public void TruncateUndone() {
+			// Truncates and checks the undone actions
+			Timeline timeline = new Timeline();
+			Point from = Point.Zero;
+			Point to = new Point(1, 0, 0);
+
+			List<TestMoveAction> expected = new List<TestMoveAction>();
+			for (int i = 0; i < 10; i++) {
+				TestMoveAction action = new TestMoveAction(null, from, to, i);
+				timeline.PushAction(action);
+				from = to;
+				to.X++;
+				if (i > 4) {
+					expected.Add(action);
+				}
+			}
+			timeline.ToLast();
+			expected.Reverse();
+			
+			List<TestMoveAction> actual = new List<TestMoveAction>();
+			timeline.ActionUndone += a => { actual.Add((TestMoveAction)a); };
+
+			timeline.TruncateAt(4);
+
+			for (int i = 0; i < expected.Count; i++) {
+				Assert.AreEqual(expected[i].From, actual[i].From);
+				Assert.AreEqual(expected[i].To, actual[i].To);
 			}
 		}
 	}

@@ -11,30 +11,14 @@ namespace LostGen.Model {
         public Team Team;
         #endregion Stats
 
-        #region CollectionProperties
-        public IEnumerable<Gear> Gear { get { return _gear; } }
-        public int GearCount { get { return _gear.Count; } }
-        #endregion CollectionProperties
-
         #region PrivateMembers
         private bool _didStatsChange;
         private int _queueCost;
         
         private ActionPoints _actionPoints;
         private PawnStats _stats;
-        private Health _health;
-
-        private List<Gear> _gear = new List<Gear>();
-        
+        private Health _health;        
         #endregion PrivateMembers
-
-        public void AddGear(Gear gear) {
-            _gear.Add(gear);
-        }
-
-        public void RemoveGear(Gear gear) {
-            _gear.Remove(gear);
-        }
 
         #region PawnOverrides
         public override void Start() {

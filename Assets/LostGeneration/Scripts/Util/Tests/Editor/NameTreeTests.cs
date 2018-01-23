@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using NUnit.Framework;
 
-using LostGen;
+using LostGen.Util;
 
 namespace Tests {
     public class NameTreeTests {

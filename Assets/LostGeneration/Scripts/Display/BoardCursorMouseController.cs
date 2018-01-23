@@ -3,14 +3,15 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using LostGen.Model;
+using LostGen.Util;
 
 namespace LostGen.Display {
     [RequireComponent(typeof(BoardCursor))]
     public class BoardCursorMouseController : MonoBehaviour,
-                                            IBoardCursorController,
-                                            IPointerClickHandler,
-                                            IPointerDownHandler,
-                                            IPointerUpHandler
+                                              IBoardCursorController,
+                                              IPointerClickHandler,
+                                              IPointerDownHandler,
+                                              IPointerUpHandler
     {
         #region PrivateFields
         [SerializeField] private Camera _camera;
@@ -19,6 +20,7 @@ namespace LostGen.Display {
         [SerializeField] private Point _boardPoint;
         [SerializeField] private bool _clipThroughSolids = true;
         [SerializeField] private bool _stickToGround = true;
+        [SerializeField] private LayerMask _blockLayer;
         #endregion PrivateFields
 
         #region Private
@@ -28,6 +30,7 @@ namespace LostGen.Display {
 
         private Ray _screenCast;
         private Point _entryPoint;
+        private Vector3 _entryV3;
         private Point _exitPoint;
         #endregion Private
 
@@ -48,62 +51,71 @@ namespace LostGen.Display {
         }
 
         private void LateUpdate() {
-            if (!IsMouseOutsideWindow() && _isWindowFocused) {
-                _screenPoint = Input.mousePosition;
+            if (IsMouseOutsideWindow() || !_isWindowFocused) { return; }
+            _screenPoint = Input.mousePosition;
 
-                // Get the point on the Collider beneath the cursor
-                _screenCast = _camera.ScreenPointToRay(_screenPoint);
-                RaycastHit hitInfo;
-                if (_boardCursor.ClickCollider.Raycast(_screenCast, out hitInfo, 100f)) {
+            // Get the point on the Collider beneath the cursor
+            _screenCast = _camera.ScreenPointToRay(_screenPoint);
+            RaycastHit hitInfo;
+            if (!Physics.Raycast(_screenCast, out hitInfo, 100f, _blockLayer)) { return; }
 
-                    Point entry = Point.Clamp(
-                        PointVector.ToPoint(hitInfo.point),
-                        Point.Zero,
-                        _board.Blocks.Size - Point.One
+            Vector3 hitVector = _screenCast.GetPoint(hitInfo.distance - 0.5f);
+            Point entry = Point.Clamp(
+                PointVector.ToPoint(hitVector),
+                Point.Zero,
+                _board.Blocks.Size - Point.One
+            );
+            _entryV3 = hitVector;
+            
+
+            if (entry != _entryPoint) {
+                _entryPoint = entry;
+
+                // Get the opposing cast point
+                float distanceToBoardCenter = Vector3.Distance(_screenCast.origin, _boardCursor.BoardRef.transform.position);
+                Ray opposingCast = new Ray(_screenCast.GetPoint(2f * distanceToBoardCenter + 1f), -_screenCast.direction);
+                _boardCursor.ClickCollider.Raycast(opposingCast, out hitInfo, 100f);
+
+                _exitPoint = Point.Clamp(
+                    PointVector.ToPoint(hitInfo.point),
+                    Point.Zero,
+                    _board.Blocks.Size - Point.One
+                );
+
+                // Perform a discrete line cast from the entry and exit points.
+                // At the first solid block encountered, grab the previous point in the line
+                Point previous = _entryPoint;
+                // The linecast is performed on a grid that's twice as granular as the usual Board coordinate space
+                int precision = 2;
+                foreach (Point point in Point.Line(precision * _entryPoint, precision * _exitPoint)) {
+                    Point boardPoint = new Point(
+                        Mathf.RoundToInt((float)point.X / precision),
+                        Mathf.RoundToInt((float)point.Y / precision),
+                        Mathf.RoundToInt((float)point.Z / precision)
                     );
-
-                    if (entry != _entryPoint) {
-                        _entryPoint = entry;
-
-                        // Get the opposing cast point
-                        float distanceToBoardCenter = Vector3.Distance(_screenCast.origin, _boardCursor.BoardRef.transform.position);
-                        Ray opposingCast = new Ray(_screenCast.GetPoint(2f * distanceToBoardCenter + 1f), -_screenCast.direction);
-                        _boardCursor.ClickCollider.Raycast(opposingCast, out hitInfo, 100f);
-
-                        _exitPoint = Point.Clamp(
-                            PointVector.ToPoint(hitInfo.point),
-                            Point.Zero,
-                            _board.Blocks.Size - Point.One
-                        );
-
-                        // Perform a discrete line cast from the entry and exit points.
-                        // At the first solid block encountered, grab the previous point in the line
-                        Point previous = _entryPoint;
-                        foreach (Point point in Point.Line(_entryPoint, _exitPoint)) {
-                            if (_board.Blocks.InBounds(point)) {
-                                BoardBlock block = _board.Blocks.At(point);
-                                if (block.IsSolid) { break; }
-                                previous = point;
-                            }
-                        }
-
-                        // Cast downward from the found point
-                        BoardBlock downBlock = _board.Blocks.At(previous);
-                        for (Point down = previous + Point.Down; !downBlock.IsSolid; down += Point.Down) {
-                            downBlock = _board.Blocks.At(down);
-                            if (downBlock.IsSolid) {
-                                if (_boardPoint != previous) {
-                                    _boardPoint = previous;
-
-                                    if (Moved != null) {
-                                        Moved(_boardPoint);
-                                    }
-                                }
-                                break;
-                            }
-                            previous = down;
-                        }
+                    if (_board.Blocks.InBounds(boardPoint)) {
+                        BoardBlock block = _board.Blocks.At(boardPoint);
+                        if (block.IsSolid) { break; }
+                        previous = boardPoint;
                     }
+                }
+                DownCast(previous);
+            }
+        }
+
+        private void DownCast(Point from) {
+            // Cast downward from the found point
+            if (_board.Blocks.InBounds(from)) {
+                BoardBlock downBlock = _board.Blocks.At(from);
+                for (Point current = from + Point.Down;
+                    _board.Blocks.InBounds(current) && !downBlock.IsSolid;
+                    current += Point.Down) {
+                    // If the current block is solid, the block above it is a valid cursor position
+                    downBlock = _board.Blocks.At(current);
+                    if (downBlock.IsSolid && _boardPoint != from && Moved != null) {
+                        Moved(_boardPoint = from);
+                    }
+                    from = current;
                 }
             }
         }
@@ -125,14 +137,18 @@ namespace LostGen.Display {
             Gizmos.DrawSphere(PointVector.ToVector(_exitPoint), 0.5f);
 
             Gizmos.color = Color.blue;
-            foreach (Point point in Point.Line(_entryPoint, _exitPoint)) {
-                Gizmos.DrawSphere(PointVector.ToVector(point), 0.1f);
+            foreach (Point point in Point.Line(2 * _entryPoint, 2 * _exitPoint)) {
+                Gizmos.DrawSphere(PointVector.ToVector(point / 2), 0.1f);
             }
-
             Gizmos.DrawSphere(PointVector.ToVector(_boardPoint), 0.5f);
+
+            Gizmos.color = Color.green;
+            Gizmos.DrawSphere(_entryV3, 0.25f);
         }
         #endregion MonoBehaviour
 
+        // I need to rely on the IPointer*s interfaces, since raw Input.GetMouseButton checks fire regardless of if
+        // the hardware cursor is on top a UI element. IPointer* events are blocked by UI.
         #region PointerEvents
 
         public void OnPointerClick(PointerEventData eventData) {

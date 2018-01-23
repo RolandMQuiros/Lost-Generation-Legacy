@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using LostGen.Util;
 
 namespace LostGen.Display {
     public class BoardCameraController : MonoBehaviour {
@@ -9,7 +10,6 @@ namespace LostGen.Display {
         [SerializeField]private string _zoomInput;
         [SerializeField]private string _shiftPlaneInput;
         [SerializeField]private string _sprintInput;
-
         [SerializeField]private float _regularSpeed = 8f;
         [SerializeField]private float _highSpeed = 14f;
         [SerializeField]private float _correctionTime = 0.5f;

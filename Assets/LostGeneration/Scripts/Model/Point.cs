@@ -156,6 +156,12 @@ namespace LostGen.Model
             );
         }
 
+        public static bool WithinBox(Point point, Point lower, Point upper) {
+            return point.X >= lower.X && point.X < upper.X &&
+                   point.Y >= lower.Y && point.Y < upper.Y &&
+                   point.Z >= lower.Z && point.Z < upper.Z;
+        }
+
         public static Point Clamp(Point point, Point lower, Point upper) {
             return new Point(
                 Math.Min(Math.Max(point.X, lower.X), upper.X),
@@ -182,6 +188,30 @@ namespace LostGen.Model
         public static int ChebyshevDistance(Point start, Point end) {
             Point offset = Point.Abs(end - start);
             return Math.Max(Math.Max(offset.X, offset.Y), offset.Z);
+        }
+
+        public static void ForEachXYZ(Point lower, Point upper, Action<Point> action) {
+            Point point = lower;
+            for (point.X = lower.X; point.X < upper.X; point.X++) {
+                for (point.Y = lower.Y; point.Y < upper.Y; point.Y++) {
+                    for (point.Z = lower.Z; point.Z < upper.Z; point.Z++) {
+                        action(point);
+                    }
+                }
+            }
+        }
+
+        public static void ForEachXYZ(Point lower, Point upper, Action<Point> eachX = null, Action<Point> eachXY = null, Action<Point> eachXYZ = null) {
+            Point point = lower;
+            for (point.X = lower.X; point.X < upper.X; point.X++) {
+                if (eachX != null) { eachX(point); }
+                for (point.Y = lower.Y; point.Y < upper.Y; point.Y++) {
+                    if (eachXY != null) { eachXY(point); }
+                    for (point.Z = lower.Z; point.Z < upper.Z; point.Z++) {
+                        if (eachXYZ != null) { eachXYZ(point); }
+                    }
+                }
+            }
         }
 
         public static Point operator +(Point p1, Point p2) {

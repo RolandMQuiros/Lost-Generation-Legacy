@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LostGen.Model;
+using LostGen.Util;
 
 namespace LostGen.Display {
     public class BoardMesh : MonoBehaviour {
-        public GameObject CellPrefab;
-        public Point CellSize;
-        public BoardRef BoardRef;
-        public BlockProperties[] BlockProperties;
-        public Material BlockMaterial;
+        [SerializeField]private GameObject _cellPrefab;
+        [SerializeField]private Point _cellSize;
+        [SerializeField]private BoardRef _boardRef;
+        [SerializeField]private BlockProperties[] _blockProperties;
+        [SerializeField]private Material _blockMaterial;
         private BlockMesh[,,] _cells;
 
         public BlockMesh GetCell(Point cellPosition) {
@@ -19,47 +20,59 @@ namespace LostGen.Display {
         public BlockMesh GetCellAt(Point blockPosition) {
             return _cells
             [
-                blockPosition.X / CellSize.X,
-                blockPosition.Y / CellSize.Y,
-                blockPosition.Z / CellSize.Z
+                blockPosition.X / _cellSize.X,
+                blockPosition.Y / _cellSize.Y,
+                blockPosition.Z / _cellSize.Z
             ];
         }
 
         public void BuildCell(int cx, int cy, int cz) {
             Point start = new Point
             (
-                cx * CellSize.X,
-                cy * CellSize.Y,
-                cz * CellSize.Z
+                cx * _cellSize.X,
+                cy * _cellSize.Y,
+                cz * _cellSize.Z
             );
-            Point blockCoords = new Point();
 
             BlockMesh cell = _cells[cx, cy, cz];
+            GameObject cellObj;
+
+            // If no cell exists, build one
             if (cell == null) {
-                GameObject cellObj = GameObject.Instantiate(CellPrefab, transform);
-                cellObj.transform.localPosition = PointVector.ToVector(start);
+                Vector3 lower = PointVector.ToVector(start);
+                cellObj = GameObject.Instantiate(_cellPrefab, transform);
+                cellObj.transform.localPosition = lower;
                 cellObj.name = "cell(" + cx + "," + cy + "," + cz + ")";
 
                 MeshRenderer renderer = cellObj.GetComponent<MeshRenderer>();
                 cell = cellObj.GetComponent<BlockMesh>();
-                cell.Resize(CellSize);
-                cell.BlockProperties = BlockProperties;
-                renderer.sharedMaterial = BlockMaterial;
+                cell.Resize(_cellSize);
+                cell.BlockProperties = _blockProperties;
+                renderer.sharedMaterial = _blockMaterial;
+            }
+            // Otherwise, resize the existing one
+            else {
+                cellObj = cell.gameObject;
+                cell.Resize(_cellSize);
             }
 
-            for (blockCoords.X = -1; blockCoords.X <= CellSize.X; blockCoords.X++) {
-                for (blockCoords.Y = -1; blockCoords.Y <= CellSize.Y; blockCoords.Y++) {
-                    for (blockCoords.Z = -1; blockCoords.Z <= CellSize.Z; blockCoords.Z++) {
-                        Point point = blockCoords + start;
-                        if (BoardRef.Board.Blocks.InBounds(point)) {
-                            BoardBlock block = BoardRef.Board.Blocks.At(point);
-                            cell.SetBlock(blockCoords, block.BlockType);
-                        }
-                    }
+            // Set the cell's block data
+            Point.ForEachXYZ(Point.Zero - Point.One, _cellSize + Point.One, (Point cellPoint) => {
+                Point blockPoint = cellPoint + start;
+                if (_boardRef.Board.Blocks.InBounds(blockPoint)) {
+                    BoardBlock block = _boardRef.Board.Blocks.At(blockPoint);
+                    cell.SetBlock(cellPoint, block.BlockType);
                 }
-            }
+            });
 
+            // Create the cell's mesh
             cell.Build();
+
+            // Set the collider's bounding box to that of the newly-built mesh
+            MeshFilter meshFilter = cellObj.GetComponent<MeshFilter>();
+            BoxCollider collider = cellObj.GetComponent<BoxCollider>();
+            collider.center = meshFilter.mesh.bounds.center;
+            collider.size = meshFilter.mesh.bounds.size;
         }
 
         private void OnBlocksChanged(Dictionary<BoardBlock, BoardBlock> blocksChanged) {
@@ -68,9 +81,9 @@ namespace LostGen.Display {
                 if (block.Key.BlockType != block.Value.BlockType) {
                     Point cell = new Point
                     (
-                        block.Value.Point.X / CellSize.X,
-                        block.Value.Point.Y / CellSize.Y,
-                        block.Value.Point.Z / CellSize.Z
+                        block.Value.Point.X / _cellSize.X,
+                        block.Value.Point.Y / _cellSize.Y,
+                        block.Value.Point.Z / _cellSize.Z
                     );
 
                     cellsToUpdate.Add(cell);
@@ -86,12 +99,12 @@ namespace LostGen.Display {
         private void Start() {
             _cells = new BlockMesh
             [
-                Mathf.CeilToInt((float)BoardRef.Board.Blocks.Size.X / CellSize.X),
-                Mathf.CeilToInt((float)BoardRef.Board.Blocks.Size.Y / CellSize.Y),
-                Mathf.CeilToInt((float)BoardRef.Board.Blocks.Size.Z / CellSize.Z)
+                Mathf.CeilToInt((float)_boardRef.Board.Blocks.Size.X / _cellSize.X),
+                Mathf.CeilToInt((float)_boardRef.Board.Blocks.Size.Y / _cellSize.Y),
+                Mathf.CeilToInt((float)_boardRef.Board.Blocks.Size.Z / _cellSize.Z)
             ];
 
-            BoardRef.Board.Blocks.Changed += OnBlocksChanged;
+            _boardRef.Board.Blocks.Changed += OnBlocksChanged;
 
             for (int x = 0; x < _cells.GetLength(0); x++) {
                 for (int y = 0; y < _cells.GetLength(1); y++) {

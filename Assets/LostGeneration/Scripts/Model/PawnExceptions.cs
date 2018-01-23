@@ -1,7 +1,6 @@
 using System;
-using LostGen.Model;
 
-namespace LostGen {
+namespace LostGen.Model {
     /// <summary>
     /// Throw this from PawnComponent.OnAdd when a required component is missing
     /// </summary>

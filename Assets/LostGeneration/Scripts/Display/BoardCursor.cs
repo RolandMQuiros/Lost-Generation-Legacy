@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using LostGen.Model;
+using LostGen.Util;
 
 namespace LostGen.Display {
 	/// <summary>
@@ -16,27 +17,30 @@ namespace LostGen.Display {
 	/// </remarks>
 	[RequireComponent(typeof(BoxCollider))]
 	public class BoardCursor : MonoBehaviour {
-		[Serializable]private class BoardCursorEvent : UnityEvent<Point> { }
-
+		#region Fields
 		[Tooltip("The cursor pointer")]
 		[SerializeField]private Transform _pointer;
 		[Tooltip("Reference to the Board")]
 		[SerializeField]private BoardRef _boardRef;
 		[Tooltip("The cursor's current Point on the Board")]
 		[SerializeField]private Point _boardPoint;
+		#endregion
+		#region Events
+		[Serializable]public class BoardCursorEvent : UnityEvent<Point> { }
 		[Tooltip("Called when the player taps and releases")]
-		[SerializeField]private BoardCursorEvent Clicked;
+		public BoardCursorEvent Clicked;
 		[Tooltip("Called when the player taps down")]
-		[SerializeField]private BoardCursorEvent TappedDown;
+		public BoardCursorEvent TappedDown;
 		[Tooltip("Called when the player releases a tap")]
-		[SerializeField]private BoardCursorEvent TappedUp;
+		public BoardCursorEvent TappedUp;
 		[Tooltip("Called when the cursor's position moves")]
-		[SerializeField]private BoardCursorEvent Moved;
+		public BoardCursorEvent Moved;
+		#endregion
 		private BoxCollider _clickCollider;
 		
 		/// <summary>This cursor's <see cref="Point"/> on the <see cref="Board"/></summary>
 		/// <returns>The current <see cref="Point"/></returns>
-		public Point BoardPoint { get { return _boardPoint; } }
+		public Point BoardPoint { get { return BoardPoint; } }
 		/// <returns>The <see cref="BoardRef"/> this cursor is attached to</returns>
 		public BoardRef BoardRef { get { return _boardRef; } }
 		/// <summary>
@@ -72,11 +76,7 @@ namespace LostGen.Display {
 				controller.Moved      += OnMoved;
 			}
 		}
-
-		private void Start() {
-			ResizeClickCollider();
-		}
-
+		private void Start() { ResizeClickCollider(); }
 		#endregion MonoBehaviour
 	}
 }

@@ -8,6 +8,7 @@ namespace LostGen.Model {
         private bool _neighborsBuilt = false;
         private bool _ignorePawns = false;
         public bool CanWalkDiagonally { get { return _canWalkDiagonally; } }
+        
         public WalkNode(Board board, Point point, bool canWalkDiagonally, bool ignorePawns)
         : base(board, point) {
             _canWalkDiagonally = canWalkDiagonally;
