@@ -21,8 +21,8 @@ public class BoardTest : MonoBehaviour {
         System.Random rand = new System.Random(_seed);
         Point upper = _boardRef.Board.Blocks.Size;
 
-        Point.ForEachXYZ(Point.Zero, upper, null,
-            (Point Point) => { rand = new System.Random(_seed); },
+        Point.ForEachXYZ(Point.Zero, upper, null, null,
+            //(Point Point) => { rand = new System.Random(_seed); },
             (Point point) => {
                 if (point.Y < upper.Y / 2) {
                     blocks.Add (
@@ -34,19 +34,20 @@ public class BoardTest : MonoBehaviour {
                             BlockType = 1
                         }
                     );
-                } else {
-                    int r = rand.Next() % _boardTypes;
-                    byte blockType = (byte)r;
-                    blocks.Add (
-                        new BoardBlock() {
-                            Point = point,
-                            IsSolid = blockType != 0,
-                            IsOpaque = blockType != 0,
-                            IsDiggable = blockType != 0,
-                            BlockType = blockType
-                        }
-                    );
                 }
+                // else {
+                //     int r = rand.Next() % _boardTypes;
+                //     byte blockType = (byte)r;
+                //     blocks.Add (
+                //         new BoardBlock() {
+                //             Point = point,
+                //             IsSolid = blockType != 0,
+                //             IsOpaque = blockType != 0,
+                //             IsDiggable = blockType != 0,
+                //             BlockType = blockType
+                //         }
+                //     );
+                // }
             }
         );
 
@@ -55,7 +56,7 @@ public class BoardTest : MonoBehaviour {
 
     private void Start() {
         Pawn combatant1 = MakeCombatant(new Pawn("Test Combatant 1", _boardRef.Board, _boardRef.Board.Blocks.Size / 2 + Point.Right), 5);
-        combatant1.AddComponent(new LongWalkSkill() { CanWalkDiagonally = true });
+        combatant1.AddComponent(new LongWalkSkill() { CanWalkDiagonally = false });
         
         Pawn combatant2 = MakeCombatant(new Pawn("Test Combatant 2", _boardRef.Board, _boardRef.Board.Blocks.Size / 2 + Point.Left), 6);
         combatant2.AddComponent(new LongWalkSkill() { CanWalkDiagonally = false });
@@ -78,7 +79,6 @@ public class BoardTest : MonoBehaviour {
 
     private Pawn MakeCombatant(Pawn pawn, int agility) {
         pawn.IsSolid = true;
-
         pawn.AddComponent(new Health(10));
         pawn.AddComponent(new PawnStats(
             new Stats() {
@@ -91,11 +91,7 @@ public class BoardTest : MonoBehaviour {
         ));
         pawn.AddComponent(new ActionPoints(5));
         pawn.AddComponent(new Combatant());
-        
-        for (int i = 0; i < 5; i++) { pawn.AddComponent(new WalkSkill()); }
-
-        for (int i = 0; i < 5; i++) { pawn.AddComponent(new MeleeAttackSkill(2, new Point[] { Point.Right, Point.Right * 2})); }
-
+        pawn.AddComponent(new MeleeAttackSkill(2, new Point[] { Point.Right, Point.Right * 2}));
         pawn.AddComponent(new Timeline());
 
         return pawn;
