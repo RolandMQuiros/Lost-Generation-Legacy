@@ -18,17 +18,15 @@ Lost Generation is a roguelite dungeon crawler without permadeath, where you can
 
 - **Voxel Renderer** The `BlockMesh` MonoBehaviour can generate voxel-like geometry based on 3D byte arrays, creating meshes not unlike the terrain in Minecraft.
 
-![Voxel Terrian]([Imgur](https://i.imgur.com/i5PFDpL.png)
+![Voxel Terrain](https://i.imgur.com/i5PFDpL.png)
 
-*A detail shot of the above Terrain, and the actual images used to texture it:*
 ![Voxel Textures](https://i.imgur.com/GY7lHWs.png) ![AutoTile textures](https://i.imgur.com/Ydcvsl0.png)
-
 
 In addition, each side of each block is dynamically textured with autotiles, which change according to adjacent block types. I use the same approach to AutoTiles as [RPG Maker VX and up](http://blog.rpgmakerweb.com/tutorials/anatomy-of-an-autotile/).
 
 - **Character Customization** Every "human" character you meet in the game will be either procedurally generated or created by other players. Using a large number of blend shapes and control bones on a base human mesh, players will be able to greatly customize their avatar's appearance.
 
-![Character Customization](https://i.imgur.com/7jx2Qq0.gifv)
+![Character Customization](https://i.imgur.com/7jx2Qq0.gif)
 
 The screen above also generates sliders based on the blend shape and control bone names, so changes to the source FBX files will immediately be reflected in the customizer.
 
@@ -38,7 +36,7 @@ My implementation includes some small optimizations inspired by [Hierarchical Ta
 
 - **Basic Combat Architecture** When dungeon-diving, players control up to five party members at once in a turn-based tactical combat system. Unlike most tactics games, turns resolve "simultaneously".
 
-![Simultaneous Resolution Combat](https://i.imgur.com/ZUoKWnh.gifv)
+![Simultaneous Resolution Combat](https://i.imgur.com/ZUoKWnh.gif)
 
 The system supporting the above is a general roguelike framework, completely decoupled from Unity, that supports action-based state changes and undo/redo stacks.
 
