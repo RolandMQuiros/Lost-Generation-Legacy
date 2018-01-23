@@ -12,12 +12,12 @@ Lost Generation is a roguelite dungeon crawler without permadeath, where you can
 
 - Build a community of fellow impoverished adventurers with characters with dynamic personalities, schedules, and goals
 
-- Form bonds and rivalries; earn respect or disdain; find camaraderie and purpose. And, if you're lucky, maybe some financial security.
+- Form bonds and rivalries; earn respect or disdain; find camaraderie and purpose. And, if you're lucky, get maybe some financial security.
 
 # Technical Features 
 
 ## Voxel Renderer
-The `BlockMesh` MonoBehaviour can generate voxel-like geometry based on 3D byte arrays, creating meshes not unlike the terrain in Minecraft.
+The [BlockMesh](Assets/LostGeneration/Scripts/Display/BlockMesh.cs) MonoBehaviour can generate voxel-like geometry based on 3D byte arrays, creating meshes not unlike the terrain in Minecraft.
 
 ![Voxel Terrain](https://i.imgur.com/i5PFDpL.png)
 
