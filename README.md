@@ -12,7 +12,7 @@ Lost Generation is a roguelite dungeon crawler without permadeath, where you can
 
 - Build a community of fellow impoverished adventurers with characters with dynamic personalities, schedules, and goals
 
-- Form bonds and rivalries; earn respect or disdain; find camaraderie and purpose. And, if you're lucky, get maybe some financial security.
+- Form bonds and rivalries; earn respect or disdain; find thrills, frustration, love, and purpose. And maybe, if you're lucky, some financial stability.
 
 # Technical Features 
 
