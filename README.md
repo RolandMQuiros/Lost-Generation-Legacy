@@ -2,7 +2,7 @@ You are an eager new adventurer, fresh from the wizardry academy, the knighthood
 
 But first, you need to pay off your student loans.
 
-# Lost-Generation
+# Lost Generation
 
 Lost Generation is a roguelite dungeon crawler without permadeath, where you can lose everything except the friends you make along the way.
 
