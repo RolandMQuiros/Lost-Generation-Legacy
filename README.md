@@ -16,7 +16,8 @@ Lost Generation is a roguelite dungeon crawler without permadeath, where you can
 
 # Technical Features 
 
-- **Voxel Renderer** The `BlockMesh` MonoBehaviour can generate voxel-like geometry based on 3D byte arrays, creating meshes not unlike the terrain in Minecraft.
+## Voxel Renderer
+The `BlockMesh` MonoBehaviour can generate voxel-like geometry based on 3D byte arrays, creating meshes not unlike the terrain in Minecraft.
 
 ![Voxel Terrain](https://i.imgur.com/i5PFDpL.png)
 
@@ -24,24 +25,26 @@ Lost Generation is a roguelite dungeon crawler without permadeath, where you can
 
 In addition, each side of each block is dynamically textured with autotiles, which change according to adjacent block types. I use the same approach to AutoTiles as [RPG Maker VX and up](http://blog.rpgmakerweb.com/tutorials/anatomy-of-an-autotile/).
 
-- **Character Customization** Every "human" character you meet in the game will be either procedurally generated or created by other players. Using a large number of blend shapes and control bones on a base human mesh, players will be able to greatly customize their avatar's appearance.
+## Character Customization
+Every "human" character you meet in the game will be either procedurally generated or created by other players. Using a large number of blend shapes and control bones on a base human mesh, players will be able to greatly customize their avatar's appearance.
 
 ![Character Customization](https://i.imgur.com/7jx2Qq0.gif)
 
 The screen above also generates sliders based on the blend shape and control bone names, so changes to the source FBX files will immediately be reflected in the customizer.
 
-- **Planning AI Systems** All NPCs will use [Goal-Oriented Action Planning](http://alumni.media.mit.edu/~jorkin/goap.html) to determine their actions both in and out of the dungeon. This lets the game create interesting (not necessarily *optimal*) behaviors with, ideally, less hand-crafted content.
+## Planning AI Systems
+All NPCs will use [Goal-Oriented Action Planning](http://alumni.media.mit.edu/~jorkin/goap.html) to determine their actions both in and out of the dungeon. This lets the game create interesting (not necessarily *optimal*) behaviors with, ideally, less hand-crafted content.
 
 My implementation includes some small optimizations inspired by [Hierarchical Task Networks](http://www.gameaipro.com/GameAIPro/GameAIPro_Chapter12_Exploring_HTN_Planners_through_Example.pdf).
 
-- **Basic Combat Architecture** When dungeon-diving, players control up to five party members at once in a turn-based tactical combat system. Unlike most tactics games, turns resolve "simultaneously".
+## Basic Combat Architecture
+When dungeon-diving, players control up to five party members at once in a turn-based tactical combat system. Unlike most tactics games, turns resolve "simultaneously".
 
 ![Simultaneous Resolution Combat](https://i.imgur.com/ZUoKWnh.gif)
 
 The system supporting the above is a general roguelike framework, completely decoupled from Unity, that supports action-based state changes and undo/redo stacks.
 
-- **A Lotta Testing**
-
+## A Lotta Testing
 ![Unit Tests](https://i.imgur.com/bnvwC0Q.png)
 
 The transactional nature of turned-based games make them similar to more traditional apps. This lets me test core game logic more in managable pieces, more often than I would with realtime games.
