@@ -1,27 +1,49 @@
-You just graduated from adventurer's school, and now you have to pay off your student loans.  Luckily, you're not alone.
+You are an eager new adventurer, fresh from the wizardry academy, the knighthood apprenticeship, the hunter's guild, ready to take to the dungeons and forge your name among Del Abismo's greatest heroes!
+
+But first, you need to pay off your student loans.
 
 # Lost-Generation
 
-Lost Generation is a roguelite dungeon crawler without permadeath, but you can still lose everything, except the friends you made along the way.
-
-- Build a community of fellow impoverished adventurers with characters with dynamic personalities, schedules, and goals
+Lost Generation is a roguelite dungeon crawler without permadeath, where you can lose everything except the friends you make along the way.
 
 - Plumb the procredurally-generated dungeon depths with up to five party members
 
 - Fight the unforgiving hordes in a unique, simultaneously-resolving tactical combat system
 
-# Current Progress
+- Build a community of fellow impoverished adventurers with characters with dynamic personalities, schedules, and goals
 
-The game is very much a work-in-progress. Features I currently have implemented are:
+- Form bonds and rivalries; earn respect or disdain; find camaraderie and purpose. And, if you're lucky, maybe some financial security.
 
-- A block mesh renderer with auto-tiled textures
+# Technical Features 
 
-- A [Goal-Oriented Action Planning implementation](http://alumni.media.mit.edu/~jorkin/goap.html), modified to include some small optimizations inspired by [Hierarchical Task Networks](http://www.gameaipro.com/GameAIPro/GameAIPro_Chapter12_Exploring_HTN_Planners_through_Example.pdf).
+- **Voxel Renderer** The `BlockMesh` MonoBehaviour can generate voxel-like geometry based on 3D byte arrays, creating meshes not unlike the terrain in Minecraft.
 
-- An implementation of [Djikstra Maps](http://www.roguebasin.com/index.php?title=The_Incredible_Power_of_Dijkstra_Maps) used to inform the actions from the above planner
+![Voxel Terrian]([Imgur](https://i.imgur.com/i5PFDpL.png)
 
-- A component-based roguelike architecture, built to be independent from Unity
+*A detail shot of the above Terrain, and the actual images used to texture it:*
+![Voxel Textures](https://i.imgur.com/GY7lHWs.png) ![AutoTile textures](https://i.imgur.com/Ydcvsl0.png)
 
-- A rudimentary in-game blend shape editor for character customization
 
-- A partial implementation of the aforementioned combat system
+In addition, each side of each block is dynamically textured with autotiles, which change according to adjacent block types. I use the same approach to AutoTiles as [RPG Maker VX and up](http://blog.rpgmakerweb.com/tutorials/anatomy-of-an-autotile/).
+
+- **Character Customization** Every "human" character you meet in the game will be either procedurally generated or created by other players. Using a large number of blend shapes and control bones on a base human mesh, players will be able to greatly customize their avatar's appearance.
+
+![Character Customization](https://i.imgur.com/7jx2Qq0.gifv)
+
+The screen above also generates sliders based on the blend shape and control bone names, so changes to the source FBX files will immediately be reflected in the customizer.
+
+- **Planning AI Systems** All NPCs will use [Goal-Oriented Action Planning](http://alumni.media.mit.edu/~jorkin/goap.html) to determine their actions both in and out of the dungeon. This lets the game create interesting (not necessarily *optimal*) behaviors with, ideally, less hand-crafted content.
+
+My implementation includes some small optimizations inspired by [Hierarchical Task Networks](http://www.gameaipro.com/GameAIPro/GameAIPro_Chapter12_Exploring_HTN_Planners_through_Example.pdf).
+
+- **Basic Combat Architecture** When dungeon-diving, players control up to five party members at once in a turn-based tactical combat system. Unlike most tactics games, turns resolve "simultaneously".
+
+![Simultaneous Resolution Combat](https://i.imgur.com/ZUoKWnh.gifv)
+
+The system supporting the above is a general roguelike framework, completely decoupled from Unity, that supports action-based state changes and undo/redo stacks.
+
+- **A Lotta Testing**
+
+![Unit Tests](https://i.imgur.com/bnvwC0Q.png)
+
+The transactional nature of turned-based games make them similar to more traditional apps. This lets me test core game logic more in managable pieces, more often than I would with realtime games.
