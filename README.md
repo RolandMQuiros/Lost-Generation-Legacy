@@ -1,4 +1,4 @@
-You are an eager new adventurer, fresh from the wizardry academy, the knighthood apprenticeship, the hunter's guild, ready to take to the dungeons and forge your legacy within their trecherous halls! Riches, fame, and power await all those daring enough to grasp them!
+You are an eager new adventurer, fresh from the wizardry academy, the knighthood apprenticeship, the hunter's guild, ready to take to the dungeons and forge your legacy within their trecherous halls! Riches, fame, and power await all those courageous enough to grasp them!
 
 But first, you need to pay off your student loans. 
 
