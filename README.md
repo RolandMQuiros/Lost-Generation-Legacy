@@ -22,9 +22,9 @@ The [BlockMesh](Assets/LostGeneration/Scripts/Display/BlockMesh.cs) MonoBehaviou
 
 ![Voxel Terrain](https://i.imgur.com/i5PFDpL.png)
 
-![Voxel Textures](https://i.imgur.com/GY7lHWs.png) ![AutoTile textures](https://i.imgur.com/Ydcvsl0.png)
+Each side of each block is dynamically textured with autotiles, which change according to adjacent block types. I use the same approach to AutoTiles as [RPG Maker VX and up](http://blog.rpgmakerweb.com/tutorials/anatomy-of-an-autotile/).
 
-In addition, each side of each block is dynamically textured with autotiles, which change according to adjacent block types. I use the same approach to AutoTiles as [RPG Maker VX and up](http://blog.rpgmakerweb.com/tutorials/anatomy-of-an-autotile/).
+![Voxel Textures](https://i.imgur.com/GY7lHWs.png) ![AutoTile textures](https://i.imgur.com/Ydcvsl0.png)
 
 ## Character Customization
 Every "human" character you meet in the game will be either procedurally generated or created by other players. Using a large number of blend shapes and control bones on a base human mesh, players will be able to greatly customize their avatar's appearance.
